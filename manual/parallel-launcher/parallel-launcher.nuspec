@@ -8,7 +8,7 @@
     <title>parallel-launcher (Install)</title>
     <authors>Matt Pharoah</authors>
     <projectUrl>https://parallel-launcher.ca</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/virginviolet/chocolatey-packages/main/parallel-launcher/appicon.png</iconUrl>
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher/appicon.png</iconUrl>
     <copyright>2020-2024 Matt Pharoah</copyright>
     <licenseUrl>https://gitlab.com/parallel-launcher/parallel-launcher/-/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,7 +16,7 @@
     <docsUrl>https://gitlab.com/parallel-launcher/parallel-launcher</docsUrl>
     <bugTrackerUrl>https://gitlab.com/parallel-launcher/parallel-launcher/-/boards</bugTrackerUrl>
     <tags>parallel-launcher paralleln64 mupen64plus-next mupen64plus mupen64 emulator retroarch</tags>
-    <summary>Launcher for emulators ParallelN64 and Mupen64Plus-Next.</summary>
+    <summary>Launcher for ParallelN64 and Mupen64Plus-Next.</summary>
     <description>Launcher for the Nintendo 64 emulatorsParallelN64 and Mupen64Plus-Next.
 
 The default installation directory is C:/Program Files (x86)/parallel-launcher (both the 32-bit version and the 64-bit version).</description>
