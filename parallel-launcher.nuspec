@@ -15,9 +15,11 @@
     <projectSourceUrl>https://gitlab.com/parallel-launcher/parallel-launcher</projectSourceUrl>
     <docsUrl>https://gitlab.com/parallel-launcher/parallel-launcher</docsUrl>
     <bugTrackerUrl>https://gitlab.com/parallel-launcher/parallel-launcher/-/boards</bugTrackerUrl>
-    <tags>parallel-launcher</tags>
-    <summary>Launcher for emulatorsParallelN64 and Mupen64Plus-Next.</summary>
-    <description>Launcher for the Nintendo 64 emulatorsParallelN64 and Mupen64Plus-Next.</description>
+    <tags>parallel-launcher paralleln64 mupen64plus-next mupen64plus mupen64 emulator retroarch</tags>
+    <summary>Launcher for emulators ParallelN64 and Mupen64Plus-Next.</summary>
+    <description>Launcher for the Nintendo 64 emulatorsParallelN64 and Mupen64Plus-Next.
+
+The default installation directory is C:/Program Files (x86)/parallel-launcher (both the 32-bit version and the 64-bit version).</description>
     <releaseNotes>- Enabled error logging in RetroArch
 - When RetroArch crashes shortly after starting, the error logs can now be viewed in the error dialog
 - Worked around a Windows bug that prevented SD card mounting from working if file compression is enabled

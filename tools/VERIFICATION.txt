@@ -12,13 +12,17 @@ and can be verified like this:
 3. You can use one of the following methods to obtain the checksum
   - Use powershell function 'Get-Filehash'
   - Use chocolatey utility 'checksum.exe'
-
+  
   64-bit
   checksum type: sha256
   checksum64: D29D5AF0D3A5726D20F09D0BBA0E4927D4EE4E4EBC50A20BE83584C66749D65C
-
+  
   32-bit
   checksum type: sha256
   checksum64: 2F3AAE6C3F209DD77F2D084FD73B5C577D9FD53BB9632FDFD0E721089837811A
+  
+  Manual
+  checksum type: sha256
+  checksum64: DF5F47D1A2EE98D700F43F93E1CCBCA25B8CFF5D2B2B44C4FFF96EBD638FED6F
 
 The license in 'LICENSE.txt' is obtained from <https://gitlab.com/parallel-launcher/parallel-launcher/-/blob/master/LICENSE>
