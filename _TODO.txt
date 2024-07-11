@@ -101,8 +101,6 @@
 
 - For embedded binaries - use `$fileLocation` (`$file`/`$file64`) and
   `Install-ChocolateyInstallPackage`/ `Get-ChocolateyUnzip`.
-- Downloading binaries at runtime - use `$url`/`$url64` and
-  `Install-ChocolateyPackage` / `Install-ChocolateyZipPackage`.
 - Other needs (creating files, setting registry keys), use regular
   PowerShell to do so or see if there is a function already defined:
   https://docs.chocolatey.org/en-us/create/functions
