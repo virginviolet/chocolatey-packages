@@ -1,17 +1,4 @@
-<<<<<<< HEAD
-﻿
-Note: Include this file if including binaries you have the right to distribute.
-Otherwise delete. this file.
-
-===DELETE ABOVE THIS LINE AND THIS LINE===
-
-From: <insert applicable license url here>
-
-LICENSE
-
-<Insert License Here>
-=======
-﻿From: https://github.com/FoxP/PNG-to-ICO/blob/master/LICENSE
+From: https://github.com/FoxP/PNG-to-ICO/blob/master/LICENSE
 
 LICENSE
 
@@ -39,4 +26,3 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org>
->>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4

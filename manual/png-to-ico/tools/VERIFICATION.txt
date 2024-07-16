@@ -1,19 +1,4 @@
-<<<<<<< HEAD
-﻿
-Note: Include this file if including binaries you have the right to distribute.
-Otherwise delete. this file. If you are the software author, you can mention
-this.
-
-===DELETE ABOVE THIS LINE AND THIS LINE===
-
 VERIFICATION
-Verification is intended to assist the Chocolatey moderators and community
-in verifying that this package's contents are trustworthy.
-
-<Include details of how to verify checksum contents>
-<If software vendor, explain that here>
-=======
-﻿VERIFICATION
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
@@ -33,4 +18,3 @@ and can be verified like this:
 4. You can also have a look at the scripts, chocolateybeforemodify.ps1, chocolateyinstall.ps1 and chocolateyuninstall.ps1. Open a file in a text editor or IDE and see if it looks clean. If you want to learn more about this, check out the Chocolatey docs on creating packages <https://docs.chocolatey.org/en-us/create/create-packages/>
 
 The license in 'LICENSE.txt' is obtained from <https://github.com/FoxP/PNG-to-ICO/blob/master/LICENSE>
->>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4
