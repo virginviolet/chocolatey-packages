@@ -1,4 +1,4 @@
-﻿# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
+# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
 #   $f='c:\path\to\thisFile.ps1'
 #   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
 
@@ -7,56 +7,41 @@
 ## See https://docs.chocolatey.org/en-us/choco/commands/uninstall
 ## and https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
 
-## If this is an MSI, ensure 'softwareName' is appropriate, then clean up comments and you are done.
 ## If this is an exe, change fileType, silentArgs, and validExitCodes
+
+Import-Module -Name 'C:\ProgramData\chocolatey\helpers\chocolateyInstaller.psm1'
 
 $ErrorActionPreference = 'Stop' # stop on all errors
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName
-  softwareName  = 'png-to-ico*'  #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
-  fileType      = 'EXE_MSI_OR_MSU' #only one of these: MSI or EXE (ignore MSU for now)
-  # MSI
-  silentArgs    = "/qn /norestart"
-  validExitCodes= @(0, 3010, 1605, 1614, 1641) # https://msdn.microsoft.com/en-us/library/aa376931(v=vs.85).aspx
-  # OTHERS
-  # Uncomment matching EXE type (sorted by most to least common)
-  #silentArgs   = '/S'           # NSIS
-  #silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
-  #silentArgs   = '/s'           # InstallShield
-  #silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
-  #silentArgs   = '/s'           # Wise InstallMaster
-  #silentArgs   = '-s'           # Squirrel
-  #silentArgs   = '-q'           # Install4j
-  #silentArgs   = '-s -u'        # Ghost
-  # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
-  #silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
-                                 #       https://community.chocolatey.org/packages/autohotkey.portable
-  #validExitCodes= @(0) #please insert other valid exit codes here
+  softwareName  = 'PNG-to-ICO*'  #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
+  fileType      = 'EXE'
+  silentArgs   = '/S'           # NSIS
+  validExitCodes= @(0) #please insert other valid exit codes here
 }
 
 [array]$key = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
 
 if ($key.Count -eq 1) {
   $key | % {
-    $packageArgs['file'] = "$($_.UninstallString)" #NOTE: You may need to split this if it contains spaces, see below
+    $packageArgs['file'] = "$($_.UninstallString.Trim('"'))" #NOTE: You may need to split this if it contains spaces, see below
+    # echo $packageArgs['file']
+    # pause
 
-    if ($packageArgs['fileType'] -eq 'MSI') {
-      # The Product Code GUID is all that should be passed for MSI, and very
-      # FIRST, because it comes directly after /x, which is already set in the
-      # Uninstall-ChocolateyPackage msiargs (facepalm).
-      $packageArgs['silentArgs'] = "$($_.PSChildName) $($packageArgs['silentArgs'])"
+    # The Product Code GUID is all that should be passed for MSI, and very
+    # FIRST, because it comes directly after /x, which is already set in the
+    # Uninstall-ChocolateyPackage msiargs (facepalm).
+    $packageArgs['silentArgs'] = "$($_.PSChildName) $($packageArgs['silentArgs'])"
 
-      # Don't pass anything for file, it is ignored for msi (facepalm number 2)
-      # Alternatively if you need to pass a path to an msi, determine that and
-      # use it instead of the above in silentArgs, still very first
-      $packageArgs['file'] = ''
-    } else {
-      # NOTES:
-      # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
-      # - Split args from exe in $packageArgs['file'] and pass those args through $packageArgs['silentArgs'] or ignore them
-      # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"
-      # - Review the code for auto-uninstaller for all of the fun things it does in sanitizing - https://github.com/chocolatey/choco/blob/bfe351b7d10c798014efe4bfbb100b171db25099/src/chocolatey/infrastructure.app/services/AutomaticUninstallerService.cs#L142-L192
-    }
+    # Don't pass anything for file, it is ignored for msi (facepalm number 2)
+    # Alternatively if you need to pass a path to an msi, determine that and
+    # use it instead of the above in silentArgs, still very first
+    # $packageArgs['file'] = ''
+    # NOTES:
+    # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
+    # - Split args from exe in $packageArgs['file'] and pass those args through $packageArgs['silentArgs'] or ignore them
+    # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"
+    # - Review the code for auto-uninstaller for all of the fun things it does in sanitizing - https://github.com/chocolatey/choco/blob/bfe351b7d10c798014efe4bfbb100b171db25099/src/chocolatey/infrastructure.app/services/AutomaticUninstallerService.cs#L142-L192
 
     Uninstall-ChocolateyPackage @packageArgs
   }
