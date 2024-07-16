@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <id>parallel-launcher</id>
+    <id>parallel-launcher.install</id>
     <version>7.7.0</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/parallel-launcher</packageSourceUrl>
     <owners>virginviolet</owners>
