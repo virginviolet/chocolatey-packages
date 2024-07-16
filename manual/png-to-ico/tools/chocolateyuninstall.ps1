@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
 #   $f='c:\path\to\thisFile.ps1'
 #   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
@@ -32,12 +33,49 @@ $packageArgs = @{
   #silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
                                  #       https://community.chocolatey.org/packages/autohotkey.portable
   #validExitCodes= @(0) #please insert other valid exit codes here
+=======
+$ErrorActionPreference = 'Inquire'
+
+# Specify the name or path of a .bat file to terminate
+$targetBatFile = "png_to_ico.bat"
+
+# Get all cmd processes
+$cmdProcesses = Get-WmiObject -Query "SELECT * FROM Win32_Process WHERE Name = 'cmd.exe'"
+
+foreach ($process in $cmdProcesses) {
+    # Get the command line arguments of the process
+    $commandLine = $process.CommandLine
+
+    # Check if the command line contains the target .bat file
+    if ($commandLine -like "*$targetBatFile*") {
+        Write-Host "Terminating process $($process.ProcessId) running $targetBatFile"
+        # Terminate the process
+        Stop-Process -Id $process.ProcessId -Force
+    }
+}
+
+$ErrorActionPreference = 'SilentlyContinue'
+
+Stop-Process -Name "png_to_ico_setup.exe" -F
+Stop-Process -Name "png_to_ico_uninstaller.exe" -F
+
+Import-Module -Name 'C:\ProgramData\chocolatey\helpers\chocolateyInstaller.psm1'
+
+$ErrorActionPreference = 'Stop'
+$packageArgs = @{
+  packageName   = $env:ChocolateyPackageName
+  softwareName  = 'PNG-to-ICO'
+  fileType      = 'EXE'
+  silentArgs   = '/S'
+  validExitCodes= @(0)
+>>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4
 }
 
 [array]$key = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
 
 if ($key.Count -eq 1) {
   $key | % {
+<<<<<<< HEAD
     $packageArgs['file'] = "$($_.UninstallString)" #NOTE: You may need to split this if it contains spaces, see below
 
     if ($packageArgs['fileType'] -eq 'MSI') {
@@ -59,6 +97,12 @@ if ($key.Count -eq 1) {
     }
 
     Uninstall-ChocolateyPackage @packageArgs
+=======
+    $packageArgs['file'] = "$($_.UninstallString.Trim('"'))"
+    $packageArgs['silentArgs'] = "$($_.PSChildName) $($packageArgs['silentArgs'])"
+
+Uninstall-ChocolateyPackage @packageArgs
+>>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4
   }
 } elseif ($key.Count -eq 0) {
   Write-Warning "$packageName has already been uninstalled by other means."
@@ -69,6 +113,7 @@ if ($key.Count -eq 1) {
   $key | % {Write-Warning "- $($_.DisplayName)"}
 }
 
+<<<<<<< HEAD
 ## OTHER POWERSHELL FUNCTIONS
 ## https://docs.chocolatey.org/en-us/create/functions
 #Uninstall-ChocolateyZipPackage $packageName # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
@@ -76,3 +121,5 @@ if ($key.Count -eq 1) {
 #Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
 ## Remove any shortcuts you added in the install script.
 
+=======
+>>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4
