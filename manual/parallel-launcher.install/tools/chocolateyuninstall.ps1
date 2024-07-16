@@ -11,6 +11,7 @@ $packageArgs = @{
 
 $ErrorActionPreference = 'SilentlyContinue'
 
+# This is not working
 $uninstalling = Get-Process "Setup/Uninstall*"
 if ($uninstalling) {
   "Waiting for setup to finish..."
