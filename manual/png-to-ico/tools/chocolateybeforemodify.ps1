@@ -1,15 +1,6 @@
-﻿# This runs before upgrade or uninstall.
-# Use this file to do things like stop services prior to upgrade or uninstall.
-# NOTE: It is an anti-pattern to call chocolateyUninstall.ps1 from here. If you
-#  need to uninstall an MSI prior to upgrade, put the functionality in this
-#  file without calling the uninstall script. Make it idempotent in the
-#  uninstall script so that it doesn't fail when it is already uninstalled.
-# NOTE: For upgrades - like the uninstall script, this script always runs from
-#  the currently installed version, not from the new upgraded package version.
+﻿$ErrorActionPreference = 'Inquire'
 
-$ErrorActionPreference = 'Inquire'
-
-# Specify the name or path of the .bat file
+# Specify the name or path of the .bat file to terminate
 $targetBatFile = "png_to_ico.bat"
 
 # Get all cmd processes
@@ -29,6 +20,5 @@ foreach ($process in $cmdProcesses) {
 
 $ErrorActionPreference = 'SilentlyContinue'
 
-# Stop-Process -Name "png_to_ico_setup.exe" -F 2> $null
 Stop-Process -Name "png_to_ico_setup.exe" -F
 Stop-Process -Name "png_to_ico_uninstaller.exe" -F
