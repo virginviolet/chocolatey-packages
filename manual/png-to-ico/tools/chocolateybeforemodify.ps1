@@ -7,3 +7,28 @@
 # NOTE: For upgrades - like the uninstall script, this script always runs from
 #  the currently installed version, not from the new upgraded package version.
 
+$ErrorActionPreference = 'Inquire'
+
+# Specify the name or path of the .bat file
+$targetBatFile = "png_to_ico.bat"
+
+# Get all cmd processes
+$cmdProcesses = Get-WmiObject -Query "SELECT * FROM Win32_Process WHERE Name = 'cmd.exe'"
+
+foreach ($process in $cmdProcesses) {
+    # Get the command line arguments of the process
+    $commandLine = $process.CommandLine
+
+    # Check if the command line contains the target .bat file
+    if ($commandLine -like "*$targetBatFile*") {
+        Write-Host "Terminating process $($process.ProcessId) running $targetBatFile"
+        # Terminate the process
+        Stop-Process -Id $process.ProcessId -Force
+    }
+}
+
+$ErrorActionPreference = 'SilentlyContinue'
+
+# Stop-Process -Name "png_to_ico_setup.exe" -F 2> $null
+Stop-Process -Name "png_to_ico_setup.exe" -F
+Stop-Process -Name "png_to_ico_uninstaller.exe" -F
