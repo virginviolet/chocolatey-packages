@@ -2,6 +2,7 @@
 #   $f='c:\path\to\thisFile.ps1'
 #   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
 
+<<<<<<< HEAD
 # 1. See the _TODO.md that is generated top level and read through that
 # 2. Follow the documentation below to learn how to create a package for the package type you are creating.
 # 3. In Chocolatey scripts, ALWAYS use absolute paths - $toolsDir gets you to the package's tools directory.
@@ -17,10 +18,16 @@ $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 # Internal/Organization: Download from internal location (internet sources are unreliable)
 $url        = '' # download url, HTTPS preferred
 $url64      = '' # 64bit URL here (HTTPS preferred) or remove - if installer contains both (very rare), use $url
+=======
+$ErrorActionPreference = 'Stop'
+$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$fileLocation = Join-Path $toolsDir 'png_to_ico_setup.exe'
+>>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4
 
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName
   unzipLocation = $toolsDir
+<<<<<<< HEAD
   fileType      = 'EXE_MSI_OR_MSU' #only one of these: exe, msi, msu
   url           = $url
   url64bit      = $url64
@@ -137,3 +144,18 @@ Install-ChocolateyPackage @packageArgs # https://docs.chocolatey.org/en-us/creat
 # despite the name "Install-ChocolateyZipPackage" this also works with 7z archives
 #Install-ChocolateyZipPackage $packageName $url $toolsDir $url64
 ## END PORTABLE EXAMPLE
+=======
+  fileType      = 'EXE'
+  file64         = $fileLocation
+
+  softwareName  = 'png-to-ico'
+
+  checksum64    = 'F86EECEE236CF5E1DDCDD61688334D911394746B9657D6C93546247807716CC5'
+  checksumType64= 'sha256'
+
+  silentArgs    = '/S'
+  validExitCodes= @(0)
+}
+
+Install-ChocolateyInstallPackage @packageArgs 
+>>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4

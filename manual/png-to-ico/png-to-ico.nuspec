@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <!-- Read this before creating packages: https://docs.chocolatey.org/en-us/create/create-packages -->
 <!-- It is especially important to read the above link to understand additional requirements when publishing packages to the community feed aka dot org (https://community.chocolatey.org/packages). -->
 
@@ -72,6 +73,36 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
   </metadata>
   <files>
     <!-- this section controls what actually gets packaged into the Chocolatey package -->
+=======
+
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>png-to-ico.install</id>
+    <version>1.1</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/manual/png-to-ico</packageSourceUrl>
+    <owners>virginviolet</owners>
+    <title>png-to-ico (Install)</title>
+    <authors>Paul Renard</authors>
+    <projectUrl>https://foxp.github.io/PNG-to-ICO/</projectUrl>
+    <!-- <iconUrl>http://rawcdn.githack.com/virginviolet/master/chocolatey-packages/manual/png-to-ico/icon/convert-icon-128px.png</iconUrl> -->
+    <copyright>Public domain</copyright>
+    <licenseUrl>https://github.com/FoxP/PNG-to-ICO?tab=Unlicense-1-ov-file</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/FoxP/PNG-to-ICO</projectSourceUrl>
+    <docsUrl>https://github.com/FoxP/PNG-to-ICO?tab=readme-ov-file</docsUrl>
+    <bugTrackerUrl>https://github.com/FoxP/PNG-to-ICO/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
+    <tags>png-to-ico ico icon convert conversion</tags>
+    <summary>Convert image to ICO from context menu</summary>
+    <description>A program that converts images from PNG, GIF, BMP, SVG or JPG to multi-resolution ICO files, and is run simply by right-clicking on an image and selecting "PNG to ICO". You can batch convert many images by selecting them before right clicking, or run the program on a folder with images.
+
+The default installation directory is `%AppData%\PNG-to-ICO`. </description>
+    <releaseNotes>- Fix stretching of non-square icons
+- Update ImageMagick to v7.1.1-31 Q16 HDRI x64
+</releaseNotes>
+  </metadata>
+  <files>
+>>>>>>> 29da5e3ae705b68d3c3e7d589d82bc82eb1b94b4
     <file src="tools\**" target="tools" />
   </files>
 </package>
