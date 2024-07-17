@@ -24,9 +24,8 @@ $packageArgs = @{
 silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-'
 }
 
-Install-ChocolateyInstallPackage @packageArgs
 
-$ErrorActionPreference = 'SilentlyContinue'
+Install-ChocolateyInstallPackage @packageArgs
 
 # The installer automatically launches the program, se we the program instantly.
 Stop-Process -Name "parallel-launcher" 2> $null
