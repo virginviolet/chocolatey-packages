@@ -9,7 +9,7 @@
     <title>png-to-ico (Install)</title>
     <authors>Paul Renard</authors>
     <projectUrl>https://foxp.github.io/PNG-to-ICO/</projectUrl>
-    <!-- <iconUrl>http://rawcdn.githack.com/virginviolet/master/chocolatey-packages/manual/png-to-ico/icon/convert-icon-128px.png</iconUrl> -->
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/png-to-ico.install/icon/convert-icon-128px.png</iconUrl>
     <copyright>Public domain</copyright>
     <licenseUrl>https://github.com/FoxP/PNG-to-ICO?tab=Unlicense-1-ov-file</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
