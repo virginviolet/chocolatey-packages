@@ -1,3 +1,5 @@
+$ErrorActionPreference = 'Stop'
+
 # Specify the name or path of a .bat file to terminate
 $targetBatFile = "png_to_ico.bat"
 
@@ -10,20 +12,12 @@ foreach ($process in $cmdProcesses) {
 
     # Check if the command line contains the target .bat file
     if ($commandLine -like "*$targetBatFile*") {
-        Write-Host "Terminating process $($process.ProcessId) running $targetBatFile"
+        Write-Host "Terminating process $($process.ProcessId) running $targetBatFile" 2> $null
         # Terminate the process
-        Stop-Process -Id $process.ProcessId -Force
+        Stop-Process -Id $process.ProcessId -Force 2> $null
     }
 }
 
-$ErrorActionPreference = 'SilentlyContinue'
-
-Stop-Process -Name "png_to_ico_setup.exe" -F
-Stop-Process -Name "png_to_ico_uninstaller.exe" -F
-
-Import-Module -Name 'C:\ProgramData\chocolatey\helpers\chocolateyInstaller.psm1'
-
-$ErrorActionPreference = 'Stop'
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName
   softwareName  = 'PNG-to-ICO'
