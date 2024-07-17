@@ -3,12 +3,12 @@
   <metadata>
     <id>parallel-launcher.install</id>
     <version>7.7.0</version>
-    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/parallel-launcher</packageSourceUrl>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/parallel-launcher.install</packageSourceUrl>
     <owners>virginviolet</owners>
     <title>parallel-launcher (Install)</title>
     <authors>Matt Pharoah</authors>
     <projectUrl>https://parallel-launcher.ca</projectUrl>
-    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher/appicon.png</iconUrl>
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher.install/appicon.png</iconUrl>
     <copyright>2020-2024 Matt Pharoah</copyright>
     <licenseUrl>https://gitlab.com/parallel-launcher/parallel-launcher/-/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
