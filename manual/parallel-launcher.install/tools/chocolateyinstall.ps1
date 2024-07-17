@@ -24,12 +24,8 @@ $packageArgs = @{
 silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-'
 }
 
+Start-WaitandStop "parallel-launcher"
 Install-ChocolateyInstallPackage @packageArgs
-
-$ErrorActionPreference = 'SilentlyContinue'
-
-# The installer automatically launches the program, se we the program instantly.
-Stop-Process -Name "parallel-launcher" 2> $null
 
 # Only copy the manual if the program is installed in the expected location.
 $FolderNotEmpty = Test-Path -Path $fileManualInstallDir\*
