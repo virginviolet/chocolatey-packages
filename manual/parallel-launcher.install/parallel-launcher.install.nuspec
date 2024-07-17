@@ -3,7 +3,7 @@
   <metadata>
     <id>parallel-launcher.install</id>
     <version>7.7.0</version>
-    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/parallel-launcher.install</packageSourceUrl>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/parallel-launcher.install</packageSourceUrl>
     <owners>virginviolet</owners>
     <title>parallel-launcher (Install)</title>
     <authors>Matt Pharoah</authors>
