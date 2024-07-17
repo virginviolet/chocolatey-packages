@@ -9,18 +9,20 @@ $packageArgs = @{
   silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-'
 }
 
-$ErrorActionPreference = 'SilentlyContinue'
+# It seems chocolatey waits to run the auto uninstaller until after this script,
+# which is unfortunate.
+# Start-Sleep -Seconds 10
 
-$uninstalling = Get-Process "Setup/Uninstall*"
-if ($uninstalling) {
-  "Waiting for setup to finish..."
-  Wait-Process -Name "Setup/Uninstall*" -Timeout 180 2> $null
+$uninstallerRunning = Get-Process "unins000*"
+if ($uninstallerRunning) {
+  Write-Output 'Waiting for uninstaller to finish...'
+  Wait-Process -Name "unins000*" -Timeout 180 # 3 minutes
 }
 
-Remove-Item $fileManual 2> $null
+Remove-Item $fileManual
 
 # Delete empty installation folder.
 $FolderNotEmpty = Test-Path -Path $fileManualDir\*
 if (-Not $FolderNotEmpty){
-    Remove-Item $fileManualDir 2> $null
+    Remove-Item $fileManualDir
 }
