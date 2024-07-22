@@ -7,13 +7,18 @@
 $ErrorActionPreference = 'Stop' # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $zipArchive = Join-Path $toolsDir -ChildPath 'Zelda_3_Launcher_v1.3.6.0.zip'
+$unzipDir = Join-Path $toolsDir -ChildPath 'Zelda 3 Launcher'
+$executable = Join-Path $unzipDir -ChildPath 'Zelda 3 Launcher.exe'
 
 $unzipArgs = @{
   FileFullPath = $zipArchive
-  Destination = Join-Path $toolsDir 'Zelda 3 Launcher'
+  Destination = $unzipDir
 }
 
 Get-ChocolateyUnzip @unzipArgs
+
+Install-ChocolateyShortcut -ShortcutFilePath "$env:UserProfile\Desktop\Zelda 3 Launcher.lnk" -TargetPath $executable -WorkingDirectory $unzipDir
+Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Zelda 3 Launcher.lnk" -TargetPath $executable -WorkingDirectory $unzipDir
 
 ## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
 #$appPath = "$env:ProgramFiles\appname"
