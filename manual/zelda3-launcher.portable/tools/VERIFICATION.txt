@@ -1,13 +1,20 @@
-﻿
-Note: Include this file if including binaries you have the right to distribute.
-Otherwise delete. this file. If you are the software author, you can mention
-this.
-
-===DELETE ABOVE THIS LINE AND THIS LINE===
-
-VERIFICATION
+﻿VERIFICATION
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
-<Include details of how to verify checksum contents>
-<If software vendor, explain that here>
+The installer has been downloaded from the official GitHub repository <https://github.com/FoxP/PNG-to-ICO/releases>
+and can be verified like this:
+
+1. Download Zelda_3_Launcher_v1.3.6.0.zip from this page:
+<https://github.com/RadzPrower/Zelda-3-Launcher/releases/tag/v1.3.6.0>
+2. You can use one of the following methods to obtain checksums:
+  - Use powershell function 'Get-Filehash'
+  - Use chocolatey utility 'checksum.exe'
+  
+  checksum type: sha256
+  checksum64: 04BD66EA5E4F5151D896AB18253C285B3D39C59A105B2C29E5073AF344A5CEF3
+
+3. Obtain the checksum of both the zip archive you downloaded in step 1, and of the zip archive that came with this package (in the same folder as VERIFICATION.txt). If they have the same hash, you have successfully verified this package.
+4. You can also have a look at the scripts, chocolateyinstall.ps1 and chocolateyuninstall.ps1. Open a file in a text editor or IDE and see if it looks clean. If you want to learn more about this, check out the Chocolatey docs on creating packages <https://docs.chocolatey.org/en-us/create/create-packages/>
+
+The license in 'LICENSE.txt' is obtained from <https://github.com/RadzPrower/Zelda-3-Launcher/blob/master/LICENSE>
