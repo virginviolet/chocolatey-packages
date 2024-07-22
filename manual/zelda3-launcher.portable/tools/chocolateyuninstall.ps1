@@ -11,6 +11,9 @@ Uninstall-ChocolateyZipPackage -Packagename $env:ChocolateyPackageName -ZipFileN
 
 # Remove-Item $UnzipDirectory
 
+Remove-Item "$env:UserProfile\Desktop\Zelda 3 Launcher.lnk"
+Remove-Item "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Zelda 3 Launcher.lnk"
+
 ## OTHER POWERSHELL FUNCTIONS
 ## https://docs.chocolatey.org/en-us/create/functions
 #Uninstall-ChocolateyZipPackage $packageName # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
