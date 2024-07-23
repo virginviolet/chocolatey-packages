@@ -21,13 +21,26 @@
     <bugTrackerUrl>https://github.com/RadzPrower/Zelda-3-Launcher/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
     <tags>zelda3-launcher.portable fantasy-rpg rpg video-game the-legend-of-zelda legend-of-zelda zelda zelda3 zelda-3 a-link-to-the-past alltp decompiled decompilation reimplementation pc-port game-engine snesrev launcher installer</tags>
     <summary>Launcher for Zelda3, a reimplementation of The Legend of Zelda - A Link to the Past</summary>
-    <description>A minimalistic Launcher that will download and build Zelda 3, the reimplementation of The Legend of Zelda - A Link to the Past.
+    <description># Zelda 3 Launcher
 
-By default, the launcher will be installed to `C:\Games\Zelda 3 Launcher`. The launcher will build the game into a subfolder called zelda3.
+A minimalistic Launcher that will download and build Zelda 3, the reimplementation of The Legend of Zelda - A Link to the Past.
 
-When uninstalling this package, it will remove both the launcher and the game, if the game is in the zelda3 subdirectory. It will, however, keep any user-made save files and config.
-If you for some reason want to ununistall the Launcher and keep the game, move the zelda3 folder to any folder outside the "Zelda 3 Launcher" directory, and then uninstall the package.
-If you only want to remove the game but keep the launcher, backup your save data and optionally the configuration file (see below), then simply delete the zelda3 folder.
+## Installation
+
+By default, the launcher will be installed to `C:\Games\Zelda 3 Launcher`. The launcher will build the game into a subfolder called zelda3. A shortcut will to Zelda 3 Launcher be added to the desktop and start menu.
+
+The launcher will ask for a rom. It has to be from the US region with this exact SHA256 hash: `66871D66BE19AD2C34C927D6B14CD8EB6FC3181965B6E517CB361F7316009CFB`.
+Additionally, it needs to be located outside of the Zelda 3 Launcher directory.
+
+When you first launch the launcher, it will have a button that says "Download". After it has finished downloading, you can play the game. The "Download" button will change to "Restore". This will make it build the game again. When the [zelda3 repository](https://github.com/snesrev/zelda3) is updated, the button will change to "Update", which will bulid the game again from the current repo.
+
+## Uninstallation
+
+When uninstalling this package, it will remove both the launcher and the game, if the game is in the default zelda3 subdirectory. It will, however, keep any user-made save files and configuration file. If you want to remove the save files and/or confuguration file, you will need to remove them manually. See "Game data" below for their exact location.
+If you for some reason want to ununistall the Launcher and keep the game: move the zelda3 folder to any folder outside the "Zelda 3 Launcher" directory, and then uninstall the package.
+If you only want to remove the game but keep the launcher: backup your save data and optionally the configuration file (see "Game data" below), then simply delete the zelda3 folder.
+
+## Game data
 
 Default configuration file location: C:\Games\Zelda 3 Launcher\zelda3\zelda3.ini
 Default save data location: C:\Games\Zelda 3 Launcher\zelda3\Saves</description>
