@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>zelda3-launcher.portable</id>
+    <version>1.3.6.0</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/zelda3-launcher.portable</packageSourceUrl>
+    <owners>virginviolet</owners>
+
+    <title>zelda3-launcher.portable (Install)</title>
+    <authors>Anthony Johns</authors>
+    <projectUrl>https://github.com/RadzPrower/Zelda-3-Launcher</projectUrl>
+    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
+    <!-- Here is an example using Githack -->
+    <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/zelda3-launcher.portable.png</iconUrl>-->
+    <copyright>2023 Anthony Johns</copyright>
+    <licenseUrl>https://github.com/RadzPrower/Zelda-3-Launcher/blob/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/RadzPrower/Zelda-3-Launcher</projectSourceUrl>
+    <docsUrl>https://github.com/RadzPrower/Zelda-3-Launcher</docsUrl>
+    <bugTrackerUrl>https://github.com/RadzPrower/Zelda-3-Launcher/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
+    <tags>zelda3-launcher.portable fantasy-rpg rpg video-game the-legend-of-zelda legend-of-zelda zelda zelda3 zelda-3 a-link-to-the-past alltp decompiled decompilation reimplementation pc-port game-engine snesrev launcher installer</tags>
+    <summary>Launcher for Zelda3, a reimplementation of The Legend of Zelda - A Link to the Past</summary>
+    <description>A minimalistic Launcher that will download and build Zelda 3, the reimplementation of The Legend of Zelda - A Link to the Past.
+
+By default, the launcher will be installed to `C:\Games\Zelda 3 Launcher`. The launcher will build the game into a subfolder called zelda3.
+
+When uninstalling this package, it will remove both the launcher and the game, if the game is in the zelda3 subdirectory. It will, however, keep any user-made save files and config.
+If you for some reason want to ununistall the Launcher and keep the game, move the zelda3 folder to any folder outside the "Zelda 3 Launcher" directory, and then uninstall the package.
+If you only want to remove the game but keep the launcher, backup your save data and optionally the configuration file (see below), then simply delete the zelda3 folder.
+
+Default configuration file location: C:\Games\Zelda 3 Launcher\zelda3\zelda3.ini
+Default save data location: C:\Games\Zelda 3 Launcher\zelda3\Saves</description>
+    <releaseNotes>- Made a change to closing settings window behavior so that it is consistent between the cancel button and the close (X) button.
+- Fixed runaway CPU usage while zelda3.exe was running due to it waiting on the game to close and resume control.
+</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
