@@ -6,7 +6,7 @@ $zelda3Dir  = Join-Path $unzipDir 'zelda3'
 $saveDir    = Join-Path $zelda3Dir 'saves'
 $saveDirRef = Join-Path $saveDir 'ref'
 $config     = Join-Path $zelda3Dir 'zelda3.ini'
-$tempZelda3 = Join-Path $env:TEMP 'zelda3'
+$tempZelda3 = Join-Path $env:TEMP 'zelda3.bak'
 
 
 # Prevent uninstall if the game is running, so that no progress is lost
@@ -35,8 +35,8 @@ if ($exists -And $empty){
 $exists = Test-Path -Path $zelda3Dir -ea 0
 $empty = -Not (Test-Path -Path $zelda3Dir\* -ea 0)
 if ($exists -And -Not $empty){
-    Write-Warning 'Zelda 3 WILL be removed.'
-    Write-Warning 'Settings and save data will NOT be removed.'
+    Write-Warning 'Zelda 3 will be removed.'
+    Write-Warning 'Settings and save data will be backed up.'
     Pause # Pause to abort
     # Move save data and confg to temporary location (because Powershell is hell)
     New-Item -ItemType Directory -Path $tempZelda3
@@ -65,7 +65,7 @@ if ($exists -And -Not $empty){
     # Move save data and config back to the game directory
     Move-Item -Path $tempZelda3 -Destination $unzipDir
 
-    Write-Warning 'Remove configuration file save data manually if so desired. (See this package''s description for more details.)'
+    Write-Warning 'Manually remove the configuration and save data backup if so desired. (See this package''s description for more details.)'
     Start-Sleep -Seconds 5 # time to read
 } else {
     # Remove the launcher directory
