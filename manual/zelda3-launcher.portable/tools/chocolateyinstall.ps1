@@ -7,8 +7,9 @@
 $ErrorActionPreference = 'Stop' # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $zipArchive = Join-Path $toolsDir -ChildPath 'Zelda_3_Launcher_v1.3.6.0.zip'
-$unzipDir = Join-Path $toolsDir -ChildPath 'Zelda 3 Launcher'
+$unzipDir   = "C:\Games\Zelda 3 Launcher"
 $executable = Join-Path $unzipDir -ChildPath 'Zelda 3 Launcher.exe'
+$triforceIcon = Join-Path $toolsDir -ChildPath 'triforce.ico'
 
 $unzipArgs = @{
   FileFullPath = $zipArchive
@@ -16,40 +17,6 @@ $unzipArgs = @{
 }
 
 Get-ChocolateyUnzip @unzipArgs
-
+Copy-Item $triforceIcon $unzipDir # In case the user wants to use this icon for either the launcher or the game (as of typing, the launcher does not add an icon to zelda3.exe when building it).
 Install-ChocolateyShortcut -ShortcutFilePath "$env:UserProfile\Desktop\Zelda 3 Launcher.lnk" -TargetPath $executable -WorkingDirectory $unzipDir
 Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Zelda 3 Launcher.lnk" -TargetPath $executable -WorkingDirectory $unzipDir
-
-## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
-#$appPath = "$env:ProgramFiles\appname"
-##Will resolve to C:\Program Files\appname
-#$statementsToRun = "/C `"$appPath\bin\installservice.bat`""
-#Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
-
-## add specific folders to the path - any executables found in the chocolatey package
-## folder will already be on the path. This is used in addition to that or for cases
-## when a native installer doesn't add things to the path.
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
-#Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
-
-## Add specific files as shortcuts to the desktop
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
-#$target = Join-Path $toolsDir "$($packageName).exe"
-# Install-ChocolateyShortcut -shortcutFilePath "<path>" -targetPath "<path>" [-workDirectory "C:\" -arguments "C:\test.txt" -iconLocation "C:\test.ico" -description "This is the description"]
-
-## Outputs the bitness of the OS (either "32" or "64")
-## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-#$osBitness = Get-ProcessorBits
-
-## Set persistent Environment variables
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
-#Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
-
-## Set up a file association
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
-#Install-ChocolateyFileAssociation
-
-## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
-## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
-## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-#Install-BinFile
