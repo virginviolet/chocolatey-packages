@@ -1,15 +1,11 @@
-﻿# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
-#   $f='c:/path/to/thisFile.ps1'
-#   gc $f | ? {$_ -notmatch "^/s*#"} | % {$_ -replace '(^.*?)/s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
-
-$ErrorActionPreference = 'Stop' # stop on all errors
+﻿$ErrorActionPreference = 'Stop' # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $zipArchive = Join-Path $toolsDir -ChildPath 'Zelda_3_Launcher_v1.3.6.0.zip'
 $unzipDir   = "C:/Games/Zelda 3 Launcher"
 $zelda3Dir  = Join-Path $unzipDir 'zelda3'
 $saveDir    = Join-Path $zelda3Dir 'Saves'
 $saveDirRef = Join-Path $saveDir 'ref'
-$config     = Join-Path $zelda3Dir 'zelda.ini'
+$config     = Join-Path $zelda3Dir 'zelda3.ini'
 $tempZelda3 = Join-Path $env:TEMP 'zelda3'
 
 # Try to remove reference saves files directory
@@ -40,6 +36,7 @@ try {
         # Start-Sleep 5
         
         # Remove reference save files
+        # If we do not check if directory exists, it will jump directly to catch {}
         $Exists = Test-Path -Path $saveDirRef
         if ($Exists) {
             Remove-Item $saveDirRef -Recurse -Force
@@ -71,6 +68,7 @@ try {
 } catch {}
 
 # Try to remove desktop shortcut (it's plausible the user might have removed it)
+# We do not need to check if directory exists, because if it does not, it will just continue from catch.
 try {Remove-Item "$env:UserProfile/Desktop/Zelda 3 Launcher.lnk"} catch {}
 
 # Try to remove start menu shortcut (it's plausible the user might have removed it)
