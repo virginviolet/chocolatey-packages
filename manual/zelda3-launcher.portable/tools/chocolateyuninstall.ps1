@@ -25,7 +25,7 @@ if ($exists -And $empty){
     Remove-Item $saveDirRef
 }
 
-# Remove Save directory if empty
+# Remove save directory if empty
 $exists = Test-Path -Path $saveDir -ea 0
 $empty = -Not (Test-Path -Path $saveDir\* -ea 0)
 if ($exists -And $empty){
