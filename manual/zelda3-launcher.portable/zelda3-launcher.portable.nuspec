@@ -51,14 +51,12 @@ To restore files from the backup, follow these steps in order:
 1. Download/build the game from the launcher
 2. Close the launcher.
 3. In Explorer, go to the Launcher's directory (default: `C:\Games\Zelda 3 Launcher`)
-4. Copy the contents of the `zelda3.bak` folder into the `zelda3` folder. Merge folders and overwrite files when prompted.
+4. Move the contents of the `zelda3.bak` folder into the `zelda3` folder. Merge folders and overwrite files when prompted.
 5. Delete the now empty zelda3.bak folder.
-
 
 ## Backup removal
 
 If you want to remove save data and configuration file backup after uninstallation, you must do so manually. Just delete the Zelda 3 Launcher folder (default location: `C:\Games\Zelda 3 Launcher`).
-
 
 ## Game data
 
