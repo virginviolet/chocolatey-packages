@@ -11,10 +11,9 @@
     <title>zelda3-launcher.portable (Install)</title>
     <authors>Anthony Johns</authors>
     <projectUrl>https://github.com/RadzPrower/Zelda-3-Launcher</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!-- Here is an example using Githack -->
-    <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/zelda3-launcher.portable.png</iconUrl>-->
-    <copyright>2023 Anthony Johns</copyright>
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda3-launcher.portable/icons/triforce.ico</iconUrl>
+    <!-- If zelda3 ever gets it's own package, change icon to this
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda3-launcher.portable/icons/RadzPrower.png</iconUrl>-->    <copyright>2023 Anthony Johns</copyright>
     <licenseUrl>https://github.com/RadzPrower/Zelda-3-Launcher/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/RadzPrower/Zelda-3-Launcher</projectSourceUrl>
