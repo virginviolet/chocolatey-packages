@@ -1,0 +1,1 @@
+﻿Start-CheckandStop "Zelda 3 Launcher"
