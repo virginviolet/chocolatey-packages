@@ -24,14 +24,18 @@ $packageArgs = @{
 silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-'
 }
 
+# The installer automatically launches the program, se we should to close the program.
+# Start-WaitandStop "parallel-launcher" # Does not work, for some reason, so instead
+# we use use Stop-Process after the installation.
 
 Install-ChocolateyInstallPackage @packageArgs
 
-# The installer automatically launches the program, se we the program instantly.
-Stop-Process -Name "parallel-launcher" 2> $null
+# The installer automatically launches the program, se we should to close the program.
+# (this likely stops the process before the program's window has even appeared).
+Stop-Process -Name "parallel-launcher"
 
 # Only copy the manual if the program is installed in the expected location.
-$FolderNotEmpty = Test-Path -Path $fileManualInstallDir\*
-if ($FolderNotEmpty){
-  Copy-Item $fileManual $fileManualInstallDir 2> $null
+$empty = -Not (Test-Path -Path $fileManualInstallDir\* -ea 0)
+if (-Not $empty){
+  Copy-Item $fileManual $fileManualInstallDir
 }
