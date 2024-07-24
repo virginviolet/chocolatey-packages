@@ -1,10 +1,13 @@
-$ErrorActionPreference = 'Inquire'
+$ErrorActionPreference = 'Continue'
 
-# Specify the name or path of the .bat file to terminate
+# Let's close the .bat file if it is running (edge case, unconfirmed if it would actually
+# interfere with installation)
+
+# Name or path of .bat file to terminate
 $targetBatFile = "png_to_ico.bat"
 
 # Get all cmd processes
-$cmdProcesses = Get-WmiObject -Query "SELECT * FROM Win32_Process WHERE Name = 'cmd.exe'"
+$cmdProcesses = Get-WmiObject -Query "SELECT * FROM Win32_Process WHERE Name = 'cmd.exe'" -ea 0
 
 foreach ($process in $cmdProcesses) {
     # Get the command line arguments of the process
@@ -14,11 +17,6 @@ foreach ($process in $cmdProcesses) {
     if ($commandLine -like "*$targetBatFile*") {
         Write-Host "Terminating process $($process.ProcessId) running $targetBatFile"
         # Terminate the process
-        Stop-Process -Id $process.ProcessId -Force
+        Stop-Process -Id $process.ProcessId -Force -ea 0
     }
 }
-
-$ErrorActionPreference = 'SilentlyContinue'
-
-Stop-Process -Name "png_to_ico_setup.exe" -F
-Stop-Process -Name "png_to_ico_uninstaller.exe" -F
