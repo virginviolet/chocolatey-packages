@@ -24,6 +24,10 @@ The default installation directory is C:/Program Files (x86)/parallel-launcher (
 - When RetroArch crashes shortly after starting, the error logs can now be viewed in the error dialog
 - Worked around a Windows bug that prevented SD card mounting from working if file compression is enabled
 - Fixed the incorrect error code being logged when an SD card fails to mount on Windows</releaseNotes>
+    <dependencies>
+      <!-- Extension for Start-CheckandStop and Start-CheckandThrow commands. -->
+      <dependency id="chocolatey-misc-helpers.extension" />
+    </dependencies>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
