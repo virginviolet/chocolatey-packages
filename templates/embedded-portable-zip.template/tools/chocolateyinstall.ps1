@@ -19,6 +19,9 @@ $unzipArgs = @{
 ## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 Get-ChocolateyUnzip @unzipArgs
 
+# Prevent shimming a GUI exe
+# New-Item -Path . -Name $unzipDir -ItemType "example.exe.gui"
+
 ## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
 #$appPath = "$env:ProgramFiles\appname"
 ##Will resolve to C:\Program Files\appname
