@@ -33,7 +33,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!-- Here is an example using Githack -->
     <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/embedded-portable-zip.template.png</iconUrl>-->
     <!-- <copyright>Year Software Vendor</copyright> -->
-    <!-- <licenseUrl>Software License Location __REMOVE_OR_FILL_OUT__</licenseUrl>
+    <!-- <licenseUrl>Software License Location</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>-->
     <!--<projectSourceUrl>Software Source Code Location</projectSourceUrl>-->
     <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
