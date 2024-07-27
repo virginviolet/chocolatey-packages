@@ -19,14 +19,14 @@ $unzipArgs = @{
 ## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 Get-ChocolateyUnzip @unzipArgs
 
-# Prevent shimming a GUI exe
-# New-Item -Path . -Name $unzipDir -ItemType "example.exe.gui"
-
 ## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
 #$appPath = "$env:ProgramFiles\appname"
 ##Will resolve to C:\Program Files\appname
 #$statementsToRun = "/C `"$appPath\bin\installservice.bat`""
 #Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
+
+# Prevents opening a hanging window when you open an application from the command line that was set up with Chocolatey
+New-Item -Path . -Name $unzipDir -ItemType "flips.exe.gui"
 
 ## add specific folders to the path - any executables found in the chocolatey package
 ## folder will already be on the path.
