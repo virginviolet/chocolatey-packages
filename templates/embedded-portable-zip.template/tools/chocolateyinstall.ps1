@@ -56,6 +56,6 @@ New-Item -Path . -Name $unzipDir -ItemType "flips.exe.gui"
 #Install-BinFile
 
 ## Other needs: use regular PowerShell to do so or see if there is a function already defined
-# - https://docs.chocolatey.org/en-us/create/functions
-# There may also be functions available in extension packages
-# - https://community.chocolatey.org/packages?q=id%3A.extension for examples and availability.
+## - https://docs.chocolatey.org/en-us/create/functions
+## There may also be functions available in extension packages
+## - https://community.chocolatey.org/packages?q=id%3A.extension for examples and availability.
