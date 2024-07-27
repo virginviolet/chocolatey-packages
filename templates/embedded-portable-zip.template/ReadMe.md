@@ -1,8 +1,7 @@
 ﻿## Summary
 How do I create packages? See https://docs.chocolatey.org/en-us/create/create-packages
 
-If you are submitting packages to the community feed (https://community.chocolatey.org)
-always try to ensure you have read, understood and adhere to the create
+Always try to ensure you have read, understood and adhere to the create
 packages wiki link above.
 
 ## Automatic Packaging Updates?
@@ -52,9 +51,6 @@ A note about a couple:
 
 ### Getting package specific information
 Use the package parameters pattern - see https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument
-
-### Need to mount an ISO?
-https://docs.chocolatey.org/en-us/guides/create/mount-an-iso-in-chocolatey-package
 
 ### Environment Variables
 Chocolatey makes a number of environment variables available (You can access any of these with $env:TheVariableNameBelow):
@@ -130,4 +126,3 @@ The following are experimental or use not recommended:
  * http_proxy - Set by original `http_proxy` passthrough, or same as `ChocolateyProxyLocation` if explicitly set.
  * https_proxy - Set by original `https_proxy` passthrough, or same as `ChocolateyProxyLocation` if explicitly set.
  * no_proxy- Set by original `no_proxy` passthrough, or same as `ChocolateyProxyBypassList` if explicitly set.
-
