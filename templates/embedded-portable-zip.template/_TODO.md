@@ -19,7 +19,7 @@ Portable packages should be possible to install without administrative rights.
 6. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 7. [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 8. [ ] Fill out tools\chocolateyInstall.ps1.
-9. [ ] Fill out Readme.txt - delete this file once you have read over and used anything you've needed from here.
+9. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
 10. [ ] If the application is a GUI, create an empty file next to the exe named 'name.exe.gui'.
 11. [ ] If you want to ignore an executable, create an empty file next to the exe named 'name.exe.ignore'.
 12. [ ] Test the package to ensure install/uninstall work appropriately.
