@@ -54,6 +54,38 @@ if (Test-Administrator) {
 
 # Remove registry keys (mostly file associations)
 
+
+function Test-RegistryValue {
+    param(
+        [Alias("PSPath")]
+        [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        [String]$Path
+        ,
+        [Parameter(Position = 1, Mandatory = $true)]
+        [String]$Name
+        ,
+        [Switch]$PassThru
+    ) 
+
+    process {
+        if (Test-Path $Path) {
+            $Key = Get-Item -LiteralPath $Path
+            if ($Key.GetValue($Name, $null) -ne $null) {
+                if ($PassThru) {
+                    Get-ItemProperty $Path $Name
+                } else {
+                    $true
+                }
+            } else {
+                $false
+            }
+        } else {
+            $false
+        }
+    }
+}
+
+
 function Remove-RegistryKeyPropertiesByvalueData($keyPath, $valueData) {
     $key = Get-Item -Path $keyPath
     $keyValues = $key.Property # easier to understand (for me at least)
@@ -81,490 +113,315 @@ function Remove-RegistryKeyPropertiesByvalueData($keyPath, $valueData) {
     }
 }
 
-function Write-Report {
+function Write-Report($itemsDeleted, $itemsSufficient, $extraItems, $extraItemsMax) {
     Write-Verbose "Deleted $itemsDeleted/$itemsSufficient sufficient items and $extraItems/$extraItemsMax' extra items."
 }
 
-Write-Verbose "Attempting to remove file association for .bps..."
+function Clear-FileAssocPatchFile($ext) {
+    $extUC = $ext.ToUpper() # upper-case
 
-Write-Verbose "´n"
-Write-Verbose "Searching HKCR..."
-$itemsDeleted = 0
-$itemsSufficient = 2
-$extraItems = 0
-$extraItemsMax = 1
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose "Attempting to remove Flips file association for $extUC..."
 
-$keyPath = "REGISTRY::HKEY_CLASSES_ROOT\.bps"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFileBPS"
-    $itemsDeleted++
-    $key = Get-Item -Path $keyPath
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose 'There seems to be no other programs on the "Open with" context menu for bps files.'
-        try {
-            Remove-Item -Path $keyPath -Force
+    Write-Verbose "´n"
+    Write-Verbose "Searching HKCR..."
+    $itemsDeleted = 0
+    $itemsSufficient = 2
+    $extraItems = 0
+    $extraItemsMax = 1
+
+    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\.$ext"
+    if (Test-Path -Path $keyPath -ea 0) {
+        Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFile$extUC"
+        $itemsDeleted++
+        $key = Get-Item -Path $keyPath
+        $valueCount = $($key.Property.Count)
+        if ($valueCount -eq 1) {
+            Write-Verbose 'There seems to be no other programs on the "Open with" context menu for $extUC files.'
+            try {
+                Remove-Item -Path $keyPath -Force
+                Write-Verbose "Deleted key '$keyPath'."
+                $extraItems++
+            }
+            catch {
+                Write-Verbose "Attempt to tidy up by deleting the key '$keyPath' failed, possibly due to lacking administrative permissions. This is not an issue."
+            }
+        }
+    }
+
+    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\FloatingIPSFile$extUC"
+    if (Test-Path -Path $keyPath -ea 0) {
+        Remove-Item -Path $keyPath -Recurse -Force
+        Write-Verbose "Deleted key '$keyPath'."
+        $itemsDeleted++
+    }
+
+    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
+
+    Write-Verbose "´n"
+    Write-Verbose "Searching HKCU..."
+    $itemsDeleted = 0
+    $itemsSufficient = 4
+    $extraItems = 0
+    $extraItemsMax = 3
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueName = "Applications\flips.exe_.$ext"
+    if (Test-Path -Path $keyPath -ea 0) {
+        # Remove this value in this key
+        Remove-ItemProperty -Path $keyPath -Name $valueName
+        Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
+        $itemsDeleted++
+    }
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueName = "FloatingIPSFile$extUC" + "_.$ext"
+    if (Test-Path -Path $keyPath -ea 0) {
+        # Remove this value in this key
+        Remove-ItemProperty -Path $keyPath -Name $valueName
+        Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
+        $itemsDeleted++
+    }
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gba\OpenWithList"
+    if (Test-Path -Path $keyPath -ea 0) {
+        Remove-RegistryKeyPropertiesByvalueData $keyPath "flips.exe"
+        $itemsDeleted++
+        $key = Get-Item -Path $keyPath
+        $valueCount = $($key.Property.Count)
+        if ($valueCount -eq 1) {
+            Write-Verbose "There seems to be no other programs on the ""Open with"" context menu for $ext files."
+            Remove-Item -Path $keyPath
             Write-Verbose "Deleted key '$keyPath'."
             $extraItems++
         }
-        catch {
-            Write-Verbose "Attempt to tidy up by deleting the key '$keyPath' failed, possibly due to lacking administrative permissions. This is not an issue."
+    }
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bps\OpenWithProgids"
+    if (Test-Path -Path $keyPath -ea 0) {
+        if (Get-ItemProperty -Path $keyPath -Name "FloatingIPSFile$extUC" -ea 0) {
+            Remove-ItemProperty -Path $keyPath -Name "FloatingIPSFile$extUC"
+            Write-Verbose "Deleted value 'FloatingIPSFile$extUC' in key '$keyPath'."
+            $itemsDeleted++
         }
-    }
-}
-
-$keyPath = "REGISTRY::HKEY_CLASSES_ROOT\FloatingIPSFileBPS"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-Item -Path $keyPath -Recurse -Force
-    Write-Verbose "Deleted key '$keyPath'."
-    $itemsDeleted++
-}
-
-Write-Report
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 4
-$extraItems = 0
-$extraItemsMax = 3
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "Applications\flips.exe_.bps"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "FloatingIPSFileBPS_.bps"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gba\OpenWithList"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-RegistryKeyPropertiesByvalueData $keyPath "flips.exe"
-    $itemsDeleted++
-    $key = Get-Item -Path $keyPath
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose 'There seems to be no other programs on the "Open with" context menu for bps files.'
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
-    }
-}
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bps\OpenWithProgids"
-if (Test-Path -Path $keyPath -ea 0) {
-    if (Get-ItemProperty -Path $keyPath -Name 'FloatingIPSFileBPS' -ea 0) {
-        Remove-ItemProperty -Path $keyPath -Name 'FloatingIPSFileBPS'
-        Write-Verbose "Deleted value 'FloatingIPSFileBPS' in key '$keyPath'."
-        $itemsDeleted++
-    }
-    $key = Get-Item -Path $keyPath
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose 'There seems to be no other programs on the "Open with" context menu for bps files.'
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
-    }
-}
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bps"
-if (Test-Path -Path $keyPath -ea 0) {
-    $empty = -Not ($(Get-Item -Path $keyPath).Property)
-    if ($empty) {
-        Write-Verbose 'There seems to be no other programs on the "Open with" context menu for bps files.'
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
-    }
-}
-
-Write-Report
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKU..."
-$itemsDeleted = 0
-$itemsSufficient = 1
-$extraItems = 0
-$extraItemsMax = 1
-
-$user = New-Object System.Security.Principal.NTAccount($env:UserName);
-$SID = $user.Translate([System.Security.Principal.SecurityIdentifier]).value;
-$SIDClasses = $($sid) + '_Classes';
-$keyPath = "REGISTRY::HKEY_USERS\$SIDClasses\.bps";
-Write-Output $(Test-Path -Path $keyPath)
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFileBPS"
-    $itemsDeleted++
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose "There are no other programs associated with .bps."
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
-    }
-}
-
-Write-Report
-
-Write-Verbose "´n"
-Write-Verbose "´n"
-Write-Verbose "´n"
-Write-Verbose "Attempting to remove file association for .ips..."
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKCR..."
-$itemsDeleted = 0
-$itemsSufficient = 2
-$extraItems = 0
-$extraItemsMax = 1
-
-$keyPath = "REGISTRY::HKEY_CLASSES_ROOT\.ips"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFileIPS"
-    $itemsDeleted++
-    $key = Get-Item -Path $keyPath
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose "There are no other programs associated with .ips."
-        try {
-            Remove-Item -Path $keyPath -Force
+        $key = Get-Item -Path $keyPath
+        $valueCount = $($key.Property.Count)
+        if ($valueCount -eq 1) {
+            Write-Verbose "There seems to be no other programs on the ""Open with"" context menu for $extUC files."
+            Remove-Item -Path $keyPath
             Write-Verbose "Deleted key '$keyPath'."
             $extraItems++
         }
-        catch {
-            Write-Verbose "Attempt to tidy up by deleting the key '$keyPath' failed, possibly due to lacking administrative permissions. This is not an issue."
+    }
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
+    if (Test-Path -Path $keyPath -ea 0) {
+        $empty = -Not ($(Get-Item -Path $keyPath).Property)
+        if ($empty) {
+            Write-Verbose "There seems to be no other programs on the ""Open with"" context menu for $extUC files."
+            Remove-Item -Path $keyPath
+            Write-Verbose "Deleted key '$keyPath'."
+            $extraItems++
         }
     }
-}
 
-$keyPath = "REGISTRY::HKEY_CLASSES_ROOT\FloatingIPSFileIPS"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-Item -Path $keyPath -Recurse -Force
-    Write-Verbose "Deleted key '$keyPath'."
-    $itemsDeleted++
-}
+    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
 
-Write-Report
+    Write-Verbose "´n"
+    Write-Verbose "Searching HKU..."
+    $itemsDeleted = 0
+    $itemsSufficient = 1
+    $extraItems = 0
+    $extraItemsMax = 1
 
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 4
-$extraItems = 0
-$extraItemsMax = 3
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "Applications\flips.exe_.ips"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "FloatingIPSFileIPS_.ips"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ips\OpenWithList"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-RegistryKeyPropertiesByvalueData $keyPath "flips.exe"
-    $itemsDeleted++
-    $key = Get-Item -Path $keyPath
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose 'There seems to be no other programs on the "Open with" context menu for ips files.'
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
+    $user = New-Object System.Security.Principal.NTAccount($env:UserName);
+    $SID = $user.Translate([System.Security.Principal.SecurityIdentifier]).value;
+    $SIDClasses = $($sid) + '_Classes';
+    $keyPath = "REGISTRY::HKEY_USERS\$SIDClasses\.$ext";
+    Write-Output $(Test-Path -Path $keyPath)
+    if (Test-Path -Path $keyPath -ea 0) {
+        Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFile$extUC"
+        $itemsDeleted++
+        $valueCount = $($key.Property.Count)
+        if ($valueCount -eq 1) {
+            Write-Verbose "There are no other programs associated with .$extUC."
+            Remove-Item -Path $keyPath
+            Write-Verbose "Deleted key '$keyPath'."
+            $extraItems++
+        }
     }
+
+    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueName = "FloatingIPSFile$extUC" + "_.$ext"
+    if (Test-Path -Path $keyPath -ea 0) {
+        # Remove this value in this key if it exists
+        if (Test-RegistryValue $keyPath $valueName -ea 0) {
+            Remove-ItemProperty -Path $keyPath -Name $valueName
+            Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
+            $itemsDeleted++
+        }
+    }
+
+    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
+
 }
 
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ips\OpenWithProgids"
-if (Test-Path -Path $keyPath -ea 0) {
-    if (Get-ItemProperty -Path $keyPath -Name 'FloatingIPSFileIPS' -ea 0) {
-        Remove-ItemProperty -Path $keyPath -Name 'FloatingIPSFileIPS'
-        Write-Verbose "Deleted value 'FloatingIPSFileIPS' in key '$keyPath'."
+
+function Clear-FileAssocRomFile($ext) {
+    $extUC = $ext.ToUpper() # upper-case
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose "Attempting to remove Flips file association for $extUC..."
+
+    Write-Verbose "´n"
+    Write-Verbose "Searching HKCU..."
+    $itemsDeleted = 0
+    $itemsSufficient = 3
+    $extraItems = 0
+    $extraItemsMax = 0
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueName = "Applications\flips.exe_.$ext"
+    if (Test-Path -Path $keyPath -ea 0) {
+        # Remove this value in this key if it exists
+        if (Test-RegistryValue $keyPath $valueName -ea 0) {
+            Remove-ItemProperty -Path $keyPath -Name $valueName
+            Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
+            $itemsDeleted++
+        }
+    }
+
+    $keyPath   = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file\shell\open\command"
+    $keyPath2   = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file"
+    $keyPath3  = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
+    $valueName2 = $ext + "_auto_file_." + $ext
+    if (Test-Path -Path $keyPath -ea 0) {
+        $key = Get-Item -Path $keyPath
+        $keyValues = $key.Property # easier to understand (for me at least)
+        foreach ($value in $keyValues) {
+            # Get the data of the value
+            $data = Get-ItemPropertyValue -Path $keyPath -Name $value
+
+            # Check if the data matches $valueData
+            if ($data -eq $valueData) {
+                
+                # Remove its parent keys
+                Write-Verbose "Found data '$valueData' in key '$keyPath'."
+                Remove-Item -Path $keyPath2 -Recurse -Force
+                Write-Verbose "Deleted parent key '$keyPath' recursively."
+                $itemsDeleted++
+
+                # Also remove this value in this key
+                if (Test-RegistryValue $keyPath3 $valueName2 -ea 0) {
+                    Remove-ItemProperty -Path $keyPath3 -Name $valueName2
+                    Write-Verbose "Deleted value '$valueName2' in key '$keyPath3'."
+                    $itemsDeleted++
+                }
+            }
+        }
+    }
+
+}
+
+function Clear-RemainingKeys() {
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose 'Attempting to remove flips.exe from the "Open with" menu...'
+    Write-Verbose "´n"
+    Write-Verbose "Searching HKCR..."
+    $itemsDeleted = 0
+    $itemsSufficient = 1
+    $extraItems = 0
+    $extraItemsMax = 0
+    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\Applications\flips.exe"
+    if (Test-Path -Path $keyPath -ea 0) {
+        Remove-Item -Path $keyPath -Recurse -Force
+        Write-Verbose "Deleted key '$keyPath'."
         $itemsDeleted++
     }
-    $key = Get-Item -Path $keyPath
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose 'There seems to be no other programs on the "Open with" context menu for ips files.'
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
+    else {
+        Write-Verbose "Key not found: $keyPath."
     }
-}
 
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ips"
-if (Test-Path -Path $keyPath -ea 0) {
-    $empty = -Not ($(Get-Item -Path $keyPath).Property)
-    if ($empty) {
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
+    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
+
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose "´n"
+    Write-Verbose 'Attempting to remove flips.exe the MUI Cache...'
+    Write-Verbose "´n"
+    Write-Verbose "Searching HKCR..."
+    $itemsDeleted = 0
+    $itemsSufficient = 1
+    $extraItems = 0
+    $extraItemsMax = 0
+    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
+    $valueData = "flips.exe"
+    if (Test-Path -Path $keyPath -ea 0) {
+        Remove-RegistryKeyPropertiesByvalueData $keyPath $valueData
+        $itemsDeleted++
     }
-}
-
-Write-Report
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKU..."
-$itemsDeleted = 0
-$itemsSufficient = 1
-$extraItems = 0
-$extraItemsMax = 1
-
-$user = New-Object System.Security.Principal.NTAccount($env:UserName)
-$SID = $user.Translate([System.Security.Principal.SecurityIdentifier]).value
-$SIDClasses = "$($sid) '_Classes'"
-$keyPath = "REGISTRY::HKEY_USERS\$SIDClasses\.ips"
-$valueData = "FloatingIPSFileIPS"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-RegistryKeyPropertiesByvalueData $keyPath $valueData
-    $itemsDeleted++
-    $valueCount = $($key.Property.Count)
-    if ($valueCount -eq 1) {
-        Write-Verbose 'There seems to be no other programs on the "Open with" context menu for .ips.'
-        Remove-Item -Path $keyPath
-        Write-Verbose "Deleted key '$keyPath'."
-        $extraItems++
+    else {
+        Write-Verbose "Key not found: $keyPath."
     }
-}
 
-Write-Report
+    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
 
-Write-Verbose "´n"
-Write-Verbose "´n"
-Write-Verbose "´n"
-Write-Verbose 'Attempting to remove flips.exe from the "Open with" menu...'
-Write-Verbose "´n"
-Write-Verbose "Searching HKCR..."
-$itemsDeleted = 0
-$itemsSufficient = 1
-$extraItems = 0
-$extraItemsMax = 0
-$keyPath = "REGISTRY::HKEY_CLASSES_ROOT\Applications\flips.exe"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-Item -Path $keyPath -Recurse -Force
-    Write-Verbose "Deleted key '$keyPath'."
-    $itemsDeleted++
-}
-else {
-    Write-Verbose "Key not found: $keyPath."
-}
+    Write-Verbose "´n"
+    Write-Verbose "Attempting to remove remaining file type handler..."
+    Write-Verbose "´n"
+    Write-Verbose "Searching HKCU..."
+    $itemsDeleted = 0
+    $itemsSufficient = 2
+    $extraItems = 0
+    $extraItemsMax = 0
 
-Write-Report
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file\shell\open\command"
+    $keyPath2 = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file"
+    $keyPath3 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
+    $valueName2 = "ips_auto_file_.ips"
+    if (Test-Path -Path $keyPath -ea 0) {
+        $key = Get-Item -Path $keyPath
+        $keyValues = $key.Property # easier to understand (for me at least)
+        foreach ($value in $keyValues) {
+            # Get the data of the value
+            $data = Get-ItemPropertyValue -Path $keyPath -Name $value
 
-Write-Verbose "´n"
-Write-Verbose "´n"
-Write-Verbose "´n"
-Write-Verbose 'Attempting to remove flips.exe the MUI Cache...'
-Write-Verbose "´n"
-Write-Verbose "Searching HKCR..."
-$itemsDeleted = 0
-$itemsSufficient = 1
-$extraItems = 0
-$extraItemsMax = 0
-$keyPath = "REGISTRY::HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
-$valueData = "flips.exe"
-if (Test-Path -Path $keyPath -ea 0) {
-    Remove-RegistryKeyPropertiesByvalueData $keyPath $valueData
-    $itemsDeleted++
-}
-else {
-    Write-Verbose "Key not found: $keyPath."
-}
+            # Check if the data matches $valueData
+            if ($data -eq $valueData) {
+                
+                # Remove its parent keys
+                Write-Verbose "Found data '$valueData' in key '$keyPath'."
+                Remove-Item -Path $keyPath2 -Recurse -Force
+                Write-Verbose "Deleted parent key '$keyPath' recursively."
+                $itemsDeleted++
 
-Write-Report
-
-Write-Verbose "´n"
-Write-Verbose "Attempting to remove file type handlers..."
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 
-$extraItems = 0
-$extraItemsMax = 0
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file\shell\open\command"
-$keyPath2 = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file"
-$keyPath3 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
-$valueName2 = "ips_auto_file_.ips"
-if (Test-Path -Path $keyPath -ea 0) {
-    $key = Get-Item -Path $keyPath
-    $keyValues = $key.Property # easier to understand (for me at least)
-    foreach ($value in $keyValues) {
-        # Get the data of the value
-        $data = Get-ItemPropertyValue -Path $keyPath -Name $value
-
-        # Check if the data matches $valueData
-        if ($data -eq $valueData) {
-            
-            # Remove its parent keys
-            Write-Verbose "Found data '$valueData' in key '$keyPath'."
-            Remove-Item -Path $keyPath2 -Recurse -Force
-            Write-Verbose "Deleted parent key '$keyPath' recursively."
-            $itemsDeleted++
-
-            # Also remove this value in this key
-            Remove-ItemProperty -Path $keyPath3 -Name $valueName2
-            Write-Verbose "Deleted value '$valueName2' in key '$keyPath3'."
-            $itemsDeleted++
+                # Also remove this value in this key
+                if (Test-RegistryValue $keyPath3 $valueName2 -ea 0) {
+                    Remove-ItemProperty -Path $keyPath3 -Name $valueName2
+                    Write-Verbose "Deleted value '$valueName2' in key '$keyPath3'."
+                    $itemsDeleted++
+                }
+            }
         }
     }
 }
 
 
-<#
-
-## BPS
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 
-$extraItems = 0
-$extraItemsMax = 
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "Applications\flips.exe_.bps"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-## GB
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 
-$extraItems = 0
-$extraItemsMax = 
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "Applications\flips.exe_.gb"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-## GBA
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 
-$extraItems = 0
-$extraItemsMax = 
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "Applications\flips.exe_.gba"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-
-# GBA_AUTO_FILE
-$keyPath   = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file\shell\open\command"
-$keyPath2  = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file"
-$keyPath3  = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
-$valueName2 = "ips_auto_file_.ips"
-if (Test-Path -Path $keyPath -ea 0) {
-    $key = Get-Item -Path $keyPath
-    $keyValues = $key.Property # easier to understand (for me at least)
-    foreach ($value in $keyValues) {
-        # Get the data of the value
-        $data = Get-ItemPropertyValue -Path $keyPath -Name $value
-
-        # Check if the data matches $valueData
-        if ($data -eq $valueData) {
-            
-            # Remove its parent keys
-            Write-Verbose "Found data '$valueData' in key '$keyPath'."
-            Remove-Item -Path $keyPath2 -Recurse -Force
-            Write-Verbose "Deleted parent key '$keyPath' recursively."
-            $itemsDeleted++
-
-            # Also remove this value in this key
-            Remove-ItemProperty -Path $keyPath3 -Name $valueName2
-            Write-Verbose "Deleted value '$valueName2' in key '$keyPath3'."
-            $itemsDeleted++
-        }
-    }
-}
-
-
-
-## SFC
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 
-$extraItems = 0
-$extraItemsMax = 
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "Applications\flips.exe_.sfc"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-
-
-## SMC
-
-Write-Verbose "´n"
-Write-Verbose "Searching HKCU..."
-$itemsDeleted = 0
-$itemsSufficient = 
-$extraItems = 0
-$extraItemsMax = 
-
-$keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-$valueName = "Applications\flips.exe_.smc"
-if (Test-Path -Path $keyPath -ea 0) {
-    # Remove this value in this key
-    Remove-ItemProperty -Path $keyPath -Name $valueName
-    Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-    $itemsDeleted++
-}
-
-
-#>
-
-Write-Report
+Clear-FileAssocPatchFile "bps"
+Clear-FileAssocPatchFile "ips"
+Clear-FileAssocRomFile "gb"
+Clear-FileAssocRomFile "gbc"
+Clear-FileAssocRomFile "gba"
+Clear-FileAssocRomFile "sfc"
+Clear-FileAssocRomFile "smc"
+Clear-RemainingKeys
 
 ## REMOVE FILE ASSOCIATION?
 ## REMOVE SHORTCUTS
