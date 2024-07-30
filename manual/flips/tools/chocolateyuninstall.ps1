@@ -54,38 +54,6 @@ if (Test-Administrator) {
 
 # Remove registry keys (mostly file associations)
 
-
-function Test-RegistryValue {
-    param(
-        [Alias("PSPath")]
-        [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-        [String]$Path
-        ,
-        [Parameter(Position = 1, Mandatory = $true)]
-        [String]$Name
-        ,
-        [Switch]$PassThru
-    ) 
-
-    process {
-        if (Test-Path $Path) {
-            $Key = Get-Item -LiteralPath $Path
-            if ($Key.GetValue($Name, $null) -ne $null) {
-                if ($PassThru) {
-                    Get-ItemProperty $Path $Name
-                } else {
-                    $true
-                }
-            } else {
-                $false
-            }
-        } else {
-            $false
-        }
-    }
-}
-
-
 function Remove-RegistryKeyPropertiesByvalueData($keyPath, $valueData) {
     $key = Get-Item -Path $keyPath
     $keyValues = $key.Property # easier to understand (for me at least)
@@ -169,7 +137,7 @@ function Clear-FileAssocPatchFile($ext) {
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "Applications\flips.exe_.$ext"
-    if (Test-Path -Path $keyPath -ea 0) {
+    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
         # Remove this value in this key
         Remove-ItemProperty -Path $keyPath -Name $valueName
         Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
@@ -178,14 +146,14 @@ function Clear-FileAssocPatchFile($ext) {
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "FloatingIPSFile$extUC" + "_.$ext"
-    if (Test-Path -Path $keyPath -ea 0) {
+    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
         # Remove this value in this key
         Remove-ItemProperty -Path $keyPath -Name $valueName
         Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
         $itemsDeleted++
     }
 
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.gba\OpenWithList"
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithList"
     if (Test-Path -Path $keyPath -ea 0) {
         Remove-RegistryKeyPropertiesByvalueData $keyPath "flips.exe"
         $itemsDeleted++
@@ -199,13 +167,12 @@ function Clear-FileAssocPatchFile($ext) {
         }
     }
 
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.bps\OpenWithProgids"
-    if (Test-Path -Path $keyPath -ea 0) {
-        if (Get-ItemProperty -Path $keyPath -Name "FloatingIPSFile$extUC" -ea 0) {
-            Remove-ItemProperty -Path $keyPath -Name "FloatingIPSFile$extUC"
-            Write-Verbose "Deleted value 'FloatingIPSFile$extUC' in key '$keyPath'."
-            $itemsDeleted++
-        }
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithProgids"
+    if ((Test-Path -Path $keyPath -ea 0) -And (Get-ItemProperty -Path $keyPath -Name "FloatingIPSFile$extUC" -ea 0)) {
+        # Remove this value in this key
+        Remove-ItemProperty -Path $keyPath -Name "FloatingIPSFile$extUC"
+        Write-Verbose "Deleted value 'FloatingIPSFile$extUC' in key '$keyPath'."
+        $itemsDeleted++
         $key = Get-Item -Path $keyPath
         $valueCount = $($key.Property.Count)
         if ($valueCount -eq 1) {
@@ -236,11 +203,20 @@ function Clear-FileAssocPatchFile($ext) {
     $extraItems = 0
     $extraItemsMax = 1
 
-    $user = New-Object System.Security.Principal.NTAccount($env:UserName);
-    $SID = $user.Translate([System.Security.Principal.SecurityIdentifier]).value;
-    $SIDClasses = $($sid) + '_Classes';
-    $keyPath = "REGISTRY::HKEY_USERS\$SIDClasses\.$ext";
-    Write-Output $(Test-Path -Path $keyPath)
+    $user = New-Object System.Security.Principal.NTAccount($env:UserName)
+    $SID = $user.Translate([System.Security.Principal.SecurityIdentifier]).value
+    $SIDClasses = $($sid) + '_Classes'
+
+    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueName = "FloatingIPSFile$extUC" + "_.$ext"
+    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
+        # Remove this value in this key
+        Remove-ItemProperty -Path $keyPath -Name $valueName
+        Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
+        $itemsDeleted++
+    }
+
+    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Clasess.$ext"
     if (Test-Path -Path $keyPath -ea 0) {
         Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFile$extUC"
         $itemsDeleted++
@@ -253,14 +229,16 @@ function Clear-FileAssocPatchFile($ext) {
         }
     }
 
-    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-    $valueName = "FloatingIPSFile$extUC" + "_.$ext"
+    $keyPath = "REGISTRY::HKEY_USERS\$SIDClasses\.$ext"
     if (Test-Path -Path $keyPath -ea 0) {
-        # Remove this value in this key if it exists
-        if (Test-RegistryValue $keyPath $valueName -ea 0) {
-            Remove-ItemProperty -Path $keyPath -Name $valueName
-            Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-            $itemsDeleted++
+        Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFile$extUC"
+        $itemsDeleted++
+        $valueCount = $($key.Property.Count)
+        if ($valueCount -eq 1) {
+            Write-Verbose "There are no other programs associated with .$extUC."
+            Remove-Item -Path $keyPath
+            Write-Verbose "Deleted key '$keyPath'."
+            $extraItems++
         }
     }
 
@@ -285,20 +263,16 @@ function Clear-FileAssocRomFile($ext) {
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "Applications\flips.exe_.$ext"
-    if (Test-Path -Path $keyPath -ea 0) {
-        # Remove this value in this key if it exists
-        if (Test-RegistryValue $keyPath $valueName -ea 0) {
-            Remove-ItemProperty -Path $keyPath -Name $valueName
-            Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
-            $itemsDeleted++
-        }
+    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
+        # Remove this value in this key
+        Remove-ItemProperty -Path $keyPath -Name $valueName
+        Write-Verbose "Deleted value '$valueName' in key '$keyPath'."
+        $itemsDeleted++
     }
 
     $keyPath   = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file\shell\open\command"
-    $keyPath2   = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file"
-    $keyPath3  = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $keyPath2  = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file"
     $valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
-    $valueName2 = $ext + "_auto_file_." + $ext
     if (Test-Path -Path $keyPath -ea 0) {
         $key = Get-Item -Path $keyPath
         $keyValues = $key.Property # easier to understand (for me at least)
@@ -310,19 +284,22 @@ function Clear-FileAssocRomFile($ext) {
             if ($data -eq $valueData) {
                 
                 # Remove its parent keys
-                Write-Verbose "Found data '$valueData' in key '$keyPath'."
+                Write-Verbose "Found data '$valueData' in key '$keyPath2'."
                 Remove-Item -Path $keyPath2 -Recurse -Force
-                Write-Verbose "Deleted parent key '$keyPath' recursively."
+                Write-Verbose "Deleted parent key '$keyPath2' recursively."
                 $itemsDeleted++
 
-                # Also remove this value in this key
-                if (Test-RegistryValue $keyPath3 $valueName2 -ea 0) {
-                    Remove-ItemProperty -Path $keyPath3 -Name $valueName2
-                    Write-Verbose "Deleted value '$valueName2' in key '$keyPath3'."
-                    $itemsDeleted++
-                }
             }
         }
+    }
+    
+    $keyPath   = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueName = $ext + "_auto_file_." + $ext
+    if (Get-ItemProperty -Path $keyPath3 -Name $valueName2 -ea 0) {
+        # Remove this value in this key
+        Remove-ItemProperty -Path $keyPath3 -Name $valueName2
+        Write-Verbose "Deleted value '$valueName2' in key '$keyPath3'."
+        $itemsDeleted++
     }
 
 }
@@ -401,9 +378,8 @@ function Clear-RemainingKeys() {
                 Remove-Item -Path $keyPath2 -Recurse -Force
                 Write-Verbose "Deleted parent key '$keyPath' recursively."
                 $itemsDeleted++
-
-                # Also remove this value in this key
-                if (Test-RegistryValue $keyPath3 $valueName2 -ea 0) {
+                
+                if (Get-ItemProperty -Path $keyPath3 -Name $valueName2 -ea 0) {
                     Remove-ItemProperty -Path $keyPath3 -Name $valueName2
                     Write-Verbose "Deleted value '$valueName2' in key '$keyPath3'."
                     $itemsDeleted++
