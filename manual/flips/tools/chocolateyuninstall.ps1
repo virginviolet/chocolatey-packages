@@ -88,7 +88,7 @@ function Remove-RegistryKeyPropertiesByvalueData($keyPath, $valueData) {
 }
 
 function Write-Report($itemsDeleted, $itemsSufficient, $extraItems, $extraItemsMax) {
-    Write-Verbose "Removed $itemsDeleted/$itemsSufficient sufficient items and $extraItems/$extraItemsMax' extra items."
+    Write-Verbose "Removed $itemsDeleted/$itemsSufficient sufficient items and $extraItems/$extraItemsMax extra items."
 }
 
 function Clear-FileAssocPatchFile($ext) {
@@ -114,7 +114,7 @@ function Clear-FileAssocPatchFile($ext) {
         $keyValues = $key.Property
         $valueCount = $($keyValues.Count)
         if ($valueCount -eq 0) {
-            Write-Verbose "There does NOT seems to be other programs associated with $extUC files."
+            Write-Verbose "There does NOT seem to be other programs associated with $extUC files."
             try {
                 # Remove the key
                 Remove-Item -Path $keyPath -Force
@@ -122,7 +122,7 @@ function Clear-FileAssocPatchFile($ext) {
                 $extraItems++
             }
             catch {
-                Write-Verbose "Attempt to tidy up by deleting the key '$keyPath' failed, possibly due to lacking administrative permissions. This is not an issue."
+                Write-Verbose "Attempt to tidy up by deleting the key '$keyPath' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue."
             }
         } else {
             Write-Verbose "There DOES seem to be other program(s) associated with $extUC files. Will NOT delete key '$keyPath'."
@@ -147,7 +147,7 @@ function Clear-FileAssocPatchFile($ext) {
     $itemsDeleted = 0
     $itemsSufficient = 4
     $extraItems = 0
-    $extraItemsMax = 3
+    $extraItemsMax = 4
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "Applications\flips.exe_.$ext"
@@ -171,7 +171,6 @@ function Clear-FileAssocPatchFile($ext) {
         Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'."
     }
 
-
     $keyPathChild1 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithList"
     if (Test-Path -Path $keyPathChild1 -ea 0) {
         Remove-RegistryKeyPropertiesByvalueData $keyPathChild1 "flips.exe"
@@ -180,7 +179,7 @@ function Clear-FileAssocPatchFile($ext) {
         $keyValues = $key.Property
         $valueCount = $($keyValues.Count)
         if ($valueCount -le 1) { # only MRUList value left
-            Write-Verbose "There does NOT seems to be other programs on the ""Open with"" context menu for $extUC files."
+            Write-Verbose "There does NOT seem to be other programs on the ""Open with"" context menu for $extUC files."
             Remove-Item -Path $keyPathChild1
             Write-Verbose "REMOVED: key '$keyPathChild1'."
             $extraItems++
@@ -202,7 +201,7 @@ function Clear-FileAssocPatchFile($ext) {
         $keyValues = $key.Property
         $valueCount = $($keyValues.Count)
         if ($valueCount -le 1) { # only MRUList value left
-            Write-Verbose "There does NOT seems to be other programs on the ""Open with"" context menu for $extUC files."
+            Write-Verbose "There does NOT seem to be other programs on the ""Open with"" context menu for $extUC files."
             # Remove key
             Remove-Item -Path $keyPathChild2
             Write-Verbose "REMOVED: key '$keyPathChild2'."
@@ -219,6 +218,27 @@ function Clear-FileAssocPatchFile($ext) {
         }
     }
 
+    $keyPathChild3 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\UserChoice"
+    $valueName = "ProgId"
+    $valueData = "Applications\flips.exe"
+    # if key exists and the value name "ProgId" has data that directs to Flips, which means Flips is the preferred program by the user for this file extension.
+    if ((Test-Path -Path $keyPathChild3 -ea 0) -And ((Get-ItemPropertyValue -Path $keyPathChild3 -name $valueName -ea 0) -eq $valueData)) {
+        try {
+            # Remove the key
+            Remove-Item -Path $keyPathChild3 -Force
+            Write-Verbose "REMOVED: key '$keyPathChild3'."
+            $extraItems++
+        }
+        catch {
+            Write-Verbose "Attempt to tidy up by deleting the key '$keyPathChild3' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue."
+        }
+    } elseif (-Not (Test-Path -Path $keyPathChild3 -ea 0)) {
+            Write-Verbose "NOT FOUND: key '$keyPathChild3'."
+    } elseif ((Get-ItemPropertyValue -Path $keyPathChild3 -name "ProgId" -ea 0) -ne "Applications\flips.exe") {
+        Write-Verbose "Value '$valueName' in key '$keyPathChild3' does not have the data '$valueData', because $extUC files are not set to always run with Flips."
+        $extraItems++
+    }
+    
     $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
     $keyPathChild1 = $keyPathChild1.Substring("REGISTRY::".Length) ## remove prefix
     $keyPathChild2 = $keyPathChild2.Substring("REGISTRY::".Length) ## remove prefix
@@ -226,9 +246,15 @@ function Clear-FileAssocPatchFile($ext) {
         $subKeyNames = (Get-ChildItem -Path $keyPathParent).Name
         if (-Not ($keyPathChild1 -in ($subKeyNames)) -And -Not ($keyPathChild2 -in $subKeyNames)) {
             Write-Verbose "There does NOT seem to be any other program on the ""Open with"" context menu for $extUC files."
-            Remove-Item -Path $keyPathParent -Recurse -Force
-            Write-Verbose "REMOVED: parent key '$keyPathParent' recursively."
-            $extraItems++
+            try {
+                # Remove the key
+                Remove-Item -Path $keyPathParent -Recurse -Force
+                Write-Verbose "REMOVED: parent key '$keyPathParent' recursively."
+                $extraItems++
+            }
+            catch {
+                Write-Verbose "Attempt to tidy up by deleting the key '$keyPathParent' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue."
+            }
         } else {
             Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT delete key '$keyPathParent'."
         }
@@ -260,14 +286,14 @@ function Clear-FileAssocPatchFile($ext) {
         Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'."
     }
 
-    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Clasess.$ext"
+    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Clasess\.$ext"
     if (Test-Path -Path $keyPath -ea 0) {
         Remove-RegistryKeyPropertiesByvalueData $keyPath "FloatingIPSFile$extUC"
         $itemsDeleted++
         $keyValues = $key.Property
         $valueCount = $($keyValues.Count)
         if ($valueCount -eq 0) {
-            Write-Verbose "There does NOT seems to be other programs associated with $extUC files."
+            Write-Verbose "There does NOT seem to be other programs associated with $extUC files."
             Remove-Item -Path $keyPath
             Write-Verbose "REMOVED: key '$keyPath'."
             $extraItems++
@@ -285,7 +311,7 @@ function Clear-FileAssocPatchFile($ext) {
         $keyValues = $key.Property
         $valueCount = $($keyValues.Count)
         if ($valueCount -eq 0) {
-            Write-Verbose 'There does NOT seems to be other programs associated with $extUC files.'
+            Write-Verbose 'There does NOT seem to be other programs associated with $extUC files.'
             Remove-Item -Path $keyPath
             Write-Verbose "REMOVED: key '$keyPath'."
             $extraItems++
@@ -313,9 +339,9 @@ function Clear-FileAssocRomFile($ext) {
     Write-Verbose "`n"
     Write-Verbose "Searching HKCU..."
     $itemsDeleted = 0
-    $itemsSufficient = 3
+    $itemsSufficient = 5
     $extraItems = 0
-    $extraItemsMax = 0
+    $extraItemsMax = 2
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "Applications\flips.exe_.$ext"
@@ -379,7 +405,7 @@ function Clear-FileAssocRomFile($ext) {
         $keyValues = $key.Property
         $valueCount = $($keyValues.Count)
         if ($valueCount -le 1) { # only MRUList value left
-            Write-Verbose "There does NOT seems to be other programs on the ""Open with"" context menu for $extUC files."
+            Write-Verbose "There does NOT seem to be other programs on the ""Open with"" context menu for $extUC files."
             # Remove the key
             Remove-Item -Path $keyPathChild1
             Write-Verbose "REMOVED: key '$keyPathChild1'."
@@ -410,13 +436,31 @@ function Clear-FileAssocRomFile($ext) {
         } else {
             Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT delete key '$keyPathChild2'."
         }
-    } else {
-        if (Test-Path -Path $keyPathChild2 -ea 0) {
+    } elseif (-Not (Test-Path -Path $keyPathChild2 -ea 0)) {
             Write-Verbose "NOT FOUND: key '$keyPathChild2'."
+    } elseif (Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0) {
+        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPathChild2'."
+    }
+
+    $keyPathChild3 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\UserChoice"
+    $valueName = "ProgId"
+    $valueData = "Applications\flips.exe"
+    # if key exists and the value name "ProgId" has data that directs to Flips, which means Flips is the preferred program by the user for this file extension.
+    if ((Test-Path -Path $keyPathChild3 -ea 0) -And ((Get-ItemPropertyValue -Path $keyPathChild3 -name $valueName -ea 0) -eq $valueData)) {
+        try {
+            # Remove the key
+            Remove-Item -Path $keyPathChild3 -Force
+            Write-Verbose "REMOVED: key '$keyPathChild3'."
+            $extraItems++
         }
-        if (Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0) {
-            Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPathChild2'."
+        catch {
+            Write-Verbose "Attempt to tidy up by deleting the key '$keyPathChild3' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue."
         }
+    } elseif (-Not (Test-Path -Path $keyPathChild3 -ea 0)) {
+            Write-Verbose "NOT FOUND: key '$keyPathChild3'."
+    } elseif ((Get-ItemPropertyValue -Path $keyPathChild3 -name "ProgId" -ea 0) -ne "Applications\flips.exe") {
+        Write-Verbose "Value '$valueName' in key '$keyPathChild3' does not have the data '$valueData', because $extUC files are not set to always run with Flips."
+        $extraItems++
     }
 
     $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
@@ -426,10 +470,15 @@ function Clear-FileAssocRomFile($ext) {
         $subKeyNames = (Get-ChildItem -Path $keyPathParent).Name
         if (-Not ($keyPathChild1 -in ($subKeyNames)) -And -Not ($keyPathChild2 -in $subKeyNames)) {
             Write-Verbose "There does NOT seem to be any other program on the ""Open with"" context menu for $extUC files."
-            # Remove the key
-            Remove-Item -Path $keyPathParent -Recurse -Force
-            Write-Verbose "REMOVED: parent key '$keyPathParent' recursively."
-            $extraItems++
+            try {
+                # Remove the key
+                Remove-Item -Path $keyPathParent -Recurse -Force
+                Write-Verbose "REMOVED: parent key '$keyPathParent' recursively."
+                $extraItems++
+            }
+            catch {
+                Write-Verbose "Attempt to tidy up by deleting the key '$keyPathParent' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue."
+            }
         } else {
             Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT delete key '$keyPathParent'."
         }
