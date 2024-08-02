@@ -10,6 +10,7 @@
 
 $ErrorActionPreference = 'Stop' # stop on all errors
 $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$toolsDir = "C:\ProgramData\chocolatey\lib\flips\tools"
 $zipArchive = Join-Path $toolsDir -ChildPath 'flips-windows.zip'
 $unzipDir = Join-Path $toolsDir -ChildPath 'builds'
 
@@ -65,7 +66,6 @@ function Remove-RegistryValuesByValueData($keyPath, $valueData) {
 
             # Remove the value
             try {
-                echo "trying"
                 Remove-ItemProperty -Path $keyPath -Name $value # PowerShell bug causes error if name is '(default)' 
                 Write-Verbose "REMOVED: value '$value' with data '$data' in key '$keyPath'.".Replace("REGISTRY::","")
                 $found = $true
@@ -458,7 +458,7 @@ function Clear-FileAssocRomFile($ext) {
     } elseif (-Not (Test-Path -Path $keyPathChild3 -ea 0)) {
             Write-Verbose "NOT FOUND: key '$keyPathChild3'.".Replace("REGISTRY::","")
     } elseif ((Get-ItemPropertyValue -Path $keyPathChild3 -name "ProgId" -ea 0) -ne "Applications\flips.exe") {
-        Write-Verbose "Value '$valueName' in key '$keyPathChild3' does not have the data '$valueData', because $extUC files are not set to always run with Flips.".Replace("REGISTRY::","")
+        Write-Verbose "Value '$valueName' in key '$keyPathChild3' does not have the data '$valueData', because $extUC files are set to always run with another program than Flips.".Replace("REGISTRY::","")
         $extraItems++
     }
 
@@ -483,10 +483,16 @@ function Clear-FileAssocRomFile($ext) {
         } else {
             Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT delete key '$keyPathParent'.".Replace("REGISTRY::","")
         }
-    } else {
-        Write-Verbose "NOT FOUND: key '$keyPathChild1'.".Replace("REGISTRY::","")
+    } elseif (($removeAutoFile2 = $true) -And `
+    (-Not (Test-Path -Path $keyPathParent -ea 0))){
+        Write-Verbose "Will NOT remove because it seems to be associated with another program: key '$keyPathParent'.".Replace("REGISTRY::","")
+    } elseif (($removeAutoFile2 = $false) -And `
+    (Test-Path -Path $keyPathParent -ea 0)){
+        Write-Verbose "NOT FOUND: key '$keyPathParent'.".Replace("REGISTRY::","")
     }
 
+    # TODO: DON'T DELETE THIS VALUE IF AUTO FILE IS USED BY OTHER PROGRAM
+    # TODO elseif
     $keyPath   = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = $ext + "_auto_file_." + $ext
     # I don't want to remove this value if *_auto_file was used by any other program than Flips,
@@ -508,7 +514,7 @@ function Clear-RemainingKeys() {
     Write-Verbose "`n"
     Write-Verbose "`n"
     Write-Verbose "`n"
-    Write-Verbose 'Continue removing flips.exe from the "Open with" menu...'
+    Write-Verbose 'Attempting to remove flips.exe from the "Open with" digalog...'
     Write-Verbose "`n"
     Write-Verbose "Searching HKCR..."
     $itemsDeleted = 0
@@ -539,7 +545,8 @@ function Clear-RemainingKeys() {
     $extraItemsMax = 0
 
     $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
-    # very slow, but finds key even if installed in another location 
+
+    # very (unless I did something wrong) slow, but finds key even if installed in another location 
     <# 
     $keyPath = $keyPath.Substring("REGISTRY::".Length) ## remove prefix
         $valueData = "flips.exe"
@@ -553,13 +560,13 @@ function Clear-RemainingKeys() {
     } #>
     
     $valueName = Join-Path $unzipDir -ChildPath "windows-x64-gui.zip\flips.exe.FriendlyAppName"
-    $subKeyNames = (Get-ChildItem -Path $keyPathParent).Name
-    if ($keyPath -in ($subKeyNames)) {
+    Write-Verbose "SEARCHING FOR: value '$valueName' in '$keyPath'.".Replace("REGISTRY::","")
+    if ($keyPath -in ((Get-Item -Path $keyPath).Property)) {
         Remove-ItemProperty -Path $keyPath -Name $value
-        Write-Verbose "REMOVED: value '$value' in key '$keyPath'.".Replace("REGISTRY::","")
+        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::","")
         $itemsDeleted++
-    else {
-        Write-Verbose "NOT FOUND: value '$value' in key '$keyPath'.".Replace("REGISTRY::","")}
+    } else {
+        Write-Verbose "NOT FOUND: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::","")
     }
 
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
@@ -577,39 +584,45 @@ function Clear-RemainingKeys() {
     $keyPathChild = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file\shell\open\command"
     $valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
     $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file"
-    $autoFileKeyRemoved = $false # initialize variable
+    $autoFile1 = 'unset'  # initialize variable
     if (Test-Path -Path $keyPathChild -ea 0) {
         $key = Get-Item -Path $keyPathChild
         $keyValues = $key.Property # easier to understand (for me at least)
-        $found = $false # initialize variable
         foreach ($value in $keyValues) {
             $data = Get-ItemPropertyValue -Path $keyPathChild -Name $value # Get the data of the value
             if ($data -eq $valueData) { # Check if the data matches $valueData
                 Write-Verbose "Found data '$valueData' in key '$keyPathChild'.".Replace("REGISTRY::","")
                 Remove-Item -Path $keyPathParent -Recurse -Force # Remove relevant parent keys
                 Write-Verbose "REMOVED: parent key '$keyPathChild' recursively.".Replace("REGISTRY::","")
-                $found = $true
-                $autoFileKeyRemoved = $true
+                $autoFile1 = 'flips'
                 $itemsDeleted++
+                break
             }
         }
-        if ($found -eq $false) {
-            Write-Verbose "NOT FOUND: value with data '$valueData' in key '$keyPathChild'.".Replace("REGISTRY::","")
+        if ($removeAutoFile -eq $false) {
+            Write-Verbose "NOT FOUND: value with data '$valueData' in key '$keyPathChild.".Replace("REGISTRY::","")
+            $autoFile1 = 'not_flips'
         }
     } else {
-        Write-Verbose "NOT FOUND: key '$keyPathChild'.".Replace("REGISTRY::","")
+        if (-Not (Test-Path -Path $keyPathParent -ea 0)){
+            Write-Verbose "NOT FOUND: key '$keyPathParent'. Will NOT attempt to investigate its non-existing subkey '$keyPathChild'.".Replace("REGISTRY::","")
+        }
+        else {
+            Write-Verbose "NOT FOUND: key '$keyPathChild'.".Replace("REGISTRY::","")
+        }
     }
-
-    # Not included in CLean-FileAssocPatchFile because I haven't seen 'bps_auto_file' in this location, only 'ips_auto_file'.
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    
+    $keyPathAutoFile2 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "ips_auto_file_.ips"
-    if (($autoFileKeyRemoved -eq $true) -And ` # Only continue if we removed the ips_auto_file key, and
-    (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0)) { # this key has this value
-        Remove-ItemProperty -Path $keyPath -Name $valueName # Remove the value
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::","")
+    if (($autoFile1 -ne 'not_flips') -And ` # Don't continue if another application is using the aute_file key, and
+    (Get-ItemProperty -Path $keyPathAutoFile2 -Name $valueName -ea 0)) { # this key has this value
+        Remove-ItemProperty -Path $keyPathAutoFile2 -Name $valueName # Remove the value
+        Write-Verbose "REMOVED: value '$valueName' in key '$keyPathAutoFile2'.".Replace("REGISTRY::","")
         $itemsDeleted++
+    } elseif ($autoFile1 -eq 'not_flips') {
+        Write-Verbose "Will NOT remove because it seems to be associated with another program: key '$keyPathAutoFile2'.".Replace("REGISTRY::","")
     } else {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'.".Replace("REGISTRY::","")
+        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPathAutoFile2'.".Replace("REGISTRY::","") # Did not find autoFile1 nor autoFlie2
     }
 
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
@@ -619,7 +632,7 @@ function Clear-RemainingKeys() {
 
 Clear-FileAssocPatchFile "bps"
 Clear-FileAssocPatchFile "ips"
-pause
+# pause
 Clear-FileAssocRomFile "gb"
 Clear-FileAssocRomFile "gbc"
 Clear-FileAssocRomFile "gba"
