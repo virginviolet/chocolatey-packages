@@ -371,7 +371,7 @@ function Clear-FileAssocRomFile($ext) {
     $keyPath         = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file\shell\open\command"
     $keyPath2        = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file"
     $valueData       = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
-    if (Test-Path -Path $keyPath -ea 0) { # if no other keys in this path
+    if (Test-Path -Path $keyPath -ea 0) {
         $key = Get-Item -Path $keyPath
         $keyValues = $key.Property # easier to understand (for me at least)
         $found = $false
@@ -425,15 +425,21 @@ function Clear-FileAssocRomFile($ext) {
 
     $keyPathChild2 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithProgids"
     $valueName = $ext + "_auto_file"
+    $pathOk = [bool](Test-Path -Path $keyPathChild2 -ea 0)
+    $foundValue = [bool](Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0)
     
-    # Because this section only removes the generic auto_file handeler, we only continue if no other program is using that handler
+    # Because this section only removes the generic auto_file handler, we only continue if Flips was the last and only program on the "Open With" context menu.
     # OnlyFlips - Keys no longer important and (unless something went wrong) have been removed - safe to continue 
     # Unset - OpenWithList key doesn't exist - safe to continue
-    # NotOnlyFlips - Keys still relevant for other programss - don't continue
-    if (($autoFileItem2 -ne $NotOnlyFlips) -And ` # It was not only Flips that used these keys, and
-    (Test-Path -Path $keyPathChild2 -ea 0) -And ` # this subkey exists and
-    (Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0)) { # has the value $valueName
-        # Remove the value $valueName in this key
+    # NotOnlyFlips - Keys still relevant for other programs - don't continue
+    if (-Not ($pathOk)) {
+        Write-Verbose "NOT FOUND: key '$keyPathChild2'.".Replace("REGISTRY::","")
+    }
+    if (($autoFileItem2 -eq $NotOnlyFlips) -And ($pathOk)) {
+        Write-Verbose "Will NOT remove key '$keyPathChild2', because it seems to be associated with another program.".Replace("REGISTRY::","")
+    }
+    if (($autoFileItem2 -ne $NotOnlyFlips) -And ($pathOk) -And ($foundValue)) { # found value $valueName in $keyPathChild2
+        # Remove the value we found
         Remove-ItemProperty -Path $keyPathChild2 -Name $valueName
         Write-Verbose "REMOVED: value '$valueName' in key '$keyPathChild2'.".Replace("REGISTRY::","")
         $itemsDeleted++
@@ -445,20 +451,13 @@ function Clear-FileAssocRomFile($ext) {
             # Remove the now empty key
             Remove-Item -Path $keyPathChild2
             Write-Verbose "REMOVED: key '$keyPathChild2'.".Replace("REGISTRY::","")
-            # It would be redundant to set $autoFileItem2 to $NotOnlyFlips here, beceause we wouldn't be here if it wasn't already set to that
             $extraItems++
         } else { # other handlers than auto_file found
             Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT remove key '$keyPathChild2'.".Replace("REGISTRY::","")
-            $autoFileItem2 = $NotOnlyFlips
+            # I guess we can still go ahead and remove the auto_ips handler, so let's set $autoFileItem2 = OnlyFlips, which means "ok to remove (or removed, if removed)" (sorry for confusion).
+            # @TODO Better name for the states
+            
         }
-    } elseif ((-Not (Test-Path -Path $keyPathChild2 -ea 0))) {
-        Write-Verbose "NOT FOUND: key '$keyPathChild2'.".Replace("REGISTRY::","")
-    } elseif ($autoFileItem2 -eq $NotOnlyFlips) {
-        Write-Verbose "Will NOT remove because it seems to be associated with another program: key '$keyPathChild2'.".Replace("REGISTRY::","")
-    } elseif (Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0) {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPathChild2'.".Replace("REGISTRY::","")
-    } else { # I think it is logically impossible to get here.
-        Write-Warning "Something unexpected happen. autoFileItem2: '$autoFileItem2'. Test-Path: '$(Test-Path -Path $keyPathChild2 -ea 0). Get-Property: $((Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0)))'."
     }
 
     $keyPathChild3 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\UserChoice"
@@ -486,7 +485,7 @@ function Clear-FileAssocRomFile($ext) {
     $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
     $keyPathChild1 = $keyPathChild1.Substring("REGISTRY::".Length) ## remove prefix
     $keyPathChild2 = $keyPathChild2.Substring("REGISTRY::".Length) ## remove prefix
-    $pathOK = (Test-Path -Path $keyPathParent -ea 0)
+    $pathOk = (Test-Path -Path $keyPathParent -ea 0)
 
     # We clean up by removing this key if it is empty
     # OnlyFlips - Subkeys no longer important and (unless something went wrong) have been removed - safe to continue
@@ -516,7 +515,7 @@ function Clear-FileAssocRomFile($ext) {
     } elseif (-Not ($pathOk)){
         Write-Verbose "NOT FOUND: key '$keyPathParent'.".Replace("REGISTRY::","")
     } else { # I think it is logically impossible to get here.
-        Write-Warning "Something unexpected happen. autoFileItem2: '$autoFileItem2'. pathOk: '$pathok'."
+        Write-Warning "Something unexpected happen. autoFileItem2: '$autoFileItem2'. pathOk: '$pathOk'."
     }
 
     # TODO: DON'T remove THIS VALUE IF AUTO FILE IS USED BY OTHER PROGRAM
@@ -615,7 +614,7 @@ function Clear-RemainingKeys() {
     $extraItems = 0
     $extraItemsMax = 0
 
-    # Not included in CLean-FileAssocPatchFile because I haven't seen 'bps_auto_file' in this location, only 'ips_auto_file'.
+    # Not included in Clean-FileAssocPatchFile because I haven't seen 'bps_auto_file' in this location, only 'ips_auto_file'.
     $keyPathChild = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file\shell\open\command"
     $valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
     $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file"
