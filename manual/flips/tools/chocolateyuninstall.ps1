@@ -66,7 +66,8 @@ $Unset = [AutoFile]::Unset
 $OnlyFlips = [AutoFile]::OnlyFlips
 $NotOnlyFlips = [AutoFile]::NotOnlyFlips
 
-
+# @TODO: Remove HKU (et cetera?)
+# @TODO: Functinos should be "Remove-FileAssocByFlips($ext)" (removes in Classes: .ext... and FloatingFileIPSExt) and "Remove-FileAssocByUser($ext)" (removes in FileExts: .ext... ext_auto_file) and "Clean-MuiCache". 
 function Remove-RegistryValuesByValueData($keyPath, $valueData) {
     $key = Get-Item -Path $keyPath
     $keyValues = $key.Property # easier to understand (for me at least)
@@ -110,9 +111,7 @@ function Clear-FileAssocPatchFile($ext) {
     Write-Verbose "`n"
     Write-Verbose "`n"
     Write-Verbose "Attempting to remove Flips file association for $extUC..."
-
     Write-Verbose "`n"
-    Write-Verbose "Searching HKCR..."
     $itemsDeleted = 0
     $itemsSufficient = 2
     $extraItems = 0
@@ -155,7 +154,6 @@ function Clear-FileAssocPatchFile($ext) {
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
 
     Write-Verbose "`n"
-    Write-Verbose "Searching HKCU..."
     $itemsDeleted = 0
     $itemsSufficient = 4
     $extraItems = 0
@@ -277,69 +275,7 @@ function Clear-FileAssocPatchFile($ext) {
     }
 
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
-
-    Write-Verbose "`n"
-    Write-Verbose "Searching HKU..."
-    $itemsDeleted = 0
-    $itemsSufficient = 3
-    $extraItems = 0
-    $extraItemsMax = 2
-
-    $user = New-Object System.Security.Principal.NTAccount($env:UserName)
-    $SID = $user.Translate([System.Security.Principal.SecurityIdentifier]).value
-    $SIDClasses = $($sid) + '_Classes'
-
-    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-    $valueName = "FloatingIPSFile$extUC" + "_.$ext"
-    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
-        # Remove this value in this key
-        Remove-ItemProperty -Path $keyPath -Name $valueName
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::","")
-        $itemsDeleted++
-    } else {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'.".Replace("REGISTRY::","")
-    }
-
-    $keyPath = "REGISTRY::HKEY_USERS\$SID\Software\Classes\.$ext"
-    if (Test-Path -Path $keyPath -ea 0) {
-        Remove-RegistryValuesByValueData $keyPath "FloatingIPSFile$extUC"
-        $itemsDeleted++
-        $keyValues = $key.Property
-        $valueCount = $($keyValues.Count)
-        if ($valueCount -eq 0) {
-            Write-Verbose "There does NOT seem to be other programs associated with $extUC files."
-            Remove-Item -Path $keyPath
-            Write-Verbose "REMOVED: key '$keyPath'.".Replace("REGISTRY::","")
-            $extraItems++
-        } else {
-            Write-Verbose "There DOES seem to be other program(s) associated with $extUC files. Will NOT remove key '$keyPath'.".Replace("REGISTRY::","")
-        }
-    } else {
-        Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::","")
-    }
-
-    $keyPath = "REGISTRY::HKEY_USERS\$SIDClasses\.$ext"
-    if (Test-Path -Path $keyPath -ea 0) {
-        Remove-RegistryValuesByValueData $keyPath "FloatingIPSFile$extUC"
-        $itemsDeleted++
-        $keyValues = $key.Property
-        $valueCount = $($keyValues.Count)
-        if ($valueCount -eq 0) {
-            Write-Verbose 'There does NOT seem to be other programs associated with $extUC files.'
-            Remove-Item -Path $keyPath
-            Write-Verbose "REMOVED: key '$keyPath'.".Replace("REGISTRY::","")
-            $extraItems++
-        } else {
-            Write-Verbose "There DOES seem to be other program(s) associated with $extUC files. Will NOT remove key '$keyPath'.".Replace("REGISTRY::","")
-        }
-    } else {
-        Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::","")
-    }
-
-    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
-
 }
-
 
 function Clear-FileAssocRomFile($ext) {
     $extUC = $ext.ToUpper() # upper-case
@@ -349,9 +285,7 @@ function Clear-FileAssocRomFile($ext) {
     Write-Verbose "`n"
     Write-Verbose "`n"
     Write-Verbose "Attempting to remove Flips file association for $extUC..."
-
     Write-Verbose "`n"
-    Write-Verbose "Searching HKCU..."
     $itemsDeleted = 0
     $itemsSufficient = 5
     $extraItems = 0
@@ -549,7 +483,6 @@ function Clear-RemainingKeys() {
     Write-Verbose "`n"
     Write-Verbose 'Attempting to remove flips.exe from the "Open with" digalog...'
     Write-Verbose "`n"
-    Write-Verbose "Searching HKCR..."
     $auto
     $itemsDeleted = 0
     $itemsSufficient = 1
@@ -572,7 +505,6 @@ function Clear-RemainingKeys() {
     Write-Verbose "`n"
     Write-Verbose 'Attempting to remove flips.exe the MUI Cache...'
     Write-Verbose "`n"
-    Write-Verbose "Searching HKCR..."
     $itemsDeleted = 0
     $itemsSufficient = 1
     $extraItems = 0
@@ -608,7 +540,6 @@ function Clear-RemainingKeys() {
     Write-Verbose "`n"
     Write-Verbose "Attempting to remove remaining file type handler..."
     Write-Verbose "`n"
-    Write-Verbose "Searching HKCU..."
     $itemsDeleted = 0
     $itemsSufficient = 2
     $extraItems = 0
