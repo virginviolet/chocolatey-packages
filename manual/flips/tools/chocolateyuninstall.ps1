@@ -52,47 +52,35 @@ if (Test-Administrator) {
     }
 } #>
 
-
 # Remove registry keys (mostly file associations)
-
-enum AutoFile {
-    Unset
-    OnlyFlips
-    NotOnlyFlips
-}
-
-# variables for better readability
-$Unset = [AutoFile]::Unset
-$OnlyFlips = [AutoFile]::OnlyFlips
-$NotOnlyFlips = [AutoFile]::NotOnlyFlips
-
-# @TODO: Remove HKU (et cetera?)
-# @TODO: Functinos should be "Remove-FileAssocByFlips($ext)" (removes in Classes: .ext... and FloatingFileIPSExt) and "Remove-FileAssocByUser($ext)" (removes in FileExts: .ext... ext_auto_file) and "Clean-MuiCache". 
 
 # === SECTION RVBVD START ===
 # === SECTION RVBVD ===
 # === SECTION RVBVD ===
-function Remove-RegistryValuesByValueData($keyPath, $valueData) {
+function Remove-RegistryValueByValueData($keyPath, $targetValueData, $extensionU) {
+    # TODO Did I accidentally find a better way to do this, later in the script?
     $key = Get-Item -Path $keyPath
     $keyValues = $key.Property # easier to understand (for me at least)
     $found = $false
     foreach ($value in $keyValues) {
         $data = Get-ItemPropertyValue -Path $keyPath -Name $value # Get the data of the value
 
-        if ($data -eq $valueData) {
-            # Check if the data matches $valueData
+        if ($data -eq $targetValueData) {
+            # Check if the data matches $targetValueData
 
             # Remove the value
             try {
                 Remove-ItemProperty -Path $keyPath -Name $value # PowerShell bug causes error if name is '(default)' 
-                Write-Verbose "REMOVED: value '$value' with data '$data' in key '$keyPath'.".Replace("REGISTRY::", "")
+                Write-VerboseRemovedValueData $keyPath $value $targetValueData
                 $found = $true
+                break # In this script, we don't expect multiple values with the same data, so we can break as soon as we find the data. 
             }
             catch {
                 if ($_.Exception.Message -match 'Property \(default\) does not exist at path*') {
                     $(Get-Item -Path $keyPath).OpenSubKey('', $true).DeleteValue('') # "(default)" actually just means empty string (Remove-ItemProperty does not accept empty string).
-                    Write-Verbose "REMOVED: value '$value' with data '$data' in key '$keyPath'.".Replace("REGISTRY::", "")
+                    Write-VerboseRemovedValueData $keyPath $value $targetValueData
                     $found = $true
+                    break # In this script, we don't expect multiple values with the same data, so we can break as soon as we find the data. 
                 }
                 else {
                     Write-Error "An ItemNotFoundException occurred: $_"
@@ -100,234 +88,335 @@ function Remove-RegistryValuesByValueData($keyPath, $valueData) {
             }
         }
     }
-    if ($found -eq $false) {
-        Write-Verbose "NOT FOUND: value with data '$valueData' in key '$keyPath' .".Replace("REGISTRY::", "")
+    if (-Not ($found)) {
+        Write-VerboseValueDataNotFound $keyPath $targetValueData $extensionU
     }
 }
-
 # === SECTION RVBVD ===
 # === SECTION RVBVD ===
 # === SECTION RVBVD END ===
 
+
 # === SECTION SMALL FUNCTIONS START ===
 # === SECTION SMALL FUNCTIONS ===
 # === SECTION SMALL FUNCTIONS ===
-function Write-Report($itemsDeleted, $itemsSufficient, $extraItems, $extraItemsMax) {
-    Write-Verbose "Removed $itemsDeleted/$itemsSufficient sufficient items and $extraItems/$extraItemsMax extra items."
+# path
+function Test-PathBool($p) {
+    return [bool](Test-Path -Path $p)
 }
+
+# path, value
+function Test-ValueNameBool($p, $n) {
+    return [bool](Get-ItemProperty -Path $p -Name $n -ea 0)
+}
+
+function Test-ValueNameBool($p, $n) {
+    return [bool](Get-ItemProperty -Path $p -Name $n -ea 0)
+}
+
+function Get-ValueData($p, $n) {
+    return Get-ItemPropertyValue -Path $p -Name $n
+}
+
+function Test-ValueDataBool($p, $n, $d) {
+    $vD = Get-ValueData $p $n
+    return ($vD -eq $d)
+}
+
+# path, extra
+Function Write-VerboseRemovedKey($p, $e) {
+    Write-Verbose "REMOVED: key '$p'.$e".Replace("REGISTRY::", "")
+}
+
+#path, value name, extension, extra
+Function Write-VerboseRemovedValueName($p, $n, $x, $e) {
+    $msg = "REMOVED: value '$n' in key '$p'.$e".Replace("REGISTRY::", "")
+    Write-Verbose $msg
+}
+
+Function Write-VerboseRemovedValueData($p, $n, $d) {
+    Write-Verbose "REMOVED: value '$n' with data '$d' in key '$p'.".Replace("REGISTRY::", "")
+}
+
+Function Write-VerboseKeyNotFound($p, $x, $e) {
+    $msg = "NOT FOUND: key '$p'.$e".Replace("REGISTRY::", "")
+    # FIXME bugtest this if statement
+    if ([bool]$x -ne $false) {
+        $msg = $msg + " This key only gets added when a $x file has been opened."
+    }
+    Write-Verbose $msg
+}
+
+Function Write-VerboseValueNameNotFound($p, $n, $x, $e) {
+    $msg = "NOT FOUND: value '$n' in key '$p'.$e".Replace("REGISTRY::", "")
+    if ([bool]$x -ne $false) {
+        $msg = $msg + " This value only gets added when a $x file has been opened."
+    }
+    Write-Verbose $msg
+}
+Function Write-VerboseValueDataNotFound($p, $d, $x, $e) {
+    $msg = "NOT FOUND: value with data '$d' in key '$p'.$e".Replace("REGISTRY::", "")
+    if ($x -ne "") {
+        $msg = $msg + " This value only gets added when a $x file has been opened."
+    }
+    Write-Verbose $msg
+}
+
+Function Write-VerboseValueNameDataNotFound($p, $d, $x, $e) { # For when you looked for a value with a specifc name and specific data. Unused.
+    $msg = "NOT FOUND: value with data '$d' in key '$p'.$e".Replace("REGISTRY::", "")
+    if ($x -ne "") {
+        $msg = $msg + " This value only gets added when a $x file has been opened."
+    }
+    Write-Verbose $msg
+}
+
+
+function Get-ValueCount($p) {
+    return $(Get-Item -Path $p).Property.Count
+}
+function Get-SubkeyCount($p) {
+    return $(Get-ChildItem -Path $p).Name.Count
+}
+
+function Write-VerboseNoFileHandlersRemaining($p) {
+    Write-Verbose "No file handlers remaining in '$p'. Will attempt to remove empty key.".Replace("REGISTRY::", "")
+}
+function Write-VerboseFileHandlersStillRemaining($p) {
+    Write-Verbose "File handlers remaining in key '$p'. Will NOT remove the key.".Replace("REGISTRY::", "")
+}
+
+function Test-PathPermission ($p) {
+    # The UserChoice key usually has weird permissions, which will likely
+    # prevent us from removing it, which is okay.
+    # The original idea was to just try Remove-Item, but Remove-Item gives
+    # misleading error message, "subkey does not exist"
+    # (this seems like a bug in PowerShell.) New-ItemProperty gives
+    # a correct message. Therefore, we try New-ItemProperty first.
+    # Test permission
+    try {
+        New-ItemProperty -Path $p -Name "PermissionTestRemoveMe" -Value "" -PropertyType String -Force | out-null
+        Remove-ItemProperty -Path $p -Name "PermissionTestRemoveMe"
+        return $true # Permission was granted!
+    }
+    catch {
+        if ($_.Exception.Message -match "Requested registry access is not allowed.") {
+            return $false
+        }
+        else {
+            Write-Warning "Unexpected error occurred: $_"
+        }
+    }
+}
+
 # === SECTION SMALL FUNCTIONS ===
 # === SECTION SMALL FUNCTIONS ===
 # === SECTION SMALL FUNCTIONS END ===
 
+# === SECTION TOAST START ===
+# === SECTION TOAST ===
+# === SECTION TOAST ===
+# === SECTION TOAST ===
+
+function Remove-AAToast($n, $extensionStr) { # file association values in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts`
+    $p = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
+    $valueOk = Test-ValueNameBool $p $n
+    if ($valueOk) {
+        Remove-ItemProperty -Path $p -Name $n
+        Write-VerboseRemovedValueName $p $n
+    }
+    else {
+        Write-VerboseValueNameNotFound $p $n $extensionStr
+    }
+}
+
+# === SECTION TOAST ===
+# === SECTION TOAST ===
+# === SECTION TOAST ===
+# === SECTION TOAST END ===
+
 # === SECTION CLASSES START ===
 # === SECTION CLASSES ===
 # === SECTION CLASSES ===
-function Clear-FileAssocPatchFile($ext) {
-    $extUC = $ext.ToUpper() # upper-case
+function Remove-FileAssocInClasses ($extension, $progId) {
+    # Does not include the key in `HKEY_CURRENT_USER\Software\Classes\Applications`
 
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose "Attempting to remove Flips file association for $extUC..."
-    Write-Verbose "`n"
-    $itemsDeleted = 0
-    $itemsSufficient = 2
-    $extraItems = 0
-    $extraItemsMax = 1
-
-    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\.$ext"
-    if (Test-Path -Path $keyPath -ea 0) {
-        Remove-RegistryValuesByValueData $keyPath "FloatingIPSFile$extUC"
-        $itemsDeleted++
-        $key = Get-Item -Path $keyPath
-        $keyValues = $key.Property
-        $valueCount = $($keyValues.Count)
-        if ($valueCount -eq 0) {
-            Write-Verbose "There does NOT seem to be other programs associated with $extUC files."
-            try {
-                # Remove the key
-                Remove-Item -Path $keyPath -Force
-                Write-Verbose "REMOVED: key '$keyPath'.".Replace("REGISTRY::", "")
-                $extraItems++
-            }
-            catch {
-                Write-Verbose "Attempt to tidy up by deleting the key '$keyPath' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue.".Replace("REGISTRY::", "")
-            }
+    # IMPROVE Make a separate function to clean up empty keys, run it at the end of the end of the script, instead of cleaning as we go. However, cleaning up and check for subkeys was a practical way to check if handlers remaining.
+    
+    $extensionU = $extension.ToUpper()
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\.$extension"
+    $pathOk = Test-PathBool($keyPath)
+    if ($pathOk) {
+        Remove-RegistryValueByValueData $keyPath $progId $extensionU
+        $valueCount = Get-ValueCount $keyPath
+        $subKeyCount = Get-SubkeyCount $keyPath
+        if (($valueCount -eq 0) -And ($subKeyCount -eq 0)) {
+            Write-VerboseNoFileHandlersRemaining $keyPath
+            Remove-Item -Path $keyPath -Force
+            Write-VerboseRemovedKey $keyPath
         }
         else {
-            Write-Verbose "There DOES seem to be other program(s) associated with $extUC files. Will NOT remove key '$keyPath'.".Replace("REGISTRY::", "")
+            Write-VerboseFileHandlersStillRemaining $keyPath
         }
     }
     else {
-        Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::", "")
+        Write-VerboseKeyNotFound $keyPath
     }
 
-    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\FloatingIPSFile$extUC"
-    if (Test-Path -Path $keyPath -ea 0) {
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\$progId"
+    $pathOk = Test-PathBool $keyPath
+    if ($pathOk) {
         Remove-Item -Path $keyPath -Recurse -Force
-        Write-Verbose "REMOVED: key '$keyPath'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
+        Write-VerboseRemovedKey $keyPath
+    } else {
+        Write-VerboseKeyNotFound $keyPath
     }
-    else {
-        Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::", "")
-    }
-    
-    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
-    
-    Write-Verbose "`n"
-    $itemsDeleted = 0
-    $itemsSufficient = 4
-    $extraItems = 0
-    $extraItemsMax = 5
+}
+# === SECTION CLASSES ===
+# === SECTION CLASSES ===
+# === SECTION CLASSES END ===
 
-    # === SECTION CLASSES ===
-    # === SECTION CLASSES ===
-    # === SECTION CLASSES END ===
-    
-    # === SECTION TOAST START ===
-    # === SECTION TOAST ===
-    # === SECTION TOAST ===
-    # === SECTION TOAST ===
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-    $valueName = "Applications\flips.exe_.$ext"
-    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
-        # Remove this value in this key
-        Remove-ItemProperty -Path $keyPath -Name $valueName
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-    }
-    else {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-    }
 
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-    $valueName = "FloatingIPSFile$extUC" + "_.$ext"
-    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
-        # Remove this value in this key
-        Remove-ItemProperty -Path $keyPath -Name $valueName
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-    }
-    else {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-    }
-
-    
-
-    # === SECTION TOAST ===
-    # === SECTION TOAST ===
-    # === SECTION TOAST ===
-    # === SECTION TOAST END ===
 
     # === SECTION FileExts START ===
     # === SECTION FileExts ===
     # === SECTION FileExts ===
-
-    $keyPathChild1 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithList"
-    $valueData = "flips.exe"
-    if (Test-Path -Path $keyPathChild1 -ea 0) {
-        Remove-RegistryValuesByValueData $keyPathChild1 $valueData
-        $itemsDeleted++
-        $key = Get-Item -Path $keyPathChild1
-        $keyValues = $key.Property
-        $valueCount = $($keyValues.Count)
-        if ($valueCount -le 1) {
-            # only MRUList value left
-            Write-Verbose "There does NOT seem to be other programs on the ""Open with"" context menu for $extUC files."
-            Remove-Item -Path $keyPathChild1
-            Write-Verbose "REMOVED: key '$keyPathChild1'.".Replace("REGISTRY::", "")
-            $extraItems++
-        }
-        else {
-            Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT remove key '$keyPathChild1'.".Replace("REGISTRY::", "")
-        }
-    }
-    else {
-        Write-Verbose "NOT FOUND: key '$keyPathChild1'.".Replace("REGISTRY::", "")
-    }
-
-    $keyPathChild2 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithProgids"
-    $valueName = "FloatingIPSFile$extUC"
-    if ((Test-Path -Path $keyPathChild2 -ea 0) -And #if key exists and
-        (Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0)) {
-        # has this value
-        # Remove the value
-        Remove-ItemProperty -Path $keyPathChild2 -Name $valueName
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPathChild2'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-        $key = Get-Item -Path $keyPathChild2
-        $keyValues = $key.Property
-        $valueCount = $($keyValues.Count)
-        if ($valueCount -le 1) {
-            # only MRUList value left
-            Write-Verbose "There does NOT seem to be other programs on the ""Open with"" context menu for $extUC files."
-            # Remove key
-            Remove-Item -Path $keyPathChild2
-            Write-Verbose "REMOVED: key '$keyPathChild2'.".Replace("REGISTRY::", "")
-            $extraItems++
-        }
-        else {
-            Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT remove key '$keyPathChild2'.".Replace("REGISTRY::", "")
-        }
-    }
-    else {
-        if (Test-Path -Path $keyPathChild2 -ea 0) {
-            Write-Verbose "NOT FOUND: key '$keyPathChild2'.".Replace("REGISTRY::", "")
-        }
-        if (Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0) {
-            Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPathChild2'.".Replace("REGISTRY::", "")
-        }
-    }
-
-    $keyPathChild3 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\UserChoice"
-    $valueName = "ProgId"
-    $valueData = "Applications\flips.exe"
-    # if key exists and the value name "ProgId" has data that directs to Flips, which means Flips is the preferred program by the user for this file extension.
-    if ((Test-Path -Path $keyPathChild3 -ea 0) -And ((Get-ItemPropertyValue -Path $keyPathChild3 -Name $valueName -ea 0) -eq $valueData)) {
-        try {
-            # Remove the key
-            Remove-Item -Path $keyPathChild3 -Force
-            Write-Verbose "REMOVED: key '$keyPathChild3'.".Replace("REGISTRY::", "")
-            $extraItems++
-        }
-        catch {
-            Write-Verbose "Attempt to tidy up by deleting the key '$keyPathChild3' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue.".Replace("REGISTRY::", "")
-        }
-    }
-    elseif (-Not (Test-Path -Path $keyPathChild3 -ea 0)) {
-        Write-Verbose "NOT FOUND: key '$keyPathChild3'.".Replace("REGISTRY::", "")
-    }
-    elseif ((Get-ItemPropertyValue -Path $keyPathChild3 -Name "ProgId" -ea 0) -ne "Applications\flips.exe") {
-        Write-Verbose "Value '$valueName' in key '$keyPathChild3' does not have the data '$valueData', because $extUC files are not set to always run with Flips.".Replace("REGISTRY::", "")
-        $extraItems++
-    }
+    function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) { # in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
+    # TODO bugtest
+    $extensionU = $extension.ToUpper() # upper-case
     
-    $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
-    $keyPathChild1 = $keyPathChild1.Substring("REGISTRY::".Length) ## remove prefix
-    $keyPathChild2 = $keyPathChild2.Substring("REGISTRY::".Length) ## remove prefix
-    if (Test-Path -Path $keyPathParent -ea 0) {
-        $subKeyNames = (Get-ChildItem -Path $keyPathParent).Name
-        if (-Not ($keyPathChild1 -in ($subKeyNames)) -And -Not ($keyPathChild2 -in $subKeyNames)) {
-            Write-Verbose "There does NOT seem to be any other program(s) on the ""Open with"" context menu for $extUC files."
-            try {
-                # Remove the key
-                Remove-Item -Path $keyPathParent -Recurse -Force
-                Write-Verbose "REMOVED: parent key '$keyPathParent' recursively.".Replace("REGISTRY::", "")
-                $extraItems++
-            }
-            catch {
-                Write-Verbose "Attempt to tidy up by deleting the key '$keyPathParent' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue.".Replace("REGISTRY::", "")
-            }
+    # This key holds programs on the "Open with" context menu and the order in which each application was most recently used.
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\OpenWithList"
+    $targetValueData = $exe
+    $pathOk = Test-PathBool $keyPath # Test if path exists
+    if ($pathOk) {
+        Remove-RegistryValueByValueData $keyPath $targetValueData $extensionU
+        $valueCount = Get-ValueCount $keyPath
+        $subkeyCount = Get-SubkeyCount $keyPath
+        if (($valueCount -le 1) -And ($subkeyCount -eq 0)) { # le = "less than or equal to"; this key having subkeys would be an edge case
+            # only values left: MRUList value, and plausibly the Default value (the latter is not counted by .Count)
+            Write-VerboseNoFileHandlersRemaining $keyPath
+            Remove-Item -Path $keyPath
+            Write-VerboseRemovedKey $keyPath
         }
         else {
-            Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT remove key '$keyPathParent'.".Replace("REGISTRY::", "")
+            $handlersRemaining = $true
+            Write-VerboseFileHandlersStillRemaining $keyPath
         }
     }
     else {
-        Write-Verbose "NOT FOUND: key '$keyPathParent'.".Replace("REGISTRY::", "")
+        Write-VerboseKeyNotFound $keyPath $extensionU
     }
 
-    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
+    # This key also holds handlers.
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\OpenWithProgids"
+    $targetValueName = $id
+    $pathOk = Test-PathBool $keyPath # Test if path exists
+    $valueOk = Test-ValueNameBool $keyPath $targetValueName # Test value name exists
+    if ($pathOk) {
+        if ($valueOk) {
+            Remove-ItemProperty -Path $keyPath -Name $targetValueName
+            Write-VerboseRemovedValueName $keyPath $targetValueName
+        }
+        else {
+            Write-VerboseValueNameNotFound $keyPath $targetValueName $extensionU
+            }
+        $valueCount = Get-ValueCount $keyPath
+        $subkeyCount = Get-SubkeyCount $keyPath
+        if (($valueCount -eq 0) -And ($subkeyCount -eq 0)) { # Again, the (Default) value isn't counted
+            Write-VerboseNoFileHandlersRemaining $keyPath
+            Remove-Item -Path $keyPath
+            Write-VerboseRemovedKey $keyPath
+        }
+        else {
+            Write-VerboseFileHandlersStillRemaining $keyPath
+        }
+    }
+    else {
+        Write-VerboseKeyNotFound $keyPath $extensionU
+    }
+
+    # This key holds says which program to always be used for .$ext. This may also be controlled with keys in Classes.
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\UserChoice"
+    $targetValueName = "ProgId"
+    $targetValueData = $id
+    $pathOk = Test-PathBool $keyPath # Test if path exists
+    $permissionOk = $true # Initialize the variable
+    if ($pathok -And (-Not ($skipUserChoiceKey))) {
+        # TODO Is the association removed in a way that the user doesn't notice if pemrission denied? Probably but needs double checking. 
+        $permissionOk = Test-PathPermission $keyPath
+        $valueNameOk = Test-ValueNameBool $keyPath $targetValueName # Test value name exists
+        if ($valueNameOk) {
+            # $valueData = Get-ValueData
+            $valueDataOk = Test-ValueDataBool $keyPath $targetValueName $targetValueData # Test if value data equals the target data
+        }
+        else {
+            # Weird edge case; key exists but not the "ProgId" value
+            Write-VerboseValueNameNotFound $keyPath $targetValueName $extensionU
+            $valueDataOk = $false # If the value didn't even exist, we did not find the value data we were looking for
+        }
+        if ($valueDataOk) {
+            Write-Verbose "The default handler for $extensionU is set to '$id' in $keyPath. Will attempt to remove the key.".Replace("REGISTRY::", "")
+        }
+        else {
+            Write-Verbose "The default handler for $extensionU is NOT set to '$id' in $keyPath. Will NOT attempt to remove the key.".Replace("REGISTRY::", "")
+        }
+        if (($valueDataOk) -Or ($valueNameOk -eq $false)) {
+            # We don't need to remove the value, since this key only holds one handler
+            # Instead, we would rather just to delete the key.
+            if ($permissionOk) {
+                Remove-Item -Path $p -Recurse -Force
+            }
+            else {
+                # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
+                Write-Verbose "Lacking permission to remove key '$keypath'. That is normal for this key. This is not a problem.".Replace("REGISTRY::", "")
+            }
+        }
+    }
+    elseif ($pathOk -eq $false) {
+        Write-VerboseKeyNotFound $keyPath
+    }
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
+    $pathOk = Test-PathBool $keyPath
+    if ($pathOk) {
+        $subkeyCount = Get-SubkeyCount $keyPath
+        $valueCount = Get-ValueCount $keyPath
+        if (($subkeyCount -eq 0) -and ($valueCount -eq 0)) { # empty key
+            Write-VerboseNoFileHandlersRemaining $path
+            Remove-Item -Path $keyPath -Recurse -Force
+            Write-VerboseRemovedKey $keyPath
+        }
+        # skip this section if $skipUserChoiceKey -eq $true
+        if (-not ($skipUserChoiceKey)) {
+            $subkeyNamesRemaining = (Get-ChildItem -Path $keyPathParent).Name
+            $handlersRemaining = $false # initialize variable
+            # I could optimize perfermance by nesting the if statements more, but I prefer not to,
+            # and it's already very fast. Feel free to improve.
+            if ($valueCount -gt 0) {
+                $handlersRemaining = $true
+            }
+            if (($subKeyCount -gt 1) -And ($subkeyNamesRemaining[0] -ne $subkeyUc)) {
+                $handlersRemaining = $true
+            }
+            if ($handlersRemaining) {
+                Write-VerboseFileHandlersStillRemaining $keyPath $extensionU
+            }
+            else {
+                Write-VerboseNoFileHandlersRemaining $keyPath $extensionU
+            }
+            if (($handlersRemaining -eq $false) -and ($permissionOk -eq $true)) { # Re-using the permission check we did for UserChoice
+                Remove-Item -Path $keyPath -Recurse -Force
+                Write-VerboseRemovedKey $keyPath
+            }
+            elseif (($handlersRemaining -eq $true) -and ($permissionOk -eq $false)) {
+                # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
+                Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. This is not a problem.".Replace("REGISTRY::", "")
+            }
+        }
+    }
+    elseif (($pathOk -eq $false)-and (-not $skipUserChoiceKey)) {
+        Write-VerboseKeyNotFound $keyPath $extensionU
+    }
 }
 # === SECTION FileExts ===
 # === SECTION FileExts ===
@@ -336,268 +425,90 @@ function Clear-FileAssocPatchFile($ext) {
 # === SECTION R-FASBP START ===
 # === SECTION R-FASBP ===
 # === SECTION R-FASBP ===
-function Clear-FileAssocRomFile($ext) {
-    $extUC = $ext.ToUpper() # upper-case
-    $autoFileItem1 = $Unset # initialize variable; refers to '"REGISTRY::HKEY_CURRENT_USER\Software\Classes\[.ext]_auto_file"'; if both 1 and 2 turn true, that means it's safe to remove certain items
-    $autoFileItem2 = $Unset # initialize variable; refers to 'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\[.ext]\'; if both 1 and 2 turn true, that means it's safe to remove certain items
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose "Attempting to remove Flips file association for $extUC..."
-    Write-Verbose "`n"
-    $itemsDeleted = 0
-    $itemsSufficient = 5
-    $extraItems = 0
-    $extraItemsMax = 5
+function Remove-FileAssocSetByProgram($ext) {
+    # TODO Would be cool if you could just paste a list of keys somewhere in the script and some function would remove them.
+    $extU = $ext.ToUpper() # upper-case
+    
+    Write-Verbose "Will attempt to remove file associations that may have been added through the application." # There is an option in the settings to add file extensions.
+    Write-Verbose "Extension: $extU"
+
+    progId = "FloatingIPSFile$extU"
+    Remove-FileAssocInClasses $ext $progId
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "Applications\flips.exe_.$ext"
-    if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
-        # Remove this value in this key
-        Remove-ItemProperty -Path $keyPath -Name $valueName
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-    }
-    else {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-    }
-
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file\shell\open\command"
-    $keyPath2 = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\" + $ext + "_auto_file"
-    $valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
-    if (Test-Path -Path $keyPath -ea 0) {
-        $key = Get-Item -Path $keyPath
-        $keyValues = $key.Property # easier to understand (for me at least)
-        $found = $false
-        foreach ($value in $keyValues) {
-            # interate values
-            # Get the data of the value
-            $data = Get-ItemPropertyValue -Path $keyPath -Name $value
-
-            # Check if the data matches $valueData
-            if ($data -eq $valueData) {
-                
-                # Remove its parent keys
-                $found = $true
-                Write-Verbose "Found data '$valueData' in key '$keyPath2'.".Replace("REGISTRY::", "")
-                Remove-Item -Path $keyPath2 -Recurse -Force
-                Write-Verbose "REMOVED: parent key '$keyPath2' recursively.".Replace("REGISTRY::", "")
-                $autoFileItem1 = $OnlyFlips # this is actually binary here, $autoFileItem1 cannot be NotOnlyFlips; I could use boolean, but I'm trying to make the code as readable
-                $itemsDeleted++
-                break
-            }
-        }
-        if ($found -eq $false) {
-            Write-Verbose "NOT FOUND: value with data '$valueData' in key '$keyPath' .".Replace("REGISTRY::", "")
-        }
-    }
-    else {
-        Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::", "")
-    }
-
-    $keyPathChild1 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithList"
-    $valueData = "flips.exe"
-    if (Test-Path -Path $keyPathChild1 -ea 0) {
-        # Remove this value in this key
-        Remove-RegistryValuesByValueData $keyPathChild1 $valueData
-        $itemsDeleted++
-        $key = Get-Item -Path $keyPathChild1
-        $keyValues = $key.Property
-        $valueCount = $($keyValues.Count)
-        if ($valueCount -le 1) {
-            # only MRUList value left
-            Write-Verbose "There does NOT seem to be other programs on the ""Open with"" context menu for $extUC files."
-            # Remove the key
-            Remove-Item -Path $keyPathChild1
-            Write-Verbose "REMOVED: key '$keyPathChild1'.".Replace("REGISTRY::", "")
-            $autoFileItem2 = $OnlyFlips # it seems like only Flips was using the auto_file handler
-            $extraItems++
-        }
-        else {
-            Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT remove key '$keyPathChild1'.".Replace("REGISTRY::", "")
-            $autoFileItem2 = $NotOnlyFlips
-        }
-    }
-    else {
-        Write-Verbose "NOT FOUND: key '$keyPathChild1'.".Replace("REGISTRY::", "")
-    }
-
-    $keyPathChild2 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithProgids"
-    $valueName = $ext + "_auto_file"
-    $pathOk = [bool](Test-Path -Path $keyPathChild2 -ea 0)
-    $foundValue = [bool](Get-ItemProperty -Path $keyPathChild2 -Name $valueName -ea 0)
+    $targetValueName = "FloatingIPSFile$extU" + "_.$ext"
+    Remove-AAToast $targetValueName $extU
     
-    # Because this section only removes the generic auto_file handler, we only continue if Flips was the last and only program on the "Open With" context menu.
-    # OnlyFlips - Keys no longer important and (unless something went wrong) have been removed - safe to continue 
-    # Unset - OpenWithList key doesn't exist - safe to continue
-    # NotOnlyFlips - Keys still relevant for other programs - don't continue
-    if (-Not ($pathOk)) {
-        Write-Verbose "NOT FOUND: key '$keyPathChild2'.".Replace("REGISTRY::", "")
-    }
-    if (($autoFileItem2 -eq $NotOnlyFlips) -And ($pathOk)) {
-        Write-Verbose "Will NOT remove key '$keyPathChild2', because it seems to be associated with another program.".Replace("REGISTRY::", "")
-    }
-    if (($autoFileItem2 -ne $NotOnlyFlips) -And ($pathOk) -And ($foundValue)) {
-        # found value $valueName in $keyPathChild2
-        # Remove the value we found
-        Remove-ItemProperty -Path $keyPathChild2 -Name $valueName
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPathChild2'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-        $key = Get-Item -Path $keyPathChild2
-        $keyValues = $key.Property
-        $valueCount = $($keyValues.Count)
-        if ($valueCount -eq 0) {
-            # if there are no values left here (because we removed the last one)
-            Write-Verbose "There does NOT seem to be any other program(s) on the ""Open with"" context menu for $extUC files."
-            # Remove the now empty key
-            Remove-Item -Path $keyPathChild2
-            Write-Verbose "REMOVED: key '$keyPathChild2'.".Replace("REGISTRY::", "")
-            $extraItems++
-        }
-        else {
-            # other handlers than auto_file found
-            Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files. Will NOT remove key '$keyPathChild2'.".Replace("REGISTRY::", "")
-            # I guess we can still go ahead and remove the auto_ips handler, so let's set $autoFileItem2 = OnlyFlips, which means "ok to remove (or removed, if removed)" (sorry for confusion).
-            # @TODO Better name for the states
-            
-        }
-    }
+    $exe = "flips.exe"
+    $id = "FloatingIPSFile$extU"
+    $skipUserChoice = $true # we skip the "UserChoice" key this when removing file assoc that program made, because the program doesn't make that key
+    Remove-FileAssocInFileExts $ext $targetValueName $skipUserChoice
 
-    $keyPathChild3 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\UserChoice"
-    $valueName = "ProgId"
-    $valueData = "Applications\flips.exe"
-    # if key exists and the value name "ProgId" has data that links to Flips, i.e. Flips is the preferred program by the user for this file extension.
-    if ((Test-Path -Path $keyPathChild3 -ea 0) -And `
-        ((Get-ItemPropertyValue -Path $keyPathChild3 -Name $valueName -ea 0) -eq $valueData)) {
-        try {
-            # Remove the key
-            Remove-Item -Path $keyPathChild3 -Force
-            Write-Verbose "REMOVED: key '$keyPathChild3'.".Replace("REGISTRY::", "")
-            $extraItems++
-        }
-        catch {
-            Write-Verbose "Attempt to tidy up by deleting the key '$keyPathChild3' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue."
-        }
-    }
-    elseif (-Not (Test-Path -Path $keyPathChild3 -ea 0)) {
-        Write-Verbose "NOT FOUND: key '$keyPathChild3'.".Replace("REGISTRY::", "")
-    }
-    elseif ((Get-ItemPropertyValue -Path $keyPathChild3 -Name "ProgId" -ea 0) -ne "Applications\flips.exe") {
-        Write-Verbose "Value '$valueName' in key '$keyPathChild3' does not have the data '$valueData', because $extUC files are set to always run with another program than Flips.".Replace("REGISTRY::", "")
-        $extraItems++
-    }
-
-    $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
-    $keyPathChild1 = $keyPathChild1.Substring("REGISTRY::".Length) ## remove prefix
-    $keyPathChild2 = $keyPathChild2.Substring("REGISTRY::".Length) ## remove prefix
-    $pathOk = (Test-Path -Path $keyPathParent -ea 0)
-
-    # We clean up by removing this key if it is empty
-    # OnlyFlips - Subkeys no longer important and (unless something went wrong) have been removed - safe to continue
-    # Unset - Subkeys didn't exist in the first place - safe to continue
-    # NotOnlyFlips - Key still relevant for other programs - don't continue
-    if (($autoFileItem2 -ne $NotOnlyFlips) -And # If only Flips was using these keys
-    ($pathOk)) {
-        $subKeyNames = (Get-ChildItem -Path $keyPathParent).Name #  Should only have one, two, or all three of these: OpenWithList, OpenWithProgids, UserChoice
-        if (-Not ($keyPathChild1 -in ($subKeyNames)) -And # if this subkey doesn't exist (because we removed it) 
-            -Not ($keyPathChild2 -in $subKeyNames)) {
-            # and neither this one (because we removed it)
-            Write-Verbose "There does NOT seem to be any other program(s) on the ""Open with"" context menu for $extUC files."
-            try {
-                # Remove the parent key (autoFileItem2), because it serves no purpose anymore
-                Remove-Item -Path $keyPathParent -Recurse -Force
-                Write-Verbose "REMOVED: parent key '$keyPathParent' recursively.".Replace("REGISTRY::", "")
-                $extraItems++
-            }
-            catch {
-                Write-Verbose "Attempt to tidy up by deleting the key '$keyPathParent' failed, possibly due to lacking permissions (if Chocolatey is not running in an elevated shell). This is not an issue.".Replace("REGISTRY::", "")
-            }
-        }
-        else {
-            # I don't know if it's actually possible to get here, unless something goes wrong. I _think_ the $autoFileItem2 check should have been enough.
-            Write-Verbose "There DOES seem to be other program(s) on the ""Open with"" context menu for $extUC files."
-            Write-Verbose "Will NOT remove parent key '$keyPathParent', because it still has the subkeys '$keyPathChild1' and '$keyPathChild2'.".Replace("REGISTRY::", "")
-        }
-    }
-    elseif ($autoFileItem2 -eq $NotOnlyFlips) {
-        Write-Verbose "Will NOT remove key '$keyPathParent', because other program(s) are still associated with it.".Replace("REGISTRY::", "")
-    }
-    elseif (-Not ($pathOk)) {
-        Write-Verbose "NOT FOUND: key '$keyPathParent'.".Replace("REGISTRY::", "")
-    }
-    else {
-        # I think it is logically impossible to get here.
-        Write-Warning "Something unexpected happen. autoFileItem2: '$autoFileItem2'. pathOk: '$pathOk'."
-    }
-
-    # TODO: DON'T remove THIS VALUE IF AUTO FILE IS USED BY OTHER PROGRAM
-    # TODO elseif
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-    $valueName = $ext + "_auto_file_." + $ext
-    $found = $false # initialize the variable
-    # OnlyFlips - Handler no longer in use and (unless something went wrong) have been removed - safe to continue
-    # Unset - Handler didn't exist in the first place - safe to continue
-    # NotOnlyFlips - The auto_file handler is still relevant for other programs - don't continue
-    if (($autoFileItem1 -ne $NotOnlyFlips) -And # Unless we found that this and...
-    ($autoFileItem2 -ne $NotOnlyFlips)) {
-        $found = [bool](Get-ItemProperty -Path $keyPath -Name $valueName -ea 0)
-    }
-    else {
-        Write-Verbose "Will NOT remove value '$valueName' in key '$keyPath', because other program(s) are still associated with that value."
-    }
-    if ($found) {
-        Remove-ItemProperty -Path $keyPath -Name $valueName # Remove the value
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-    }
-    else {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-    }
-
-    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
+    # HACK Mystery: Why does the permission problem occur before, but after removing the program and rebooting, there is no problem with this key?
+    # TODO does adding file exts as admin create keys in HKLM?
 }
+
+function Remove-FileAssocSetByUser($ext) {
+    # XXX
+    # TODO: TEST
+    $extU = $ext.ToUpper()
+    Write-Verbose "Will attempt to remove file associations that may have been manually added." # e.g. right-click and "Open with"
+    Write-Verbose "Extension: $extU."
+
+    # Added when you add a program to the "Select an app to open this .[ext] file" popup window
+    # IMPROVE It isn't necesssary to try to remove this every time the function is run. See if you can find an elegant solution.
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Applications\flips.exe"
+    $pathOk = Test-PathBool $keyPath
+    if ($pathOk) {
+        Remove-Item -Path $keyPath -Recurse -Force
+        Write-VerboseRemovedKey $keyPath
+    } else {
+        Write-VerboseKeyNotFound $keyPath "" " This key is only added if you manually add the program to the 'Select an app to open this .$ext file' popup window."
+    }
+
+    # Added when you select to "Always" use the program for the file type
+    $progId = $ext + "_auto_file"
+    Remove-FileAssocInClasses $ext $progId
+
+    # Added when you select to "Always" use the program for the file type
+    # (And maybe a file needs to opened as well. I don't know because I have
+    # only tried setting this trough the "Open with" context menu, which opens the
+    # file immediately afterwards.)
+    $exe = "flips.exe"
+    $id = $ext + "_auto_file" # we must remove this value _before_ "Applications\flips.exe_.$extU" (which is removed in the next section). If we do it in reverse order, it cannot clean up, it will say that [ext]_auto_file is not set as the default handler, which would be true, it's going to be set to "Applications\flips.exe_.[ext]", never "[ext]_auto_file" in UserChoice.
+    # IMPROVE Mabye add a $skipDefaultHandlerCheck parameter to the function.
+    $skipUserChoice = $false # finally!
+    Remove-FileAssocInFileExts $ext $exe $id $skipUserChoice
+
+    # Added when you select to use the program "Just once" or "Always" for the file type
+    $exe = "flips.exe"
+    $id = "Applications\flips.exe_.$extU"
+    $skipUserChoice = $true
+    Remove-FileAssocInFileExts $ext $exe $id $skipUserChoice
+
+    # Added when you select to use the program "Just once" or "Always" for the file type
+    $targetValueName = "Applications\flips.exe" + "_.$ext"
+    Remove-AAToast $targetValueName $extU
+    
+    # TODO: Make sure this isn't removed if other programs are still using the progid.
+    $targetValueName = $ext + "_auto_file_." + $ext
+    Remove-AAToast $targetValueName $extU
+    
+}
+
 # === SECTION R-FASBP ===
 # === SECTION R-FASBP ===
 # === SECTION R-FASBP END ===
 
 # LAST FUNCTION
-function Clear-RemainingKeys() {
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose 'Attempting to remove flips.exe from the "Open with" digalog...'
-    Write-Verbose "`n"
-    $auto
-    $itemsDeleted = 0
-    $itemsSufficient = 1
-    $extraItems = 0
-    $extraItemsMax = 0
-    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\Applications\flips.exe"
-    if (Test-Path -Path $keyPath -ea 0) {
-        Remove-Item -Path $keyPath -Recurse -Force
-        Write-Verbose "REMOVED: key '$keyPath'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-    }
-    else {
-        Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::", "")
-    }
+function Remove-MuiCacheEntry() {
 
-    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
-
-    # === SECTION MUI START ===
-    # === SECTION MUI ===
-    # === SECTION MUI ===
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose "`n"
-    Write-Verbose 'Attempting to remove flips.exe the MUI Cache...'
-    Write-Verbose "`n"
-    $itemsDeleted = 0
-    $itemsSufficient = 1
-    $extraItems = 0
-    $extraItemsMax = 0
-
-    $keyPath = "REGISTRY::HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
+    
+# === SECTION MUI START ===
+# === SECTION MUI ===
+# === SECTION MUI ===
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
 
     # very (unless I did something wrong) slow, but finds key even if installed in another location 
     <# 
@@ -606,7 +517,7 @@ function Clear-RemainingKeys() {
         
         if (Test-Path -Path $keyPath -ea 0) {
         echo "let's remove value"
-        Remove-RegistryValuesByValueData $keyPath $valueData
+        Remove-RegistryValueByValueData $keyPath $valueData
         $itemsDeleted++
     } else {
         Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::","")
@@ -622,72 +533,9 @@ function Clear-RemainingKeys() {
     else {
         Write-Verbose "NOT FOUND: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
     }
-
-    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
-    
     # === SECTION MUI ===
     # === SECTION MUI ===
     # === SECTION MUI END ===
-
-    Write-Verbose "`n"
-    Write-Verbose "Attempting to remove remaining file type handler..."
-    Write-Verbose "`n"
-    $itemsDeleted = 0
-    $itemsSufficient = 2
-    $extraItems = 0
-    $extraItemsMax = 0
-
-    # Not included in Clean-FileAssocPatchFile because I haven't seen 'bps_auto_file' in this location, only 'ips_auto_file'.
-    $keyPathChild = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file\shell\open\command"
-    $valueData = '"C:\ProgramData\chocolatey\lib\flips\tools\builds\windows-x64-gui.zip\flips.exe" "%1"'
-    $keyPathParent = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\ips_auto_file"
-    $autoFile1 = 'unset'  # initialize variable
-    if (Test-Path -Path $keyPathChild -ea 0) {
-        $key = Get-Item -Path $keyPathChild
-        $keyValues = $key.Property # easier to understand (for me at least)
-        foreach ($value in $keyValues) {
-            $data = Get-ItemPropertyValue -Path $keyPathChild -Name $value # Get the data of the value
-            if ($data -eq $valueData) {
-                # Check if the data matches $valueData
-                Write-Verbose "Found data '$valueData' in key '$keyPathChild'.".Replace("REGISTRY::", "")
-                Remove-Item -Path $keyPathParent -Recurse -Force # Remove relevant parent keys
-                Write-Verbose "REMOVED: parent key '$keyPathChild' recursively.".Replace("REGISTRY::", "")
-                $autoFile1 = 'flips'
-                $itemsDeleted++
-                break
-            }
-        }
-        if ($removeAutoFile -eq $false) {
-            Write-Verbose "NOT FOUND: value with data '$valueData' in key '$keyPathChild.".Replace("REGISTRY::", "")
-            $autoFile1 = 'not_flips'
-        }
-    }
-    else {
-        if (-Not (Test-Path -Path $keyPathParent -ea 0)) {
-            Write-Verbose "NOT FOUND: key '$keyPathParent'. Will NOT attempt to investigate its non-existing subkey '$keyPathChild'.".Replace("REGISTRY::", "")
-        }
-        else {
-            Write-Verbose "NOT FOUND: key '$keyPathChild'.".Replace("REGISTRY::", "")
-        }
-    }
-    
-    $keyPathAutoFile2 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
-    $valueName = "ips_auto_file_.ips"
-    if (($autoFile1 -ne 'not_flips') -And # Don't continue if another application is using the aute_file key, and
-    (Get-ItemProperty -Path $keyPathAutoFile2 -Name $valueName -ea 0)) {
-        # this key has this value
-        Remove-ItemProperty -Path $keyPathAutoFile2 -Name $valueName # Remove the value
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPathAutoFile2'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-    }
-    elseif ($autoFile1 -eq 'not_flips') {
-        Write-Verbose "Will NOT remove because it seems to be associated with another program: key '$keyPathAutoFile2'.".Replace("REGISTRY::", "")
-    }
-    else {
-        Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPathAutoFile2'.".Replace("REGISTRY::", "") # Did not find autoFile1 nor autoFlie2
-    }
-
-    Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
 
 }
 
@@ -695,16 +543,18 @@ function Clear-RemainingKeys() {
 # === SECTION POST-FUNCTION ===
 # === SECTION POST-FUNCTION ===
 
-
-Clear-FileAssocPatchFile "bps"
-Clear-FileAssocPatchFile "ips"
+Remove-FileAssocSetByProgram "bps";Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByProgram "ips";Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 # pause
-Clear-FileAssocRomFile "gb"
-Clear-FileAssocRomFile "gbc"
-Clear-FileAssocRomFile "gba"
-Clear-FileAssocRomFile "sfc"
-Clear-FileAssocRomFile "smc"
-Clear-RemainingKeys
+Remove-FileAssocSetByUser("bps");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByUser("ips");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByUser("gb");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByUser("gbc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByUser("gba");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByUser("sfc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByUser("smc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+
+Remove-MuiCacheEntry
 
 # === SECTION POST-FUNCTION ===
 # === SECTION POST-FUNCTION ===
