@@ -71,15 +71,13 @@ function Remove-RegistryValueByValueData($keyPath, $targetValueData, $extensionU
                 Write-VerboseRemovedValueData $keyPath $value $targetValueData
                 $found = $true
                 break # In this script, we don't expect multiple values with the same data, so we can break as soon as we find the data. 
-            }
-            catch {
+            } catch {
                 if ($_.Exception.Message -match 'Property \(default\) does not exist at path*') {
                     $(Get-Item -Path $keyPath).OpenSubKey('', $true).DeleteValue('') # "(default)" actually just means empty string (Remove-ItemProperty does not accept empty string).
                     Write-VerboseRemovedValueData $keyPath $value $targetValueData
                     $found = $true
                     break # In this script, we don't expect multiple values with the same data, so we can break as soon as we find the data. 
-                }
-                else {
+                } else {
                     Write-Error "An ItemNotFoundException occurred: $_"
                 }
             }
@@ -152,7 +150,8 @@ Function Write-VerboseValueDataNotFound($p, $d, $x, $e) {
     Write-Verbose $msg
 }
 
-Function Write-VerboseValueNameDataNotFound($p, $d, $x, $e) { # For when you looked for a value with a specifc name and specific data. Unused.
+# For when you looked for a value with a specifc name and specific data. Unused.
+Function Write-VerboseValueNameDataNotFound($p, $d, $x, $e) {
     $msg = "NOT FOUND: value with data '$d' in key '$p'.$e".Replace("REGISTRY::", "")
     if ($x -ne "") {
         $msg = $msg + " This value only gets added when a $x file has been opened."
@@ -184,28 +183,26 @@ function Test-PathPermission ($p) {
     # a correct message. Therefore, we try New-ItemProperty first.
     # Test permission
     try {
-        New-ItemProperty -Path $p -Name "PermissionTestRemoveMe" -Value "" -PropertyType String -Force | out-null
+        New-ItemProperty -Path $p -Name "PermissionTestRemoveMe" -Value "" -PropertyType String -Force | Out-Null
         Remove-ItemProperty -Path $p -Name "PermissionTestRemoveMe"
         return $true # Permission was granted!
-    }
-    catch {
+    } catch {
         if ($_.Exception.Message -match "Requested registry access is not allowed.") {
             return $false
-        }
-        else {
+        } else {
             Write-Warning "Unexpected error occurred: $_"
         }
     }
 }
 
-function Remove-AAToast($n, $extensionStr) { # file association values in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts`
+function Remove-AAToast($n, $extensionStr) {
+    # file association values in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts`
     $p = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueOk = Test-ValueNameBool $p $n
     if ($valueOk) {
         Remove-ItemProperty -Path $p -Name $n
         Write-VerboseRemovedValueName $p $n
-    }
-    else {
+    } else {
         Write-VerboseValueNameNotFound $p $n $extensionStr
     }
 }
@@ -226,12 +223,10 @@ function Remove-FileAssocInClasses ($extension, $progId) {
             Write-VerboseNoFileHandlersRemaining $keyPath
             Remove-Item -Path $keyPath -Force
             Write-VerboseRemovedKey $keyPath
-        }
-        else {
+        } else {
             Write-VerboseFileHandlersStillRemaining $keyPath
         }
-    }
-    else {
+    } else {
         Write-VerboseKeyNotFound $keyPath
     }
 
@@ -245,7 +240,8 @@ function Remove-FileAssocInClasses ($extension, $progId) {
     }
 }
 
-function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) { # in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
+# Remove items in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
+function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) {
     # TODO bugtest
     $extensionU = $extension.ToUpper() # upper-case
     
@@ -257,18 +253,18 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
         Remove-RegistryValueByValueData $keyPath $targetValueData $extensionU
         $valueCount = Get-ValueCount $keyPath
         $subkeyCount = Get-SubkeyCount $keyPath
-        if (($valueCount -le 1) -And ($subkeyCount -eq 0)) { # le = "less than or equal to"; this key having subkeys would be an edge case
+        
+        # le = "less than or equal to"; this key having subkeys would be an edge case
+        if (($valueCount -le 1) -And ($subkeyCount -eq 0)) {
             # only values left: MRUList value, and plausibly the Default value (the latter is not counted by .Count)
             Write-VerboseNoFileHandlersRemaining $keyPath
             Remove-Item -Path $keyPath
             Write-VerboseRemovedKey $keyPath
-        }
-        else {
+        } else {
             $handlersRemaining = $true
             Write-VerboseFileHandlersStillRemaining $keyPath
         }
-    }
-    else {
+    } else {
         Write-VerboseKeyNotFound $keyPath $extensionU
     }
 
@@ -281,22 +277,21 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
         if ($valueOk) {
             Remove-ItemProperty -Path $keyPath -Name $targetValueName
             Write-VerboseRemovedValueName $keyPath $targetValueName
-        }
-        else {
+        } else {
             Write-VerboseValueNameNotFound $keyPath $targetValueName $extensionU
-            }
+        }
         $valueCount = Get-ValueCount $keyPath
         $subkeyCount = Get-SubkeyCount $keyPath
-        if (($valueCount -eq 0) -And ($subkeyCount -eq 0)) { # Again, the (Default) value isn't counted
+        
+        # Again, the (Default) value isn't counted
+        if (($valueCount -eq 0) -And ($subkeyCount -eq 0)) {
             Write-VerboseNoFileHandlersRemaining $keyPath
             Remove-Item -Path $keyPath
             Write-VerboseRemovedKey $keyPath
-        }
-        else {
+        } else {
             Write-VerboseFileHandlersStillRemaining $keyPath
         }
-    }
-    else {
+    } else {
         Write-VerboseKeyNotFound $keyPath $extensionU
     }
 
@@ -313,16 +308,14 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
         if ($valueNameOk) {
             # $valueData = Get-ValueData
             $valueDataOk = Test-ValueDataBool $keyPath $targetValueName $targetValueData # Test if value data equals the target data
-        }
-        else {
+        } else {
             # Weird edge case; key exists but not the "ProgId" value
             Write-VerboseValueNameNotFound $keyPath $targetValueName $extensionU
             $valueDataOk = $false # If the value didn't even exist, we did not find the value data we were looking for
         }
         if ($valueDataOk) {
             Write-Verbose "The default handler for $extensionU is set to '$id' in $keyPath. Will attempt to remove the key.".Replace("REGISTRY::", "")
-        }
-        else {
+        } else {
             Write-Verbose "The default handler for $extensionU is NOT set to '$id' in $keyPath. Will NOT attempt to remove the key.".Replace("REGISTRY::", "")
         }
         if (($valueDataOk) -Or ($valueNameOk -eq $false)) {
@@ -330,14 +323,12 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
             # Instead, we would rather just to delete the key.
             if ($permissionOk) {
                 Remove-Item -Path $p -Recurse -Force
-            }
-            else {
+            } else {
                 # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
                 Write-Verbose "Lacking permission to remove key '$keypath'. That is normal for this key. This is not a problem.".Replace("REGISTRY::", "")
             }
         }
-    }
-    elseif ($pathOk -eq $false) {
+    } elseif ($pathOk -eq $false) {
         Write-VerboseKeyNotFound $keyPath
     }
 
@@ -346,7 +337,8 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
     if ($pathOk) {
         $subkeyCount = Get-SubkeyCount $keyPath
         $valueCount = Get-ValueCount $keyPath
-        if (($subkeyCount -eq 0) -and ($valueCount -eq 0)) { # empty key
+        if (($subkeyCount -eq 0) -and ($valueCount -eq 0)) {
+            # empty key
             Write-VerboseNoFileHandlersRemaining $path
             Remove-Item -Path $keyPath -Recurse -Force
             Write-VerboseRemovedKey $keyPath
@@ -365,21 +357,19 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
             }
             if ($handlersRemaining) {
                 Write-VerboseFileHandlersStillRemaining $keyPath $extensionU
-            }
-            else {
+            } else {
                 Write-VerboseNoFileHandlersRemaining $keyPath $extensionU
             }
-            if (($handlersRemaining -eq $false) -and ($permissionOk -eq $true)) { # Re-using the permission check we did for UserChoice
+            # Re-using the permission check we did for UserChoice
+            if (($handlersRemaining -eq $false) -and ($permissionOk -eq $true)) {
                 Remove-Item -Path $keyPath -Recurse -Force
                 Write-VerboseRemovedKey $keyPath
-            }
-            elseif (($handlersRemaining -eq $true) -and ($permissionOk -eq $false)) {
+            } elseif (($handlersRemaining -eq $true) -and ($permissionOk -eq $false)) {
                 # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
                 Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. This is not a problem.".Replace("REGISTRY::", "")
             }
         }
-    }
-    elseif (($pathOk -eq $false)-and (-not $skipUserChoiceKey)) {
+    } elseif (($pathOk -eq $false) -and (-not $skipUserChoiceKey)) {
         Write-VerboseKeyNotFound $keyPath $extensionU
     }
 }
@@ -472,21 +462,21 @@ function Remove-MuiCacheEntry() {
         Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::","")
     } #>
     
+    # TODO Rewrite
     $valueName = Join-Path $unzipDir -ChildPath "windows-x64-gui.zip\flips.exe.FriendlyAppName"
     Write-Verbose "SEARCHING FOR: value '$valueName' in '$keyPath'.".Replace("REGISTRY::", "")
     if ($keyPath -in ((Get-Item -Path $keyPath).Property)) {
         Remove-ItemProperty -Path $keyPath -Name $value
         Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
         $itemsDeleted++
-    }
-    else {
+    } else {
         Write-Verbose "NOT FOUND: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
     }
 
 }
 
-Remove-FileAssocSetByProgram "bps";Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-Remove-FileAssocSetByProgram "ips";Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByProgram "bps"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
+Remove-FileAssocSetByProgram "ips"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
 
 # Remove-FileAssocSetByUser("bps");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 # Remove-FileAssocSetByUser("ips");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
