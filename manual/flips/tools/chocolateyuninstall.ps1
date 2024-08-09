@@ -68,6 +68,10 @@ $NotOnlyFlips = [AutoFile]::NotOnlyFlips
 
 # @TODO: Remove HKU (et cetera?)
 # @TODO: Functinos should be "Remove-FileAssocByFlips($ext)" (removes in Classes: .ext... and FloatingFileIPSExt) and "Remove-FileAssocByUser($ext)" (removes in FileExts: .ext... ext_auto_file) and "Clean-MuiCache". 
+
+# === SECTION RVBVD START ===
+# === SECTION RVBVD ===
+# === SECTION RVBVD ===
 function Remove-RegistryValuesByValueData($keyPath, $valueData) {
     $key = Get-Item -Path $keyPath
     $keyValues = $key.Property # easier to understand (for me at least)
@@ -101,10 +105,23 @@ function Remove-RegistryValuesByValueData($keyPath, $valueData) {
     }
 }
 
+# === SECTION RVBVD ===
+# === SECTION RVBVD ===
+# === SECTION RVBVD END ===
+
+# === SECTION SMALL FUNCTIONS START ===
+# === SECTION SMALL FUNCTIONS ===
+# === SECTION SMALL FUNCTIONS ===
 function Write-Report($itemsDeleted, $itemsSufficient, $extraItems, $extraItemsMax) {
     Write-Verbose "Removed $itemsDeleted/$itemsSufficient sufficient items and $extraItems/$extraItemsMax extra items."
 }
+# === SECTION SMALL FUNCTIONS ===
+# === SECTION SMALL FUNCTIONS ===
+# === SECTION SMALL FUNCTIONS END ===
 
+# === SECTION CLASSES START ===
+# === SECTION CLASSES ===
+# === SECTION CLASSES ===
 function Clear-FileAssocPatchFile($ext) {
     $extUC = $ext.ToUpper() # upper-case
 
@@ -154,15 +171,23 @@ function Clear-FileAssocPatchFile($ext) {
     else {
         Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::", "")
     }
-
+    
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
-
+    
     Write-Verbose "`n"
     $itemsDeleted = 0
     $itemsSufficient = 4
     $extraItems = 0
     $extraItemsMax = 5
 
+    # === SECTION CLASSES ===
+    # === SECTION CLASSES ===
+    # === SECTION CLASSES END ===
+    
+    # === SECTION TOAST START ===
+    # === SECTION TOAST ===
+    # === SECTION TOAST ===
+    # === SECTION TOAST ===
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "Applications\flips.exe_.$ext"
     if (Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) {
@@ -186,6 +211,17 @@ function Clear-FileAssocPatchFile($ext) {
     else {
         Write-Verbose "NOT FOUND: value with name '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
     }
+
+    
+
+    # === SECTION TOAST ===
+    # === SECTION TOAST ===
+    # === SECTION TOAST ===
+    # === SECTION TOAST END ===
+
+    # === SECTION FileExts START ===
+    # === SECTION FileExts ===
+    # === SECTION FileExts ===
 
     $keyPathChild1 = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext\OpenWithList"
     $valueData = "flips.exe"
@@ -293,7 +329,13 @@ function Clear-FileAssocPatchFile($ext) {
 
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
 }
+# === SECTION FileExts ===
+# === SECTION FileExts ===
+# === SECTION FileExts END ===
 
+# === SECTION R-FASBP START ===
+# === SECTION R-FASBP ===
+# === SECTION R-FASBP ===
 function Clear-FileAssocRomFile($ext) {
     $extUC = $ext.ToUpper() # upper-case
     $autoFileItem1 = $Unset # initialize variable; refers to '"REGISTRY::HKEY_CURRENT_USER\Software\Classes\[.ext]_auto_file"'; if both 1 and 2 turn true, that means it's safe to remove certain items
@@ -514,7 +556,11 @@ function Clear-FileAssocRomFile($ext) {
 
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
 }
+# === SECTION R-FASBP ===
+# === SECTION R-FASBP ===
+# === SECTION R-FASBP END ===
 
+# LAST FUNCTION
 function Clear-RemainingKeys() {
     Write-Verbose "`n"
     Write-Verbose "`n"
@@ -538,6 +584,9 @@ function Clear-RemainingKeys() {
 
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
 
+    # === SECTION MUI START ===
+    # === SECTION MUI ===
+    # === SECTION MUI ===
     Write-Verbose "`n"
     Write-Verbose "`n"
     Write-Verbose "`n"
@@ -575,6 +624,10 @@ function Clear-RemainingKeys() {
     }
 
     Write-Report $itemsDeleted $itemsSufficient $extraItems $extraItemsMax
+    
+    # === SECTION MUI ===
+    # === SECTION MUI ===
+    # === SECTION MUI END ===
 
     Write-Verbose "`n"
     Write-Verbose "Attempting to remove remaining file type handler..."
@@ -638,6 +691,10 @@ function Clear-RemainingKeys() {
 
 }
 
+# === SECTION POST-FUNCTION START ===
+# === SECTION POST-FUNCTION ===
+# === SECTION POST-FUNCTION ===
+
 
 Clear-FileAssocPatchFile "bps"
 Clear-FileAssocPatchFile "ips"
@@ -648,6 +705,10 @@ Clear-FileAssocRomFile "gba"
 Clear-FileAssocRomFile "sfc"
 Clear-FileAssocRomFile "smc"
 Clear-RemainingKeys
+
+# === SECTION POST-FUNCTION ===
+# === SECTION POST-FUNCTION ===
+# === SECTION POST-FUNCTION END ===
 
 ## REMOVE FILE ASSOCIATION?
 ## REMOVE SHORTCUTS
