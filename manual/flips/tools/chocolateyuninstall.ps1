@@ -54,9 +54,6 @@ if (Test-Administrator) {
 
 # Remove registry keys (mostly file associations)
 
-# === SECTION RVBVD START ===
-# === SECTION RVBVD ===
-# === SECTION RVBVD ===
 function Remove-RegistryValueByValueData($keyPath, $targetValueData, $extensionU) {
     # TODO Did I accidentally find a better way to do this, later in the script?
     $key = Get-Item -Path $keyPath
@@ -92,14 +89,7 @@ function Remove-RegistryValueByValueData($keyPath, $targetValueData, $extensionU
         Write-VerboseValueDataNotFound $keyPath $targetValueData $extensionU
     }
 }
-# === SECTION RVBVD ===
-# === SECTION RVBVD ===
-# === SECTION RVBVD END ===
 
-
-# === SECTION SMALL FUNCTIONS START ===
-# === SECTION SMALL FUNCTIONS ===
-# === SECTION SMALL FUNCTIONS ===
 # path
 function Test-PathBool($p) {
     return [bool](Test-Path -Path $p)
@@ -208,15 +198,6 @@ function Test-PathPermission ($p) {
     }
 }
 
-# === SECTION SMALL FUNCTIONS ===
-# === SECTION SMALL FUNCTIONS ===
-# === SECTION SMALL FUNCTIONS END ===
-
-# === SECTION TOAST START ===
-# === SECTION TOAST ===
-# === SECTION TOAST ===
-# === SECTION TOAST ===
-
 function Remove-AAToast($n, $extensionStr) { # file association values in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts`
     $p = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueOk = Test-ValueNameBool $p $n
@@ -229,14 +210,6 @@ function Remove-AAToast($n, $extensionStr) { # file association values in `HKEY_
     }
 }
 
-# === SECTION TOAST ===
-# === SECTION TOAST ===
-# === SECTION TOAST ===
-# === SECTION TOAST END ===
-
-# === SECTION CLASSES START ===
-# === SECTION CLASSES ===
-# === SECTION CLASSES ===
 function Remove-FileAssocInClasses ($extension, $progId) {
     # Does not include the key in `HKEY_CURRENT_USER\Software\Classes\Applications`
 
@@ -271,16 +244,8 @@ function Remove-FileAssocInClasses ($extension, $progId) {
         Write-VerboseKeyNotFound $keyPath
     }
 }
-# === SECTION CLASSES ===
-# === SECTION CLASSES ===
-# === SECTION CLASSES END ===
 
-
-
-    # === SECTION FileExts START ===
-    # === SECTION FileExts ===
-    # === SECTION FileExts ===
-    function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) { # in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
+function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) { # in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
     # TODO bugtest
     $extensionU = $extension.ToUpper() # upper-case
     
@@ -418,13 +383,7 @@ function Remove-FileAssocInClasses ($extension, $progId) {
         Write-VerboseKeyNotFound $keyPath $extensionU
     }
 }
-# === SECTION FileExts ===
-# === SECTION FileExts ===
-# === SECTION FileExts END ===
 
-# === SECTION R-FASBP START ===
-# === SECTION R-FASBP ===
-# === SECTION R-FASBP ===
 function Remove-FileAssocSetByProgram($ext) {
     # TODO Would be cool if you could just paste a list of keys somewhere in the script and some function would remove them.
     $extU = $ext.ToUpper() # upper-case
@@ -497,17 +456,7 @@ function Remove-FileAssocSetByUser($ext) {
     
 }
 
-# === SECTION R-FASBP ===
-# === SECTION R-FASBP ===
-# === SECTION R-FASBP END ===
-
-# LAST FUNCTION
 function Remove-MuiCacheEntry() {
-
-    
-# === SECTION MUI START ===
-# === SECTION MUI ===
-# === SECTION MUI ===
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
 
     # very (unless I did something wrong) slow, but finds key even if installed in another location 
@@ -533,32 +482,23 @@ function Remove-MuiCacheEntry() {
     else {
         Write-Verbose "NOT FOUND: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
     }
-    # === SECTION MUI ===
-    # === SECTION MUI ===
-    # === SECTION MUI END ===
 
 }
 
-# === SECTION POST-FUNCTION START ===
-# === SECTION POST-FUNCTION ===
-# === SECTION POST-FUNCTION ===
-
 Remove-FileAssocSetByProgram "bps";Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 Remove-FileAssocSetByProgram "ips";Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-# pause
-Remove-FileAssocSetByUser("bps");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-Remove-FileAssocSetByUser("ips");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-Remove-FileAssocSetByUser("gb");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-Remove-FileAssocSetByUser("gbc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-Remove-FileAssocSetByUser("gba");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-Remove-FileAssocSetByUser("sfc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-Remove-FileAssocSetByUser("smc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+
+# Remove-FileAssocSetByUser("bps");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+# Remove-FileAssocSetByUser("ips");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+# Remove-FileAssocSetByUser("gb");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+# Remove-FileAssocSetByUser("gbc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+# Remove-FileAssocSetByUser("gba");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+# Remove-FileAssocSetByUser("sfc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+# Remove-FileAssocSetByUser("smc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 
 Remove-MuiCacheEntry
 
-# === SECTION POST-FUNCTION ===
-# === SECTION POST-FUNCTION ===
-# === SECTION POST-FUNCTION END ===
+
 
 ## REMOVE FILE ASSOCIATION?
 ## REMOVE SHORTCUTS
