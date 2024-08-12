@@ -98,9 +98,6 @@ function Test-ValueNameBool($p, $n) {
     return [bool](Get-ItemProperty -Path $p -Name $n -ea 0)
 }
 
-function Test-ValueNameBool($p, $n) {
-    return [bool](Get-ItemProperty -Path $p -Name $n -ea 0)
-}
 
 function Get-ValueData($p, $n) {
     return Get-ItemPropertyValue -Path $p -Name $n
@@ -154,7 +151,7 @@ Function Write-VerboseValueDataNotFound($p, $d, $x, $e) {
 Function Write-VerboseValueNameDataNotFound($p, $d, $x, $e) {
     $msg = "NOT FOUND: value with data '$d' in key '$p'.$e".Replace("REGISTRY::", "")
     if ($x -ne "") {
-        $msg = $msg + " This value only gets added when a $x file has been opened."
+        $msg = $msg + " This value only gets added when a $x file has been opened. It might have already been removed."
     }
     Write-Verbose $msg
 }
@@ -193,6 +190,22 @@ function Test-PathPermission ($p) {
             Write-Warning "Unexpected error occurred: $_"
         }
     }
+}
+
+# See if executable matches 
+function Test-AutoFileProgram($x, $executable) {
+    $p = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\$x" + "_auto_file\shell\open\command"
+    $pathOk = Test-PathBool($keyPath)
+    $match = $false # initialize variable
+    if ($pathOk) {
+        $targetDataTrailEnd = $exe + '" "%1"'
+        $firstValue = $(Get-Item -Path $keyPath).Property[0] # there should only be one value though
+        $data = $(Get-ItemPropertyValue -Path $keyPath -Name $firstValue)
+        $match = $data.EndsWith($targetDataTrailEnd)
+    } else {
+        Write-Verbose "NOT FOUND: key $p"
+    }
+    return $match
 }
 
 function Remove-AAToast($n, $extensionStr) {
@@ -244,6 +257,7 @@ function Remove-FileAssocInClasses ($extension, $progId) {
 function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) {
     # TODO bugtest
     $extensionU = $extension.ToUpper() # upper-case
+    # $isAutoFile = $progId.Endswith("_auto_file")
     
     # This key holds programs on the "Open with" context menu and the order in which each application was most recently used.
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\OpenWithList"
@@ -302,7 +316,7 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
     $pathOk = Test-PathBool $keyPath # Test if path exists
     $permissionOk = $true # Initialize the variable
     if ($pathok -And (-Not ($skipUserChoiceKey))) {
-        # TODO Is the association removed in a way that the user doesn't notice if pemrission denied? Probably but needs double checking. 
+        # TODO Is the association removed in a way that the user doesn't notice if pemrission denied? Probably, but needs double checking. 
         $permissionOk = Test-PathPermission $keyPath
         $valueNameOk = Test-ValueNameBool $keyPath $targetValueName # Test value name exists
         if ($valueNameOk) {
@@ -311,16 +325,19 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
         } else {
             # Weird edge case; key exists but not the "ProgId" value
             Write-VerboseValueNameNotFound $keyPath $targetValueName $extensionU
-            $valueDataOk = $false # If the value didn't even exist, we did not find the value data we were looking for
+            $valueDataOk = $false # If the value didn't even exist, then we did not find the value data we were looking for
         }
         if ($valueDataOk) {
             Write-Verbose "The default handler for $extensionU is set to '$id' in $keyPath. Will attempt to remove the key.".Replace("REGISTRY::", "")
         } else {
             Write-Verbose "The default handler for $extensionU is NOT set to '$id' in $keyPath. Will NOT attempt to remove the key.".Replace("REGISTRY::", "")
         }
-        if (($valueDataOk) -Or ($valueNameOk -eq $false)) {
-            # We don't need to remove the value, since this key only holds one handler
-            # Instead, we would rather just to delete the key.
+        if (($valueDataOk) -Or ($valueNameOk -eq $false)) { 
+            # We don't need to remove the value, since this key only holds one handler.
+            # Instead, we would rather just to delete the key (if it has the target data).
+            # The value name is just the generic "ProgId", it would be
+            # weird if this value name was gone but not the key, but
+            # let's remove the key in that edge case.
             if ($permissionOk) {
                 Remove-Item -Path $p -Recurse -Force
             } else {
@@ -364,7 +381,7 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
             if (($handlersRemaining -eq $false) -and ($permissionOk -eq $true)) {
                 Remove-Item -Path $keyPath -Recurse -Force
                 Write-VerboseRemovedKey $keyPath
-            } elseif (($handlersRemaining -eq $true) -and ($permissionOk -eq $false)) {
+            } elseif (($handlersRemaining -eq $false) -and ($permissionOk -eq $false)) {
                 # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
                 Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. This is not a problem.".Replace("REGISTRY::", "")
             }
@@ -381,7 +398,7 @@ function Remove-FileAssocSetByProgram($ext) {
     Write-Verbose "Will attempt to remove file associations that may have been added through the application." # There is an option in the settings to add file extensions.
     Write-Verbose "Extension: $extU"
 
-    progId = "FloatingIPSFile$extU"
+    $progId = "FloatingIPSFile$extU"
     Remove-FileAssocInClasses $ext $progId
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
@@ -392,7 +409,7 @@ function Remove-FileAssocSetByProgram($ext) {
     $exe = "flips.exe"
     $id = "FloatingIPSFile$extU"
     $skipUserChoice = $true # we skip the "UserChoice" key this when removing file assoc that program made, because the program doesn't make that key
-    Remove-FileAssocInFileExts $ext $targetValueName $skipUserChoice
+    Remove-FileAssocInFileExts $ext $exe $id $skipUserChoice
 
     # HACK Mystery: Why does the permission problem occur before, but after removing the program and rebooting, there is no problem with this key?
     # TODO does adding file exts as admin create keys in HKLM?
@@ -417,15 +434,28 @@ function Remove-FileAssocSetByUser($ext) {
     }
 
     # Added when you select to "Always" use the program for the file type
-    $progId = $ext + "_auto_file"
-    Remove-FileAssocInClasses $ext $progId
-
-    # Added when you select to "Always" use the program for the file type
     # (And maybe a file needs to opened as well. I don't know because I have
     # only tried setting this trough the "Open with" context menu, which opens the
     # file immediately afterwards.)
     $exe = "flips.exe"
-    $id = $ext + "_auto_file" # we must remove this value _before_ "Applications\flips.exe_.$extU" (which is removed in the next section). If we do it in reverse order, it cannot clean up, it will say that [ext]_auto_file is not set as the default handler, which would be true, it's going to be set to "Applications\flips.exe_.[ext]", never "[ext]_auto_file" in UserChoice.
+    $id = $ext + "_auto_file" # we must remove this value _before_ "Applications\flips.exe_.$extU" (which is removed in the next section). If we do it in reverse order, it cannot clean up, it will say that [ext]_auto_file is not set as the default handler, which would be true, in normal circumstances on modern versions of Windows, it's going to be set to "Applications\flips.exe_.[ext]", not "[ext]_auto_file" in UserChoice.
+    #TODO The above points towards separating removing and cleaning; and only clean afterwards... if the user is using Windows pre Vista.
+
+    # We determine if the [ext]_auto_file is set to our program, and if true, we remove [ext]_auto_file in Classes and FilExts
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\$x" + "_auto_file\shell\open\command"
+    $removeAutoFile = $false # initialize variable; holds wether it's ok to remove [ext]_auto_file
+    $pathOk = Test-PathBool($keyPath)
+    if ($pathok) {
+        $removeAutoFile = Test-AutoFileProgram($exe) # true if matches the exe
+    } else {
+        $removeAutoFile = $false
+    }
+
+    if ($removeAutoFile) {
+        # XXX
+        # move auto_file removal here I guess
+        Write-Debug ''
+    }
     # IMPROVE Mabye add a $skipDefaultHandlerCheck parameter to the function.
     $skipUserChoice = $false # finally!
     Remove-FileAssocInFileExts $ext $exe $id $skipUserChoice
@@ -439,8 +469,14 @@ function Remove-FileAssocSetByUser($ext) {
     # Added when you select to use the program "Just once" or "Always" for the file type
     $targetValueName = "Applications\flips.exe" + "_.$ext"
     Remove-AAToast $targetValueName $extU
+
+    # TODO Make sure this isn't removed if other programs are still using the progid.
+    # HOWTO If value in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command` is set to flips.exe, then remove the auto_file.
+    # Added when you select to "Always" use the program for the file type
+    $progId = $ext + "_auto_file"
+    Remove-FileAssocInClasses $ext $progId
     
-    # TODO: Make sure this isn't removed if other programs are still using the progid.
+    # TODO Make sure this isn't removed if other programs are still using the progid.
     $targetValueName = $ext + "_auto_file_." + $ext
     Remove-AAToast $targetValueName $extU
     
@@ -475,10 +511,10 @@ function Remove-MuiCacheEntry() {
 
 }
 
-Remove-FileAssocSetByProgram "bps"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
-Remove-FileAssocSetByProgram "ips"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
+# Remove-FileAssocSetByProgram "bps"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
+# Remove-FileAssocSetByProgram "ips"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
 
-# Remove-FileAssocSetByUser("bps");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByUser("bps"); Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
 # Remove-FileAssocSetByUser("ips");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 # Remove-FileAssocSetByUser("gb");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 # Remove-FileAssocSetByUser("gbc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
@@ -486,7 +522,7 @@ Remove-FileAssocSetByProgram "ips"; Write-Verbose "`n"; Write-Verbose "`n"; Writ
 # Remove-FileAssocSetByUser("sfc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 # Remove-FileAssocSetByUser("smc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
 
-Remove-MuiCacheEntry
+# Remove-MuiCacheEntry
 
 
 
