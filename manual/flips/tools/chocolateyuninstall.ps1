@@ -127,7 +127,7 @@ Function Write-VerboseKeyNotFound($p, $x, $e) {
     $msg = "NOT FOUND: key '$p'.$e".Replace("REGISTRY::", "")
     # FIXME bugtest this if statement
     if ([bool]$x -ne $false) {
-        $msg = $msg + " This key only gets added when a $x file has been opened."
+        $msg = $msg + " This key only gets added when a $x file has been opened. It might have already been removed."
     }
     Write-Verbose $msg
 }
@@ -135,14 +135,14 @@ Function Write-VerboseKeyNotFound($p, $x, $e) {
 Function Write-VerboseValueNameNotFound($p, $n, $x, $e) {
     $msg = "NOT FOUND: value '$n' in key '$p'.$e".Replace("REGISTRY::", "")
     if ([bool]$x -ne $false) {
-        $msg = $msg + " This value only gets added when a $x file has been opened."
+        $msg = $msg + " This value only gets added when a $x file has been opened. It might have already been removed."
     }
     Write-Verbose $msg
 }
 Function Write-VerboseValueDataNotFound($p, $d, $x, $e) {
     $msg = "NOT FOUND: value with data '$d' in key '$p'.$e".Replace("REGISTRY::", "")
     if ($x -ne "") {
-        $msg = $msg + " This value only gets added when a $x file has been opened."
+        $msg = $msg + " This value only gets added when a $x file has been opened. It might have already been removed."
     }
     Write-Verbose $msg
 }
@@ -254,10 +254,9 @@ function Remove-FileAssocInClasses ($extension, $progId) {
 }
 
 # Remove items in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
-function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) {
+function Remove-FileAssocInFileExts ($extension, $exe, $id) {
     # TODO bugtest
     $extensionU = $extension.ToUpper() # upper-case
-    # $isAutoFile = $progId.Endswith("_auto_file")
     
     # This key holds programs on the "Open with" context menu and the order in which each application was most recently used.
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\OpenWithList"
@@ -308,6 +307,10 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
     } else {
         Write-VerboseKeyNotFound $keyPath $extensionU
     }
+}
+
+function Remove-FileAssocInFileExtsFinal($extension, $id) {
+    $extensionU = $extension.ToUpper() # upper-case
 
     # This key holds says which program to always be used for .$ext. This may also be controlled with keys in Classes.
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\UserChoice"
@@ -315,7 +318,7 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
     $targetValueData = $id
     $pathOk = Test-PathBool $keyPath # Test if path exists
     $permissionOk = $true # Initialize the variable
-    if ($pathok -And (-Not ($skipUserChoiceKey))) {
+    if ($pathok) {
         # TODO Is the association removed in a way that the user doesn't notice if pemrission denied? Probably, but needs double checking. 
         $permissionOk = Test-PathPermission $keyPath
         $valueNameOk = Test-ValueNameBool $keyPath $targetValueName # Test value name exists
@@ -342,7 +345,7 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
                 Remove-Item -Path $p -Recurse -Force
             } else {
                 # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
-                Write-Verbose "Lacking permission to remove key '$keypath'. That is normal for this key. This is not a problem.".Replace("REGISTRY::", "")
+                Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, because it does not affect user experience.".Replace("REGISTRY::", "")
             }
         }
     } elseif ($pathOk -eq $false) {
@@ -360,8 +363,6 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
             Remove-Item -Path $keyPath -Recurse -Force
             Write-VerboseRemovedKey $keyPath
         }
-        # skip this section if $skipUserChoiceKey -eq $true
-        if (-not ($skipUserChoiceKey)) {
             $subkeyNamesRemaining = (Get-ChildItem -Path $keyPathParent).Name
             $handlersRemaining = $false # initialize variable
             # I could optimize perfermance by nesting the if statements more, but I prefer not to,
@@ -383,10 +384,10 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id, $skipUserChoiceKey) 
                 Write-VerboseRemovedKey $keyPath
             } elseif (($handlersRemaining -eq $false) -and ($permissionOk -eq $false)) {
                 # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
-                Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. This is not a problem.".Replace("REGISTRY::", "")
+                Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, because it does not affect user experience.".Replace("REGISTRY::", "")
             }
-        }
-    } elseif (($pathOk -eq $false) -and (-not $skipUserChoiceKey)) {
+    }
+    else {
         Write-VerboseKeyNotFound $keyPath $extensionU
     }
 }
@@ -421,6 +422,7 @@ function Remove-FileAssocSetByUser($ext) {
     $extU = $ext.ToUpper()
     Write-Verbose "Will attempt to remove file associations that may have been manually added." # e.g. right-click and "Open with"
     Write-Verbose "Extension: $extU."
+    $exe = "flips.exe"
 
     # Added when you add a program to the "Select an app to open this .[ext] file" popup window
     # IMPROVE It isn't necesssary to try to remove this every time the function is run. See if you can find an elegant solution.
@@ -433,52 +435,58 @@ function Remove-FileAssocSetByUser($ext) {
         Write-VerboseKeyNotFound $keyPath "" " This key is only added if you manually add the program to the 'Select an app to open this .$ext file' popup window."
     }
 
-    # Added when you select to "Always" use the program for the file type
-    # (And maybe a file needs to opened as well. I don't know because I have
-    # only tried setting this trough the "Open with" context menu, which opens the
-    # file immediately afterwards.)
-    $exe = "flips.exe"
-    $id = $ext + "_auto_file" # we must remove this value _before_ "Applications\flips.exe_.$extU" (which is removed in the next section). If we do it in reverse order, it cannot clean up, it will say that [ext]_auto_file is not set as the default handler, which would be true, in normal circumstances on modern versions of Windows, it's going to be set to "Applications\flips.exe_.[ext]", not "[ext]_auto_file" in UserChoice.
-    #TODO The above points towards separating removing and cleaning; and only clean afterwards... if the user is using Windows pre Vista.
+    # Added when you select to use the program "Just once" or "Always" for the file type
+    $exe = $exe
+    $id = "Applications\" + $exe + "_.$extU"
+    Remove-FileAssocInFileExts $ext $exe $id
 
-    # We determine if the [ext]_auto_file is set to our program, and if true, we remove [ext]_auto_file in Classes and FilExts
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\$x" + "_auto_file\shell\open\command"
-    $removeAutoFile = $false # initialize variable; holds wether it's ok to remove [ext]_auto_file
+    # Added when you select to use the program "Just once" or "Always" for the file type
+    $targetValueName = "Applications\" + $exe + "_.$extU"
+    Remove-AAToast $targetValueName $extU
+
+    # We determine if the [ext]_auto_file is set to our program, and if true, we remove [ext]_auto_file in Classes, FilExts, and AAToasts.
+    $ext_auto_file = $ext + "_auto_file"
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\$ext_auto_file\shell\open\command"
+    $autoFileMatch = $false # initialize variable
     $pathOk = Test-PathBool($keyPath)
     if ($pathok) {
-        $removeAutoFile = Test-AutoFileProgram($exe) # true if matches the exe
+        $autoFileMatch = Test-AutoFileProgram($exe) # true if matches the exe
     } else {
-        $removeAutoFile = $false
+        Write-VerboseKeyNotFound $keyPath
+        Write-Verbose "Will attempt to remove '$ext_auto_file' in other places if found.".Replace("REGISTRY::", "") # It serves no purpose if this key doesn't exist, so we might as well clean up mentions of it it we find any.
+    }
+    if ($pathok -And -Not $autoFileMatch) {
+        Write-Verbose "The value data in $keyPath does NOT point to $exe. Will NOT attempt to remove $ext_auto_file.".Replace("REGISTRY::", "")
+    }
+    elseif ($pathOk -And $autoFileMatch) {
+        Write-Verbose "The value data in $keyPath does point to $exe. Will attempt to remove $ext_auto_file.".Replace("REGISTRY::", "")
+    }
+    if ($autoFileMatch -Or (-Not $pathOk)) {
+        # Added when you select to "Always" use the program for the file type
+        $progId = $ext_auto_file
+        Remove-FileAssocInClasses $ext $progId
+        
+        # Added when you select to "Always" use the program for the file type
+        # (And maybe a file needs to opened as well. I don't know because I have
+        # only tried setting this trough the "Open with" context menu, which opens the
+        # file immediately afterwards.)
+        $exe = $exe
+        $id = $ext_auto_file
+        Remove-FileAssocInFileExts $ext $exe $id
+
+        $targetValueName = $ext + "_auto_file_." + $ext
+        Remove-AAToast $targetValueName $extU
+        
+        # Added if [ext]_auto_file is manually modified, or perhaps if you set up file association in Windows XP and copied the key over to current Windows.
+        $progId = $ext_auto_file
+        Remove-FileAssocInFileExtsFinal $ext $progId
     }
 
-    if ($removeAutoFile) {
-        # XXX
-        # move auto_file removal here I guess
-        Write-Debug ''
-    }
-    # IMPROVE Mabye add a $skipDefaultHandlerCheck parameter to the function.
-    $skipUserChoice = $false # finally!
-    Remove-FileAssocInFileExts $ext $exe $id $skipUserChoice
-
-    # Added when you select to use the program "Just once" or "Always" for the file type
-    $exe = "flips.exe"
-    $id = "Applications\flips.exe_.$extU"
-    $skipUserChoice = $true
-    Remove-FileAssocInFileExts $ext $exe $id $skipUserChoice
-
-    # Added when you select to use the program "Just once" or "Always" for the file type
-    $targetValueName = "Applications\flips.exe" + "_.$ext"
-    Remove-AAToast $targetValueName $extU
-
-    # TODO Make sure this isn't removed if other programs are still using the progid.
-    # HOWTO If value in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command` is set to flips.exe, then remove the auto_file.
-    # Added when you select to "Always" use the program for the file type
-    $progId = $ext + "_auto_file"
-    Remove-FileAssocInClasses $ext $progId
-    
-    # TODO Make sure this isn't removed if other programs are still using the progid.
-    $targetValueName = $ext + "_auto_file_." + $ext
-    Remove-AAToast $targetValueName $extU
+    # We need to do this after removing keys and values for both `[ext]_auto_file` and `Applications\flips.exe`. If we try to bake the code from Remove-FileAssocInFileExtsFinal into Remove-FileAssociInFileExts, there will be issues, (unless we do some convoluted or perhaps clever coding). It might say that there are other file handlers left (either of the ones mentioned) and that it won't attempt to remove.
+    # For normal cases on modern Windows, we could solve this by just removing `Applications\flips.exe` last. But, theoretically, you can set default program in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command`, then UserChoice will be set to [ext]_auto_file, and then, I think, we would need to remove [ext]_auto_file last.
+    # Or we could bake it into Remove-FileAssociInFileExts and run it that whole function three times (e.g. first with `[ext]_auto_file`, then `Applications\flips.exe`., then `[ext]_auto_file` again), which would account for both scenarios. Splitting it up seems most reasonable.
+    $progId = "Applications\" + $exe
+    Remove-FileAssocInFileExtsFinal $ext $progId
     
 }
 
