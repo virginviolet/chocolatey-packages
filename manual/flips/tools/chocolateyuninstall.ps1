@@ -409,8 +409,7 @@ function Remove-FileAssocSetByProgram($ext) {
     
     $exe = "flips.exe"
     $id = "FloatingIPSFile$extU"
-    $skipUserChoice = $true # we skip the "UserChoice" key this when removing file assoc that program made, because the program doesn't make that key
-    Remove-FileAssocInFileExts $ext $exe $id $skipUserChoice
+    Remove-FileAssocInFileExts $ext $exe $id
 
     # HACK Mystery: Why does the permission problem occur before, but after removing the program and rebooting, there is no problem with this key?
     # TODO does adding file exts as admin create keys in HKLM?
