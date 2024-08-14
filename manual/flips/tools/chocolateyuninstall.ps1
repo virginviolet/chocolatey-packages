@@ -70,13 +70,13 @@ function Remove-RegistryValueByValueData($keyPath, $targetValueData, $extensionU
                 Remove-ItemProperty -Path $keyPath -Name $value # PowerShell bug causes error if name is '(default)' 
                 Write-VerboseRemovedValueData $keyPath $value $targetValueData
                 $found = $true
-                break # In this script, we don't expect multiple values with the same data, so we can break as soon as we find the data. 
+                return # In this script, we don't expect multiple values with the same data, so we can return as soon as we find the data. 
             } catch {
                 if ($_.Exception.Message -match 'Property \(default\) does not exist at path*') {
                     $(Get-Item -Path $keyPath).OpenSubKey('', $true).DeleteValue('') # "(default)" actually just means empty string (Remove-ItemProperty does not accept empty string).
                     Write-VerboseRemovedValueData $keyPath $value $targetValueData
                     $found = $true
-                    break # In this script, we don't expect multiple values with the same data, so we can break as soon as we find the data. 
+                    return # In this script, we don't expect multiple values with the same data, so we can return as soon as we find the data. 
                 } else {
                     Write-Error "An ItemNotFoundException occurred: $_"
                 }
@@ -127,7 +127,7 @@ Function Write-VerboseKeyNotFound($p, $x, $e) {
     $msg = "NOT FOUND: key '$p'.$e".Replace("REGISTRY::", "")
     # FIXME bugtest this if statement
     if ([bool]$x -ne $false) {
-        $msg = $msg + " This key only gets added when a $x file has been opened. It might have already been removed."
+        $msg = $msg + " This key only gets added when a $x file has been opened. It may have already been removed."
     }
     Write-Verbose $msg
 }
@@ -135,14 +135,14 @@ Function Write-VerboseKeyNotFound($p, $x, $e) {
 Function Write-VerboseValueNameNotFound($p, $n, $x, $e) {
     $msg = "NOT FOUND: value '$n' in key '$p'.$e".Replace("REGISTRY::", "")
     if ([bool]$x -ne $false) {
-        $msg = $msg + " This value only gets added when a $x file has been opened. It might have already been removed."
+        $msg = $msg + " This value only gets added when a $x file has been opened. It may have already been removed."
     }
     Write-Verbose $msg
 }
 Function Write-VerboseValueDataNotFound($p, $d, $x, $e) {
     $msg = "NOT FOUND: value with data '$d' in key '$p'.$e".Replace("REGISTRY::", "")
     if ($x -ne "") {
-        $msg = $msg + " This value only gets added when a $x file has been opened. It might have already been removed."
+        $msg = $msg + " This value only gets added when a $x file has been opened. It may have already been removed."
     }
     Write-Verbose $msg
 }
@@ -151,7 +151,7 @@ Function Write-VerboseValueDataNotFound($p, $d, $x, $e) {
 Function Write-VerboseValueNameDataNotFound($p, $d, $x, $e) {
     $msg = "NOT FOUND: value with data '$d' in key '$p'.$e".Replace("REGISTRY::", "")
     if ($x -ne "") {
-        $msg = $msg + " This value only gets added when a $x file has been opened. It might have already been removed."
+        $msg = $msg + " This value only gets added when a $x file has been opened. It may have already been removed."
     }
     Write-Verbose $msg
 }
@@ -257,6 +257,15 @@ function Remove-FileAssocInClasses ($extension, $progId) {
 function Remove-FileAssocInFileExts ($extension, $exe, $id) {
     # TODO bugtest
     $extensionU = $extension.ToUpper() # upper-case
+
+    # Don't continue if this parent key doesn't exist
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$extension"
+    $pathOk = Test-PathBool $keyPath # Test if path exists
+    if (-not $pathOk) {
+        Write-VerboseKeyNotFound $keyPath $extensionU
+        return
+    }
+    echo hey
     
     # This key holds programs on the "Open with" context menu and the order in which each application was most recently used.
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\OpenWithList"
@@ -311,6 +320,14 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id) {
 
 function Remove-FileAssocInFileExtsFinal($extension, $id) {
     $extensionU = $extension.ToUpper() # upper-case
+    # Don't continue if this parent key doesn't exist
+
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$extension"
+    $pathOk = Test-PathBool $keyPath # Test if path exists
+    if (-not $pathOk) {
+        Write-VerboseKeyNotFound $keyPath $extensionU
+        return
+    }
 
     # This key holds says which program to always be used for .$ext. This may also be controlled with keys in Classes.
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\UserChoice"
@@ -342,50 +359,45 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
             # weird if this value name was gone but not the key, but
             # let's remove the key in that edge case.
             if ($permissionOk) {
-                Remove-Item -Path $p -Recurse -Force
+                Remove-Item -Path $keyPath -Force
             } else {
                 # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
-                Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, because it does not affect user experience.".Replace("REGISTRY::", "")
+                Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup in registry, but it is not an issue as it makes no difference to user experience.".Replace("REGISTRY::", "")
             }
         }
-    } elseif ($pathOk -eq $false) {
+    } else {
         Write-VerboseKeyNotFound $keyPath
     }
 
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
     $pathOk = Test-PathBool $keyPath
     if ($pathOk) {
+        # XXX Bugtest
+        $subkeyNamesRemaining = (Get-ChildItem -Path $keyPath).Name
         $subkeyCount = Get-SubkeyCount $keyPath
         $valueCount = Get-ValueCount $keyPath
-        if (($subkeyCount -eq 0) -and ($valueCount -eq 0)) {
+        if (
+            ($valueCount -gt 0) -or
+        (($subKeyCount -gt 1) -And -Not ($subkeyNamesRemaining[0].EndsWith("\UserChoice"))) # if the first subkey isn't UserChoice
+        ) {
+            Write-VerboseFileHandlersStillRemaining $keyPath $extensionU
+        }
+        elseif (($subkeyCount -eq 0) -and ($valueCount -eq 0)) {
             # empty key
-            Write-VerboseNoFileHandlersRemaining $path
+            Write-VerboseNoFileHandlersRemaining $path $extensionU
+            Remove-Item -Path $keyPath -Recurse -Force
+            Write-VerboseRemovedKey $keyPath
+        } elseif ($permissionOk -eq $true) {
+            # Re-using $pemissionOk value from UserChoice, no neet to test again.
+            Write-VerboseNoFileHandlersRemaining $keyPath $extensionU
             Remove-Item -Path $keyPath -Recurse -Force
             Write-VerboseRemovedKey $keyPath
         }
-            $subkeyNamesRemaining = (Get-ChildItem -Path $keyPathParent).Name
-            $handlersRemaining = $false # initialize variable
-            # I could optimize perfermance by nesting the if statements more, but I prefer not to,
-            # and it's already very fast. Feel free to improve.
-            if ($valueCount -gt 0) {
-                $handlersRemaining = $true
-            }
-            if (($subKeyCount -gt 1) -And ($subkeyNamesRemaining[0] -ne $subkeyUc)) {
-                $handlersRemaining = $true
-            }
-            if ($handlersRemaining) {
-                Write-VerboseFileHandlersStillRemaining $keyPath $extensionU
-            } else {
-                Write-VerboseNoFileHandlersRemaining $keyPath $extensionU
-            }
-            # Re-using the permission check we did for UserChoice
-            if (($handlersRemaining -eq $false) -and ($permissionOk -eq $true)) {
-                Remove-Item -Path $keyPath -Recurse -Force
-                Write-VerboseRemovedKey $keyPath
-            } elseif (($handlersRemaining -eq $false) -and ($permissionOk -eq $false)) {
-                # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
-                Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, because it does not affect user experience.".Replace("REGISTRY::", "")
-            }
+        else {
+            Write-VerboseNoFileHandlersRemaining $keyPath $extensionU # message is lying, the attempt has already been made
+            # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
+            Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, because it does not affect user experience.".Replace("REGISTRY::", "")
+        }
     }
     else {
         Write-VerboseKeyNotFound $keyPath $extensionU
@@ -393,7 +405,7 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
 }
 
 function Remove-FileAssocSetByProgram($ext) {
-    # TODO Would be cool if you could just paste a list of keys somewhere in the script and some function would remove them.
+    # TODO Would be cool if you could just paste a list of keys somewhere and some function or script would remove them. But that wouldn't make much sense, because we need to programatically determine wether to remove [ext]_auto_key. It would just add a layer of complexity, to interpret that list.
     $extU = $ext.ToUpper() # upper-case
     
     Write-Verbose "Will attempt to remove file associations that may have been added through the application." # There is an option in the settings to add file extensions.
@@ -409,6 +421,8 @@ function Remove-FileAssocSetByProgram($ext) {
     
     $exe = "flips.exe"
     $id = "FloatingIPSFile$extU"
+    # TODO "NOT FOUND: value 'FloatingIPSFileIPS' in key 'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ips\OpenWithProgids'. This value only gets added when a IPS file has been opened."
+    # Is the second sentence true?
     Remove-FileAssocInFileExts $ext $exe $id
 
     # HACK Mystery: Why does the permission problem occur before, but after removing the program and rebooting, there is no problem with this key?
@@ -416,12 +430,11 @@ function Remove-FileAssocSetByProgram($ext) {
 }
 
 function Remove-FileAssocSetByUser($ext) {
-    # XXX
-    # TODO: TEST
     $extU = $ext.ToUpper()
     Write-Verbose "Will attempt to remove file associations that may have been manually added." # e.g. right-click and "Open with"
     Write-Verbose "Extension: $extU."
     $exe = "flips.exe"
+    $fileExtsExtPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext"
 
     # Added when you add a program to the "Select an app to open this .[ext] file" popup window
     # IMPROVE It isn't necesssary to try to remove this every time the function is run. See if you can find an elegant solution.
@@ -431,17 +444,17 @@ function Remove-FileAssocSetByUser($ext) {
         Remove-Item -Path $keyPath -Recurse -Force
         Write-VerboseRemovedKey $keyPath
     } else {
-        Write-VerboseKeyNotFound $keyPath "" " This key is only added if you manually add the program to the 'Select an app to open this .$ext file' popup window."
+        Write-VerboseKeyNotFound $keyPath "" " This key is only added if you manually add the program to the 'Select an app to open this .$ext file' popup window. It may have already been removed."
     }
+
+    # Added when you select to use the program "Just once" or "Always" for the file type
+    $targetValueName = "Applications\" + $exe + "_.$extU"
+    Remove-AAToast $targetValueName $extU
 
     # Added when you select to use the program "Just once" or "Always" for the file type
     $exe = $exe
     $id = "Applications\" + $exe + "_.$extU"
     Remove-FileAssocInFileExts $ext $exe $id
-
-    # Added when you select to use the program "Just once" or "Always" for the file type
-    $targetValueName = "Applications\" + $exe + "_.$extU"
-    Remove-AAToast $targetValueName $extU
 
     # We determine if the [ext]_auto_file is set to our program, and if true, we remove [ext]_auto_file in Classes, FilExts, and AAToasts.
     $ext_auto_file = $ext + "_auto_file"
@@ -469,74 +482,81 @@ function Remove-FileAssocSetByUser($ext) {
         # (And maybe a file needs to opened as well. I don't know because I have
         # only tried setting this trough the "Open with" context menu, which opens the
         # file immediately afterwards.)
-        $exe = $exe
-        $id = $ext_auto_file
-        Remove-FileAssocInFileExts $ext $exe $id
-
         $targetValueName = $ext + "_auto_file_." + $ext
         Remove-AAToast $targetValueName $extU
         
-        # Added if [ext]_auto_file is manually modified, or perhaps if you set up file association in Windows XP and copied the key over to current Windows.
-        $progId = $ext_auto_file
+        $exe = $exe
+        $id = $ext_auto_file
+        Remove-FileAssocInFileExts $ext $exe $id
+        
+        # We check if this path exists in order to avoid the same "NOT FOUND" verbose message being shown again (we ran this function recently).
+        $pathOk = Test-PathBool $fileExtsExtPath # Test if path exists
+        if ($pathOk) {
+            # Added if [ext]_auto_file is manually modified, or perhaps if you set up file association in Windows XP and copied the key over to current Windows.
+            $progId = $ext_auto_file
+            Remove-FileAssocInFileExtsFinal $ext $progId
+        }
+    }
+
+    # We check if this path exists in order to avoid the same "NOT FOUND" verbose message being shown again (we ran this function recently).
+    $pathOk = Test-PathBool $fileExtsExtPath # Test if path exists
+    if ($pathOk) {
+        echo ok
+        # We need to do this after removing keys and values for both `[ext]_auto_file` and `Applications\flips.exe`. If we try to bake the code from Remove-FileAssocInFileExtsFinal into Remove-FileAssociInFileExts, there will be issues, (unless we do some convoluted or perhaps clever coding). It might say that there are other file handlers left (either of the ones mentioned) and that it won't attempt to remove.
+        # For normal cases on modern Windows, we could solve this by just removing `Applications\flips.exe` last. But, theoretically, you can set default program in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command`, then UserChoice will be set to [ext]_auto_file, and then, I think, we would need to remove [ext]_auto_file last.
+        # Or we could bake it into Remove-FileAssociInFileExts and run it that whole function three times (e.g. first with `[ext]_auto_file`, then `Applications\flips.exe`., then `[ext]_auto_file` again), which would account for both scenarios. Splitting it up seems most reasonable.
+        $progId = "Applications\" + $exe
         Remove-FileAssocInFileExtsFinal $ext $progId
     }
-
-    # We need to do this after removing keys and values for both `[ext]_auto_file` and `Applications\flips.exe`. If we try to bake the code from Remove-FileAssocInFileExtsFinal into Remove-FileAssociInFileExts, there will be issues, (unless we do some convoluted or perhaps clever coding). It might say that there are other file handlers left (either of the ones mentioned) and that it won't attempt to remove.
-    # For normal cases on modern Windows, we could solve this by just removing `Applications\flips.exe` last. But, theoretically, you can set default program in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command`, then UserChoice will be set to [ext]_auto_file, and then, I think, we would need to remove [ext]_auto_file last.
-    # Or we could bake it into Remove-FileAssociInFileExts and run it that whole function three times (e.g. first with `[ext]_auto_file`, then `Applications\flips.exe`., then `[ext]_auto_file` again), which would account for both scenarios. Splitting it up seems most reasonable.
-    $progId = "Applications\" + $exe
-    Remove-FileAssocInFileExtsFinal $ext $progId
     
 }
 
-function Remove-MuiCacheEntry() {
+function Remove-MuiCacheEntry($n) {
+    Write-Verbose "Will attempt to remove MUI cache entry."
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
-
-    # very (unless I did something wrong) slow, but finds key even if installed in another location 
-    <# 
-    $keyPath = $keyPath.Substring("REGISTRY::".Length) ## remove prefix
-        $valueData = "flips.exe"
-        
-        if (Test-Path -Path $keyPath -ea 0) {
-        echo "let's remove value"
-        Remove-RegistryValueByValueData $keyPath $valueData
-        $itemsDeleted++
+    $targetValueName = $n
+    $valueNameOk = Test-ValueNameBool $keyPath $targetValueName
+    if ($valueNameOk) {
+        Remove-ItemProperty -Path $keyPath -Name $targetValueName
+        Write-VerboseRemovedValueName $keyPath $targetValueName
     } else {
-        Write-Verbose "NOT FOUND: key '$keyPath'.".Replace("REGISTRY::","")
-    } #>
-    
-    # TODO Rewrite
-    $valueName = Join-Path $unzipDir -ChildPath "windows-x64-gui.zip\flips.exe.FriendlyAppName"
-    Write-Verbose "SEARCHING FOR: value '$valueName' in '$keyPath'.".Replace("REGISTRY::", "")
-    if ($keyPath -in ((Get-Item -Path $keyPath).Property)) {
-        Remove-ItemProperty -Path $keyPath -Name $value
-        Write-Verbose "REMOVED: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
-        $itemsDeleted++
-    } else {
-        Write-Verbose "NOT FOUND: value '$valueName' in key '$keyPath'.".Replace("REGISTRY::", "")
+        Write-VerboseValueNameNotFound $keyPath $targetValueName
     }
 
 }
 
-# Remove-FileAssocSetByProgram "bps"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
-# Remove-FileAssocSetByProgram "ips"; Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
+Write-Verbose 'You may safetly ignore "NOT FOUND" verbose messages from this uninstallation script.'; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
-Remove-FileAssocSetByUser("bps"); Write-Verbose "`n"; Write-Verbose "`n"; Write-Verbose "`n"
-# Remove-FileAssocSetByUser("ips");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-# Remove-FileAssocSetByUser("gb");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-# Remove-FileAssocSetByUser("gbc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-# Remove-FileAssocSetByUser("gba");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-# Remove-FileAssocSetByUser("sfc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
-# Remove-FileAssocSetByUser("smc");Write-Verbose "`n";Write-Verbose "`n";Write-Verbose "`n"
+Remove-FileAssocSetByProgram "bps"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByProgram "ips"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
-# Remove-MuiCacheEntry
+Remove-FileAssocSetByUser("bps"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("ips");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+
+Remove-FileAssocSetByUser("nes");Write-Verbose "...";Write-Verbose "...";Write-Verbose "..."
+Remove-FileAssocSetByUser("sfc");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("smc");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("n64");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("z64");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("gb");Write-Verbose "...";Write-Verbose "...";Write-Verbose "..."
+Remove-FileAssocSetByUser("gbc");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("gba");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("bin");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("md");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("gen");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+
+$friendlyAppName = "flips.exe"
+$executableDir = Join-Path $unzipDir -ChildPath "windows-x64-gui.zip"
+$targetValueName = Join-Path $executableDir -ChildPath "$friendlyAppName.FriendlyAppName"
+Remove-MuiCacheEntry $targetValueName
+
+# TODO Search registry to see if there are any more keys we need to remove with this script
 
 
-
-## REMOVE FILE ASSOCIATION?
-## REMOVE SHORTCUTS
-## ADD REMOVE SHORTCUTS TO TEMPLATE
-## ADD START MENU TO TEMPLATE
+## TODO REMOVE FILE ASSOCIATION?
+## TODO REMOVE SHORTCUTS
+## TODO ADD REMOVE SHORTCUTS TO TEMPLATE
+## TODO ADD START MENU TO TEMPLATE
 
 ## OTHER POWERSHELL FUNCTIONS
 ## https://docs.chocolatey.org/en-us/create/functions
