@@ -265,7 +265,6 @@ function Remove-FileAssocInFileExts ($extension, $exe, $id) {
         Write-VerboseKeyNotFound $keyPath $extensionU
         return
     }
-    echo hey
     
     # This key holds programs on the "Open with" context menu and the order in which each application was most recently used.
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension\OpenWithList"
@@ -381,8 +380,7 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
         (($subKeyCount -gt 1) -And -Not ($subkeyNamesRemaining[0].EndsWith("\UserChoice"))) # if the first subkey isn't UserChoice
         ) {
             Write-VerboseFileHandlersStillRemaining $keyPath $extensionU
-        }
-        elseif (($subkeyCount -eq 0) -and ($valueCount -eq 0)) {
+        } elseif (($subkeyCount -eq 0) -and ($valueCount -eq 0)) {
             # empty key
             Write-VerboseNoFileHandlersRemaining $path $extensionU
             Remove-Item -Path $keyPath -Recurse -Force
@@ -392,14 +390,12 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
             Write-VerboseNoFileHandlersRemaining $keyPath $extensionU
             Remove-Item -Path $keyPath -Recurse -Force
             Write-VerboseRemovedKey $keyPath
-        }
-        else {
+        } else {
             Write-VerboseNoFileHandlersRemaining $keyPath $extensionU # message is lying, the attempt has already been made
             # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
             Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, because it does not affect user experience.".Replace("REGISTRY::", "")
         }
-    }
-    else {
+    } else {
         Write-VerboseKeyNotFound $keyPath $extensionU
     }
 }
@@ -469,8 +465,7 @@ function Remove-FileAssocSetByUser($ext) {
     }
     if ($pathok -And -Not $autoFileMatch) {
         Write-Verbose "The value data in $keyPath does NOT point to $exe. Will NOT attempt to remove $ext_auto_file.".Replace("REGISTRY::", "")
-    }
-    elseif ($pathOk -And $autoFileMatch) {
+    } elseif ($pathOk -And $autoFileMatch) {
         Write-Verbose "The value data in $keyPath does point to $exe. Will attempt to remove $ext_auto_file.".Replace("REGISTRY::", "")
     }
     if ($autoFileMatch -Or (-Not $pathOk)) {
@@ -501,7 +496,6 @@ function Remove-FileAssocSetByUser($ext) {
     # We check if this path exists in order to avoid the same "NOT FOUND" verbose message being shown again (we ran this function recently).
     $pathOk = Test-PathBool $fileExtsExtPath # Test if path exists
     if ($pathOk) {
-        echo ok
         # We need to do this after removing keys and values for both `[ext]_auto_file` and `Applications\flips.exe`. If we try to bake the code from Remove-FileAssocInFileExtsFinal into Remove-FileAssociInFileExts, there will be issues, (unless we do some convoluted or perhaps clever coding). It might say that there are other file handlers left (either of the ones mentioned) and that it won't attempt to remove.
         # For normal cases on modern Windows, we could solve this by just removing `Applications\flips.exe` last. But, theoretically, you can set default program in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command`, then UserChoice will be set to [ext]_auto_file, and then, I think, we would need to remove [ext]_auto_file last.
         # Or we could bake it into Remove-FileAssociInFileExts and run it that whole function three times (e.g. first with `[ext]_auto_file`, then `Applications\flips.exe`., then `[ext]_auto_file` again), which would account for both scenarios. Splitting it up seems most reasonable.
@@ -531,19 +525,19 @@ Remove-FileAssocSetByProgram "bps"; Write-Verbose "..."; Write-Verbose "..."; Wr
 Remove-FileAssocSetByProgram "ips"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
 Remove-FileAssocSetByUser("bps"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("ips");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("ips"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
-Remove-FileAssocSetByUser("nes");Write-Verbose "...";Write-Verbose "...";Write-Verbose "..."
-Remove-FileAssocSetByUser("sfc");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("smc");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("n64");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("z64");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("gb");Write-Verbose "...";Write-Verbose "...";Write-Verbose "..."
-Remove-FileAssocSetByUser("gbc");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("gba");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("bin");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("md");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
-Remove-FileAssocSetByUser("gen");Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("nes"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("sfc"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("smc"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("n64"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("z64"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("gb"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("gbc"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("gba"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("bin"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("md"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
+Remove-FileAssocSetByUser("gen"); Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
 $friendlyAppName = "flips.exe"
 $executableDir = Join-Path $unzipDir -ChildPath "windows-x64-gui.zip"
