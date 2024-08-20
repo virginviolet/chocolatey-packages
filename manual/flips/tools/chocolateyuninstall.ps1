@@ -241,11 +241,11 @@ function Remove-FileAssocInClasses ($extension, $progId) {
 
 # Remove items in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
 function Remove-FileAssocInFileExts ($extension, $exe, $id) {
-    # TODO bugtest
+    # [x] bugtest
     $extensionU = $extension.ToUpper() # upper-case
 
     # Don't continue if this parent key doesn't exist
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$extension"
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension"
     $pathOk = Test-PathBool $keyPath # Test if path exists
     if (-not $pathOk) {
         Write-VerboseKeyNotFound $keyPath
@@ -307,7 +307,7 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
     $extensionU = $extension.ToUpper() # upper-case
     # Don't continue if this parent key doesn't exist
 
-    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$extension"
+    $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$extension"
     $pathOk = Test-PathBool $keyPath # Test if path exists
     if (-not $pathOk) {
         Write-VerboseKeyNotFound $keyPath
@@ -321,7 +321,7 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
     $pathOk = Test-PathBool $keyPath # Test if path exists
     $permissionOk = $true # Initialize the variable
     if ($pathok) {
-        # TODO Is the association removed in a way that the user doesn't notice if pemrission denied? Probably, but needs double checking. 
+        # [x] TODO Is the association removed in a way that the user doesn't notice if pemrission denied? Probably, but needs double checking. Answer: Yes.
         $permissionOk = Test-PathPermission $keyPath
         $valueNameOk = Test-ValueNameBool $keyPath $targetValueName # Test value name exists
         if ($valueNameOk) {
@@ -357,14 +357,28 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
     $pathOk = Test-PathBool $keyPath
     if ($pathOk) {
-        # XXX Bugtest
+        # [x] Bugtest
+        # TESTS
+        # [x] Assoc set by program
+        # [x] Only add to menu
+        # [x] Run once
+        # [x] Always run
+        # [x] Not run; other program on list
+        # [x] Run once; other program on list
+        # [x] Run once; other program as default
+        # [x] Always run; other program on list
+        # [x] Assoc set in Classes\ext_auto_file; UserChoice set to bps_auto_file; no other program on list
+        # [x] Assoc for other program set in Classes\ext_auto_file; UserChoice set to bps_auto_file
+        # [x] Assoc set in Classes\ext_auto_file; UserChoice set to bps_auto_file; other program on list
+        # [x] Assoc set in program's settings; always run
+        # [x] Assoc set in program's settings; add exe; always run
+        # [x] Assoc set in program's settings; run once. Nothing happened.
         $subkeyNamesRemaining = (Get-ChildItem -Path $keyPath).Name
         $subkeyCount = Get-SubkeyCount $keyPath
         $valueCount = Get-ValueCount $keyPath
-        if (
-            ($valueCount -gt 0) -or
-        (($subKeyCount -gt 1) -And -Not ($subkeyNamesRemaining[0].EndsWith("\UserChoice"))) # if the first subkey isn't UserChoice
-        ) {
+        # [x] FIXME Says "No file handlers remaining" if UserKey exists and is set to some other app
+        if (($valueCount -gt 0) -or (($subKeyCount -gt 1)))
+        {
             Write-VerboseFileHandlersStillRemaining $keyPath
         } elseif (($subkeyCount -eq 0) -and ($valueCount -eq 0)) {
             # empty key
@@ -379,7 +393,7 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
         } else {
             Write-VerboseNoFileHandlersRemaining $keyPath # message is lying, the attempt has already been made
             # If Test-PathPermission gives "Unexpected error occured", the below output may be incorrect.
-            Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, because it does not affect user experience.".Replace("REGISTRY::", "")
+            Write-Verbose "Lacking permission to remove key '$keyPath'. That is normal for this key. It prevents complete cleanup, but it's not a real issue, as it does not affect user experience.".Replace("REGISTRY::", "")
         }
     } else {
         Write-VerboseKeyNotFound $keyPath
@@ -387,10 +401,9 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
 }
 
 function Remove-FileAssocSetByProgram($ext) {
-    # TODO Would be cool if you could just paste a list of keys somewhere and some function or script would remove them. But that wouldn't make much sense, because we need to programatically determine wether to remove [ext]_auto_key. It would just add a layer of complexity, to interpret that list.
+    # [x] TODO Would be cool if you could just paste a list of keys somewhere and some function or script would remove them. But that wouldn't make much sense, because we need to programatically determine wether to remove [ext]_auto_key. It would just add a layer of complexity, to interpret that list. Won't do.
     $extU = $ext.ToUpper() # upper-case
     
-    Write-Verbose "Will attempt to remove file associations that may have been added through the application." # There is an option in the settings to add file extensions.
     Write-Verbose "Extension: $extU"
 
     $progId = "FloatingIPSFile$extU"
@@ -399,22 +412,25 @@ function Remove-FileAssocSetByProgram($ext) {
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts"
     $valueName = "Applications\flips.exe_.$ext"
     $targetValueName = "FloatingIPSFile$extU" + "_.$ext"
-    Remove-AAToast $targetValueName
+    Remove-AAToast $targetValueName # Only added if opened a file with the file type at least once
     
     $exe = "flips.exe"
     $id = "FloatingIPSFile$extU"
-    Remove-FileAssocInFileExts $ext $exe $id
+    Remove-FileAssocInFileExts $ext $exe $id # Only added if opened a file with the file type at least once
 
-    # HACK Mystery: Why does the permission problem occur before, but after removing the program and rebooting, there is no problem with this key? Or, is that even what made the different?
-    # TODO does adding file exts as admin create keys in HKLM?  
+    # HACK Mystery: Why does the permission problem occur before, but after removing the program and rebooting, there is no problem with this key? Or, is that even what made the difference?
+    # [x] TODO does adding file exts as admin create keys in HKLM?
+    # Answer: No. It's still HKCU.
+
+    # The ProgId value here is added if file association is set up through program, then the user manually selects to use the program "Always" for the application.
+    Remove-FileAssocInFileExtsFinal $ext $progId
 }
 
 function Remove-FileAssocSetByUser($ext) {
     $extU = $ext.ToUpper()
-    Write-Verbose "Will attempt to remove file associations that may have been manually added." # e.g. right-click and "Open with"
     Write-Verbose "Extension: $extU."
     $exe = "flips.exe"
-    $fileExtsExtPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$ext"
+    $fileExtsExtPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
 
     # Added when you add a program to the "Select an app to open this .[ext] file" popup window
     # IMPROVE It isn't necesssary to try to remove this every time the function is run. See if you can find an elegant solution.
@@ -480,9 +496,9 @@ function Remove-FileAssocSetByUser($ext) {
     # We check if this path exists in order to avoid the same "NOT FOUND" verbose message being shown again (we ran this function recently).
     $pathOk = Test-PathBool $fileExtsExtPath # Test if path exists
     if ($pathOk) {
-        # We need to do this after removing keys and values for both `[ext]_auto_file` and `Applications\flips.exe`. If we try to bake the code from Remove-FileAssocInFileExtsFinal into Remove-FileAssociInFileExts, there will be issues, (unless we do some convoluted or perhaps clever coding). It might say that there are other file handlers left (either of the ones mentioned) and that it won't attempt to remove.
-        # For normal cases on modern Windows, we could solve this by just removing `Applications\flips.exe` last. But, theoretically, you can set default program in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command`, then UserChoice will be set to [ext]_auto_file, and then, I think, we would need to remove [ext]_auto_file last.
-        # Or we could bake it into Remove-FileAssociInFileExts and run it that whole function three times (e.g. first with `[ext]_auto_file`, then `Applications\flips.exe`., then `[ext]_auto_file` again), which would account for both scenarios. Splitting it up seems most reasonable.
+        # We need to do this after removing keys and values for both `[ext]_auto_file` and `Applications\[executable].exe`. If we try to bake the code from Remove-FileAssocInFileExtsFinal into Remove-FileAssociInFileExts, there will be issues, (unless we do some convoluted or perhaps clever coding). It might say that there are other file handlers left (either of the ones mentioned) and that it won't attempt to remove.
+        # For normal cases on modern Windows, we could solve this by just removing `Applications\[executable].exe` last. But, theoretically, you can set default program in `HKEY_CURRENT_USER\Software\Classes\[ext]_auto_file\shell\open\command`, then UserChoice will be set to [ext]_auto_file, and then, I think, we would need to remove [ext]_auto_file last.
+        # Or we could bake it into Remove-FileAssociInFileExts and run it that whole function three times (e.g. first with `[ext]_auto_file`, then `Applications\[executable].exe`., then `[ext]_auto_file` again), which would account for both scenarios. Splitting it up seems most reasonable.
         $progId = "Applications\" + $exe
         Remove-FileAssocInFileExtsFinal $ext $progId
     }
@@ -506,12 +522,15 @@ function Remove-MuiCacheEntry($n) {
 
 Write-Verbose 'You may safetly ignore "NOT FOUND" verbose messages from this uninstallation script.'; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
+Write-Verbose "Will attempt to remove file associations that may have been added through the application." # There is an option in the settings to add file extensions.
 Remove-FileAssocSetByProgram "bps"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 Remove-FileAssocSetByProgram "ips"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
+Write-Verbose "Will attempt to remove file associations that may have been manually added." # e.g. right-click and "Open with"
 Remove-FileAssocSetByUser "bps"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 Remove-FileAssocSetByUser "ips"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
+# File extensions that are often used with IPS and BPS patches.
 Remove-FileAssocSetByUser "nes"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 Remove-FileAssocSetByUser "sfc"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 Remove-FileAssocSetByUser "smc"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
@@ -529,8 +548,9 @@ $executableDir = Join-Path $unzipDir -ChildPath "windows-x64-gui.zip"
 $targetValueName = Join-Path $executableDir -ChildPath "$friendlyAppName.FriendlyAppName"
 Remove-MuiCacheEntry $targetValueName
 
-# TODO Search registry to see if there are any more keys we need to remove with this script
+# [x] TODO Search registry to see if there are any more keys we need to remove with this script. DONE. Nothing more that I want to remove.
 
+# TODO Separate file ext removal into its own script
 
 ## TODO REMOVE FILE ASSOCIATION?
 ## TODO REMOVE SHORTCUTS
