@@ -12,6 +12,8 @@ $unzipArgs = @{
   Destination = $toolsDir
 }
 
+## TODO: "flips.exe" → "Floating IPS"
+
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
 
