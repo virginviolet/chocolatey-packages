@@ -209,7 +209,7 @@ function Remove-AAToast($n) {
 function Remove-FileAssocInClasses ($extension, $progId) {
     # Does not include the key in `HKEY_CURRENT_USER\Software\Classes\Applications`
 
-    # IMPROVE Make a separate function to clean up empty keys, run it at the end of the end of the script, instead of cleaning as we go. However, cleaning up and check for subkeys was a practical way to check if handlers remaining.
+    # IMPROVE Possibly a potiential improvement: Make a separate function to clean up empty keys, run it at the end of the end of the script, instead of cleaning as we go. However, cleaning up and check for subkeys was a practical way to check if handlers remaining.
     
     $extensionU = $extension.ToUpper()
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\.$extension"
@@ -241,7 +241,6 @@ function Remove-FileAssocInClasses ($extension, $progId) {
 
 # Remove items in `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts`
 function Remove-FileAssocInFileExts ($extension, $exe, $id) {
-    # [x] bugtest
     $extensionU = $extension.ToUpper() # upper-case
 
     # Don't continue if this parent key doesn't exist
@@ -321,7 +320,6 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
     $pathOk = Test-PathBool $keyPath # Test if path exists
     $permissionOk = $true # Initialize the variable
     if ($pathok) {
-        # [x] TODO Is the association removed in a way that the user doesn't notice if pemrission denied? Probably, but needs double checking. Answer: Yes.
         $permissionOk = Test-PathPermission $keyPath
         $valueNameOk = Test-ValueNameBool $keyPath $targetValueName # Test value name exists
         if ($valueNameOk) {
@@ -357,26 +355,9 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
     $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.$ext"
     $pathOk = Test-PathBool $keyPath
     if ($pathOk) {
-        # [x] Bugtest
-        # TESTS
-        # [x] Assoc set by program
-        # [x] Only add to menu
-        # [x] Run once
-        # [x] Always run
-        # [x] Not run; other program on list
-        # [x] Run once; other program on list
-        # [x] Run once; other program as default
-        # [x] Always run; other program on list
-        # [x] Assoc set in Classes\ext_auto_file; UserChoice set to bps_auto_file; no other program on list
-        # [x] Assoc for other program set in Classes\ext_auto_file; UserChoice set to bps_auto_file
-        # [x] Assoc set in Classes\ext_auto_file; UserChoice set to bps_auto_file; other program on list
-        # [x] Assoc set in program's settings; always run
-        # [x] Assoc set in program's settings; add exe; always run
-        # [x] Assoc set in program's settings; run once. Nothing happened.
         $subkeyNamesRemaining = (Get-ChildItem -Path $keyPath).Name
         $subkeyCount = Get-SubkeyCount $keyPath
         $valueCount = Get-ValueCount $keyPath
-        # [x] FIXME Says "No file handlers remaining" if UserKey exists and is set to some other app
         if (($valueCount -gt 0) -or (($subKeyCount -gt 1)))
         {
             Write-VerboseFileHandlersStillRemaining $keyPath
@@ -401,7 +382,6 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
 }
 
 function Remove-FileAssocSetByProgram($ext) {
-    # [x] TODO Would be cool if you could just paste a list of keys somewhere and some function or script would remove them. But that wouldn't make much sense, because we need to programatically determine wether to remove [ext]_auto_key. It would just add a layer of complexity, to interpret that list. Won't do.
     $extU = $ext.ToUpper() # upper-case
     
     Write-Verbose "Extension: $extU"
@@ -418,8 +398,7 @@ function Remove-FileAssocSetByProgram($ext) {
     $id = "FloatingIPSFile$extU"
     Remove-FileAssocInFileExts $ext $exe $id # Only added if opened a file with the file type at least once
 
-    # HACK Mystery: Why does the permission problem occur before, but after removing the program and rebooting, there is no problem with this key? Or, is that even what made the difference?
-    # [x] TODO does adding file exts as admin create keys in HKLM?
+    # HACK Mystery: Why does the permission problem occur sometimes and sometimes not?
     # Answer: No. It's still HKCU.
 
     # The ProgId value here is added if file association is set up through program, then the user manually selects to use the program "Always" for the application.
@@ -547,8 +526,6 @@ $friendlyAppName = "flips.exe"
 $executableDir = Join-Path $unzipDir -ChildPath "windows-x64-gui.zip"
 $targetValueName = Join-Path $executableDir -ChildPath "$friendlyAppName.FriendlyAppName"
 Remove-MuiCacheEntry $targetValueName
-
-# [x] TODO Search registry to see if there are any more keys we need to remove with this script. DONE. Nothing more that I want to remove.
 
 # TODO Separate file ext removal into its own script
 
