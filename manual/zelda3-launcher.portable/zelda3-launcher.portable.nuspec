@@ -68,7 +68,7 @@ Default save data location: C:\Games\Zelda 3 Launcher\zelda3\Saves</description>
 </releaseNotes>
     <dependencies>
       <!-- Extension for Start-CheckandStop and Start-CheckandThrow commands. -->
-      <dependency id="chocolatey-misc-helpers.extension" />
+      <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" />
     </dependencies>
   </metadata>
   <files>
