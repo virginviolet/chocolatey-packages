@@ -18,14 +18,14 @@ Portable packages should be possible to install without administrative rights.
 5. [x] Fill out VERIFICATION.txt
 6. [x] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 7. [x] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
-8. [x] Read the Readme.txt and delete it once you have used anything you've needed from here.
-9.  [x] Fill out tools\chocolateyInstall.ps1.
-10. [x] If the application is a GUI, create an empty file next to the exe named 'name.exe.gui'.
-11. [x] If you want to ignore an executable, create an empty file next to the exe named 'name.exe.ignore'.
-12. [x] Test the package to ensure install/uninstall work appropriately.
-13. [x] Add nupkg to .gitignore.
-14. [x] Fill out nuspec.
-15. [x] Fill out tools\VERIFICATION.txt
+8.  [x] Fill out tools\chocolateyInstall.ps1.
+9.  [x] If the application is a GUI, create an empty file next to the exe named 'name.exe.gui'.
+10. [x] If you want to ignore an executable, create an empty file next to the exe named 'name.exe.ignore'.
+11. [x] Test the package to ensure install/uninstall work appropriately.
+12. [x] Add nupkg to .gitignore.
+13. [x] Fill out nuspec.
+14. [x] Fill out tools\VERIFICATION.txt
+15. [x] Delete ReadMe.md once you have read over and used anything you've needed from here.
 16. [x] Commit.
 17. [x] Clean out the comments you are not using in chocolateybeforeModify.ps1.
 18. [x] Clean out the comments and sections you are not using in chocolateyInstall.ps1.

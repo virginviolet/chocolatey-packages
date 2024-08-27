@@ -1,1 +1,1 @@
-﻿Remove-Process "flips" # TODO test
+﻿Remove-Process "flips"

@@ -1,9 +1,4 @@
-﻿# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
-#   $f='c:\path\to\thisFile.ps1'
-#   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
-
-# In Chocolatey scripts, ALWAYS use absolute paths - $toolsDir gets you to the package's tools directory.
-$ErrorActionPreference = 'Stop' # stop on all errors
+﻿$ErrorActionPreference = 'Stop' # stop on all errors
 $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $zipArchive = Join-Path $toolsDir -ChildPath 'flips-windows.zip'
 $unzipDir = Join-Path $toolsDir -ChildPath 'flips-windows'
@@ -25,11 +20,10 @@ $friendlyAppName = "Floating IPS"
 $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
 $valueName = Join-Path $executableDir -ChildPath "$exe.FriendlyAppName"
 $valueData = $friendlyAppName
-$valueOk = [bool](Get-ItemProperty -Path $keyPath -Name $valueName -ea 0)
+$valueOk = [bool](Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) # value exists
 if ($valueOk) {
   Set-ItemProperty -Path $keyPath -Name $valueName -Value $valueData -Type STRING
-}
-else {
+} else {
   New-ItemProperty -Path $keyPath -Name $valueName -Value $valueData -Type STRING
 }
 
