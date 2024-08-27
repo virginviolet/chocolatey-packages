@@ -4,12 +4,15 @@
 
 # In Chocolatey scripts, ALWAYS use absolute paths - $toolsDir gets you to the package's tools directory.
 $ErrorActionPreference = 'Stop' # stop on all errors
-$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$zipArchive = Join-Path $toolsDir -ChildPath 'example.zip'
+$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$zipArchive = Join-Path $toolsDir -ChildPath 'flips-windows.zip'
+$unzipDir = Join-Path $toolsDir -ChildPath 'flips-windows'
+$executableDir = Join-Path $unzipDir -ChildPath 'builds\windows-x64-gui.zip'
+$executable = Join-Path $executableDir "flips.exe"
 
 $unzipArgs = @{
   FileFullPath = $zipArchive
-  Destination = $toolsDir
+  Destination  = $unzipDir
 }
 
 ## TODO: "flips.exe" → "Floating IPS"
@@ -18,41 +21,13 @@ $unzipArgs = @{
 ## see https://docs.chocolatey.org/en-us/create/functions
 
 ## Unzips a file to the specified location - auto overwrites existing content
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 Get-ChocolateyUnzip @unzipArgs
 
-## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
-#$appPath = "$env:ProgramFiles\appname"
-##Will resolve to C:\Program Files\appname
-#$statementsToRun = "/C `"$appPath\bin\installservice.bat`""
-#Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
+## Add desktop shortcut
+Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\Floating IPS.lnk" -targetPath $executable -workingDirectory $executableDir -description "Apply IPS and BPS patches."
 
-## add specific folders to the path - any executables found in the chocolatey package
-## folder will already be on the path.
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
-#Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
-
-## Add specific files as shortcuts to the desktop
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
-#$target = Join-Path $toolsDir "$($packageName).exe"
-# Install-ChocolateyShortcut -shortcutFilePath "<path>" -targetPath "<path>" [-workDirectory "C:\" -arguments "C:\test.txt" -iconLocation "C:\test.ico" -description "This is the description"]
-
-## Outputs the bitness of the OS (either "32" or "64")
-## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-#$osBitness = Get-ProcessorBits
-
-## Set persistent Environment variables
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
-#Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
-
-## Set up a file association
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
-#Install-ChocolateyFileAssociation
-
-## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
-## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
-## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-#Install-BinFile
+## Add start menu shortcut
+Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Floating IPS.lnk" -targetPath $executable -WorkingDirectory $executableDir -description "Apply IPS and BPS patches."
 
 ## Other needs: use regular PowerShell to do so or see if there is a function already defined
 # - https://docs.chocolatey.org/en-us/create/functions
