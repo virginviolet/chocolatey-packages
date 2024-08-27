@@ -28,13 +28,12 @@ function Test-Administrator {
 
 # Until the following feature is implemented, I prefer to remove process in both chocolateyuninstall and chocolateybeforemodify:
 # https://github.com/chocolatey/choco/issues/1731
-Remove-Process "flips" # TODO test
+Remove-Process "flips"
 
 Uninstall-ChocolateyZipPackage -Packagename $env:ChocolateyPackageName -ZipFileName '$zipArchive' # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
 
 # Uninstall-ChocolateyZipPackage will remove the FILES from the archive.
-# If you wish to remove the DIRECTORY they were extracted too,
-# you'll additionally have to handle that in this script.
+# This removes the DIRECTORY they were extracted too.
 Remove-Item $unzipDir -Recurse -Force
 
 # Remove desktop shortcut if it exists (it's plausible the user might have removed it)
@@ -60,5 +59,3 @@ if (Test-Administrator) {
 
 # Remove registry keys (mostly file associations)
 & $removeRegistryKeys $executableDir
-
-# [x] Separate file ext removal into its own script
