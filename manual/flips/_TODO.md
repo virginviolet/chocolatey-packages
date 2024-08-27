@@ -32,8 +32,8 @@ Portable packages should be possible to install without administrative rights.
 19. [x] Clean out the comments and sections you are not using in chocolateyUninstall.ps1.
 20. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
 21. [x] Test the package again to ensure install/uninstall work appropriately.
-22. [ ] Commit and publish to GitHub.
-23. [ ] Merge branch with main.
+22. [x] Commit and publish to GitHub.
+23. [x] Merge branch with main.
 24. [ ] Add icon key to nuspec.
 25. [ ] Test the package yet again to ensure install/uninstall work appropriately.
 26. [ ] Delete this file.
