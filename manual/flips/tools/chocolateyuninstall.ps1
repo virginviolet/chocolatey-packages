@@ -14,6 +14,7 @@ $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 # $zipArchive = Join-Path $toolsDir -ChildPath 'flips-windows.zip'
 $unzipDir = Join-Path $toolsDir -ChildPath 'flips-windows'
 $executableDir = Join-Path $unzipDir -ChildPath 'builds\windows-x64-gui.zip'
+$removeRegistryKeys = Join-Path $toolsDir -ChildPath 'removeregistrykeys.ps1'
 
 # Check if running in administrative shell
 function Test-Administrator {  
@@ -58,15 +59,6 @@ if (Test-Administrator) {
 }
 
 # Remove registry keys (mostly file associations)
-& ".\removeregistrykeys.ps1" $executableDir
+& $removeRegistryKeys $executableDir
 
 # [x] Separate file ext removal into its own script
-
-## TODO ADD REMOVE SHORTCUTS TO TEMPLATE
-## TODO ADD START MENU TO TEMPLATE
-
-## OTHER POWERSHELL FUNCTIONS
-## https://docs.chocolatey.org/en-us/create/functions
-#Uninstall-ChocolateyEnvironmentVariable - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
-#Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-## Remove any shortcuts you added in the install script.
