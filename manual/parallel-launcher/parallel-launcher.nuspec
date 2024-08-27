@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <id>parallel-launcher.install</id>
+    <id>parallel-launcher</id>
     <version>7.7.0</version>
-    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/parallel-launcher.install</packageSourceUrl>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/parallel-launcher</packageSourceUrl>
     <owners>virginviolet</owners>
     <title>parallel-launcher (Install)</title>
     <authors>Matt Pharoah</authors>
     <projectUrl>https://parallel-launcher.ca</projectUrl>
-    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher.install/appicon.png</iconUrl>
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher/appicon.png</iconUrl>
     <copyright>2020-2024 Matt Pharoah</copyright>
     <licenseUrl>https://gitlab.com/parallel-launcher/parallel-launcher/-/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
