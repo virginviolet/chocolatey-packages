@@ -5,18 +5,12 @@ enclosed in quotation marks, you should use an editor that supports UTF-8, not t
   <metadata>
     <id>flips</id>
     <version>181</version>
-    <!-- <packageSourceUrl>Where is this Chocolatey package located (think
-    GitHub)?</packageSourceUrl>-->
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/flips</packageSourceUrl>
     <owners>virginviolet</owners>
     <title>flips.nuspec</title>
     <authors>Alcaro</authors>
     <projectUrl>https://github.com/Alcaro/Flips</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package.
-    More information can be found here:
-    https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!-- Here is an example using Githack -->
-    <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/embedded-portable-zip.template.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/flips/icon/flips-48px.png</iconUrl>
     <licenseUrl>https://github.com/Alcaro/Flips?tab=License-1-ov-file</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/Alcaro/Flips</projectSourceUrl>
