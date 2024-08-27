@@ -11,9 +11,9 @@
 $ErrorActionPreference = 'Stop' # stop on all errors
 Uninstall-ChocolateyZipPackage -Packagename $env:ChocolateyPackageName -ZipFileName 'example.zip' # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
 
+
 # Uninstall-ChocolateyZipPackage will remove the FILES from the archive.
-# If you wish to remove the DIRECTORY they were extracted too,
-# you'll additionally have to handle that in this script.
+# This removes the DIRECTORY they were extracted too.
 Remove-Item 'C:\example'
 
 ## OTHER POWERSHELL FUNCTIONS

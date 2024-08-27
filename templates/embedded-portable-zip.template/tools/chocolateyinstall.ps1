@@ -6,6 +6,9 @@
 $ErrorActionPreference = 'Stop' # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 $zipArchive = Join-Path $toolsDir -ChildPath 'example.zip'
+$executableDir = $toolsDir
+$executable = Join-Path $executableDir "$($packageName).exe"
+$shortcutName = "$packageName"
 
 $unzipArgs = @{
   FileFullPath = $zipArchive
@@ -15,7 +18,7 @@ $unzipArgs = @{
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
 
-## Unzips a file to the specified location - auto overwrites existing content
+## Unzip file to the specified location - auto overwrites existing content
 ## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 Get-ChocolateyUnzip @unzipArgs
 
@@ -25,18 +28,17 @@ Get-ChocolateyUnzip @unzipArgs
 #$statementsToRun = "/C `"$appPath\bin\installservice.bat`""
 #Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
 
-# Prevents opening a hanging window when you open an application from the command line that was set up with Chocolatey
-New-Item -Path . -Name $unzipDir -ItemType "flips.exe.gui"
-
 ## add specific folders to the path - any executables found in the chocolatey package
 ## folder will already be on the path.
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
 #Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
 
-## Add specific files as shortcuts to the desktop
+## Add desktop shortcut
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
-#$target = Join-Path $toolsDir "$($packageName).exe"
-# Install-ChocolateyShortcut -shortcutFilePath "<path>" -targetPath "<path>" [-workDirectory "C:\" -arguments "C:\test.txt" -iconLocation "C:\test.ico" -description "This is the description"]
+Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$shortcutName.lnk" -targetPath $executable -workingDirectory $executableDir -arguments "C:\test.txt" -iconLocation "C:\test.ico" -description "This is the description."
+
+## Add start menu shortcut
+Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk" -targetPath $executable -workingDirectory $executableDir -description "This is the description."
 
 ## Outputs the bitness of the OS (either "32" or "64")
 ## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
