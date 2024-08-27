@@ -45,7 +45,6 @@ function Test-ValueNameBool($p, $n) {
     return [bool](Get-ItemProperty -Path $p -Name $n -ea 0)
 }
 
-
 function Get-ValueData($p, $n) {
     return Get-ItemPropertyValue -Path $p -Name $n
 }
@@ -305,8 +304,7 @@ function Remove-FileAssocInFileExtsFinal($extension, $id) {
         $subkeyNamesRemaining = (Get-ChildItem -Path $keyPath).Name
         $subkeyCount = Get-SubkeyCount $keyPath
         $valueCount = Get-ValueCount $keyPath
-        if (($valueCount -gt 0) -or (($subKeyCount -gt 1)))
-        {
+        if (($valueCount -gt 0) -or (($subKeyCount -gt 1))) {
             Write-VerboseFileHandlersStillRemaining $keyPath
         } elseif (($subkeyCount -eq 0) -and ($valueCount -eq 0)) {
             # empty key
@@ -469,6 +467,6 @@ Remove-FileAssocSetByUser "bin"; Write-Verbose "..."; Write-Verbose "..."; Write
 Remove-FileAssocSetByUser "md"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 Remove-FileAssocSetByUser "gen"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
-$friendlyAppName = "flips.exe"
-$targetValueName = Join-Path $executableDir -ChildPath "$friendlyAppName.FriendlyAppName"
+$exe = "flips.exe" # Default
+$targetValueName = Join-Path $executableDir -ChildPath "$exe.FriendlyAppName"
 Remove-MuiCacheEntry $targetValueName
