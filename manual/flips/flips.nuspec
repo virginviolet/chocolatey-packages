@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter
+enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>flips</id>
+    <version>181</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/flips</packageSourceUrl>
+    <owners>virginviolet</owners>
+    <title>flips.nuspec</title>
+    <authors>Alcaro</authors>
+    <projectUrl>https://github.com/Alcaro/Flips</projectUrl>
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/flips/icon/flips-48px.png</iconUrl>
+    <licenseUrl>https://github.com/Alcaro/Flips?tab=License-1-ov-file</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/Alcaro/Flips</projectSourceUrl>
+    <docsUrl>https://github.com/Alcaro/Flips</docsUrl>
+    <bugTrackerUrl>https://github.com/Alcaro/Flips/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
+    <tags>flips floating-ips ips international-patching-system bps beat-protocol-system rom-patch rom patcher rom-hacking</tags>
+    <summary>Tool for applying IPS and BPS patches</summary>
+    <description>Floating IPS (Flips) is a fully featured GUI program for applying IPS and BPS patches.
+
+      IPS and BPS patches are common ways to distribute rom hacks.
+    </description>
+    <dependencies>
+      <dependency id="chocolatey-core.extension" version="1.4.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
