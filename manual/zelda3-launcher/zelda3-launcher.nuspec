@@ -11,7 +11,7 @@
     <title>zelda3-launcher (Portable)</title>
     <authors>Anthony Johns</authors>
     <projectUrl>https://github.com/RadzPrower/Zelda-3-Launcher</projectUrl>
-    <!-- <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/zelda3-launcher/manual/zelda3-launcher.portable/icons/triforce.ico%20extracted%20(PNG)/triforce-2.PNG</iconUrl> -->
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda3-launcher/icons/triforce.ico%20extracted%20(PNG)/triforce-2.PNG</iconUrl>
     <!-- If zelda3 ever gets it's own package, change icon to this
     <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda3-launcher.portable/icons/RadzPrower.png</iconUrl>-->
     <copyright>2023 Anthony Johns</copyright>
