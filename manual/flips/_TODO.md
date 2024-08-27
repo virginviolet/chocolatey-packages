@@ -26,12 +26,12 @@ Portable packages should be possible to install without administrative rights.
 13. [x] Add nupkg to .gitignore.
 14. [x] Fill out nuspec.
 15. [x] Fill out tools\VERIFICATION.txt
-16. [ ] Commit.
+16. [x] Commit.
 17. [x] Clean out the comments you are not using in chocolateybeforeModify.ps1.
-18. [ ] Clean out the comments and sections you are not using in chocolateyInstall.ps1.
-19. [ ] Clean out the comments and sections you are not using in chocolateyUninstall.ps1.
-20. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-21. [ ] Test the package again to ensure install/uninstall work appropriately.
+18. [x] Clean out the comments and sections you are not using in chocolateyInstall.ps1.
+19. [x] Clean out the comments and sections you are not using in chocolateyUninstall.ps1.
+20. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
+21. [x] Test the package again to ensure install/uninstall work appropriately.
 22. [ ] Commit and publish to GitHub.
 23. [ ] Merge branch with main.
 24. [ ] Add icon key to nuspec.
