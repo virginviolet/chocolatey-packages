@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter
+enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>flips</id>
     <version>181</version>
-    <!-- <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>-->
+    <!-- <packageSourceUrl>Where is this Chocolatey package located (think
+    GitHub)?</packageSourceUrl>-->
     <owners>virginviolet</owners>
     <title>flips.nuspec</title>
     <authors>Alcaro</authors>
     <projectUrl>https://github.com/Alcaro/Flips</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
+    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package.
+    More information can be found here:
+    https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
     <!-- Here is an example using Githack -->
     <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/embedded-portable-zip.template.png</iconUrl>-->
     <!-- <copyright>Year Software Vendor</copyright> -->
