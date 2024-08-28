@@ -20,11 +20,14 @@ $friendlyAppName = "Floating IPS"
 $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
 $valueName = Join-Path $executableDir -ChildPath "$exe.FriendlyAppName"
 $valueData = $friendlyAppName
+$pathOk = [bool](Test-Path -Path $keyPath) # key exists
 $valueOk = [bool](Get-ItemProperty -Path $keyPath -Name $valueName -ea 0) # value exists
-if ($valueOk) {
-  Set-ItemProperty -Path $keyPath -Name $valueName -Value $valueData -Type STRING
-} else {
-  New-ItemProperty -Path $keyPath -Name $valueName -Value $valueData -Type STRING
+if ($pathOk) {
+  if ($valueOk) {
+    Set-ItemProperty -Path $keyPath -Name $valueName -Value $valueData -Type STRING
+  } else {
+    New-ItemProperty -Path $keyPath -Name $valueName -Value $valueData -Type STRING
+  }
 }
 
 ## Add desktop shortcut
