@@ -75,7 +75,7 @@ if (-Not $unzipDirExists) {
         }
 
         # Set backup directory name
-        $lastModified = (Get-Date).ToString("yyyy-MM-dd_HHmmss") # Initialize variable
+        $lastModified = Get-Date # Initialize variable
         $configDate = $lastModified # Initialize variable
         $saveDate = $lastModified # Initialize variable
         $saveFileExists = Test-PathBool $saveFile
