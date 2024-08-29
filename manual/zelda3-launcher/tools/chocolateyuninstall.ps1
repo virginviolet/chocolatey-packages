@@ -3,6 +3,7 @@
 function Test-PathBool($p) {
     return [bool](Test-Path -Path $p)
 }
+
 $unzipDir = "C:\Games\Zelda 3 Launcher"
 $zelda3Dir = Join-Path $unzipDir -ChildPath 'zelda3'
 $saveDir = Join-Path $zelda3Dir -ChildPath 'saves'
@@ -87,13 +88,7 @@ if (-Not $unzipDirExists) {
             $saveDate = (Get-Item $saveFile).LastWriteTime
             $lastModified = $saveDate
         }
-        # It would make sense to set $lastModified to whichever was modified last ($saveDate or $configDate), like the commented out code below shows. However, in an edge case scenario, this might cause save data to be unintentionally overwritten when config is newer than save data. This could be alternatively solved via prompting, but that seems suboptimal for chocolatey. So let's just prioritize last modified date of save file (i.e. $saveDate) over the config file's date. We might lose some configs in rare cases, but at least save data won't be lost. 
-        <# if ($configExists -And $saveDirExists) {
-            if ($configDate -gt $saveDate) {
-                # if config was modified at a later date than save file, then set $lastModified to config's date
-                $lastModified = $configDate
-            }
-        } #>
+        # It would make sense to here set $lastModified to whichever was modified last ($saveDate or $configDate). However, in an edge case scenario, this might cause save data to be unintentionally overwritten when config is newer than save data. This could be alternatively solved via prompting, but that seems suboptimal for Chocolatey. So let's just prioritize last modified date of save file (i.e. $saveDate) over the config file's date ($configDate). We might lose config in rare cases, but at least save data won't be lost.
         $lastModified = $lastModified.ToString("yyyy-MM-dd_HHmmss")
         $zelda3BackupName = "zelda3.bak@$lastModified" # If the zelda3 directory exists, the launcher will think the game is built (perhaps a bug report should be submitted to the launcher repo for that), so we let the directory be named $zelda3BackupName istead. This, of course, lets us have multiple backups, each with a timestamp in directory name, arguably simplifying uninstallation when there are existing backup(s). We let the user deal with that manually instead.
         $tempBakDir = Join-Path $tempBackupsDir -ChildPath $zelda3BackupName
