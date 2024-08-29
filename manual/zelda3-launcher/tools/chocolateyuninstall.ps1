@@ -34,7 +34,7 @@ if (-Not $unzipDirExists) {
         Remove-Item $saveDir
     }
     
-    # To clean, we get everything we want to keep and move it to a temporary safe place ($TEMP), then delete everything in the original directory, then move the keeping-things back into the folder.
+    # To clean, we get everything we want to keep and move it to a temporary safe place ($TEMP), then delete everything in the original directory, then move the keeping-things back into the directory.
     
     $zelda3Exists = Test-PathBool $zelda3Dir
     $zelda3Empty = -Not (Test-PathBool $zelda3Dir\*)
@@ -47,24 +47,24 @@ if (-Not $unzipDirExists) {
         Pause # Pause so that the user have time to read, and can abort if desired. Chocolatey stops Pause after 30 seconds by default.
     }
     
-    # Detour to move existing backup folder(s) to temporary location. I have to do this _before_ cleaning the launcher folder (or backups will get removed), but _after_ the "Zelda 3 will be removed" output and associated Pause, because if the user aborts the script during the pause, they wouldn't be able to find their backups if we had silently moved them away to $TEMP already.
-    $backupFolders = Get-ChildItem -Path $unzipDir -Directory -Filter "zelda3.bak*"
-    $backupFoldersExists = [bool]($backupFolders)
+    # Detour to move existing backup directories to temporary location. I have to do this _before_ cleaning the launcher directory (or backups will get removed), but _after_ the "Zelda 3 will be removed" output and associated Pause, because if the user aborts the script during the pause, they wouldn't be able to find their backups if we had silently moved them away to $TEMP already.
+    $backupDirs = Get-ChildItem -Path $unzipDir -Directory -Filter "zelda3.bak*"
+    $backupDirsExists = [bool]($backupDirs)
     $tempBackupsDir = Join-Path $env:TEMP -ChildPath 'zelda3baks'
     $tempBackupsDirExists = Test-PathBool $tempBackupsDir
     $tempBakDir = ''
-    if ($backupFoldersExists) {
+    if ($backupDirsExists) {
         if (-Not $tempBackupsDirExists) {
             New-Item -Path $tempBackupsDir -ItemType "directory" 1> $null
             $tempBackupsDirExists = $true
         }
-        foreach ($backupFolder in $backupFolders) {
-            $tempBakDir = Join-Path $tempBackupsDir -ChildPath $backupFolder.Name
-            Move-Item -Path $backupFolder.FullName -Destination $tempBakDir
+        foreach ($backupDir in $backupDirs) {
+            $tempBakDir = Join-Path $tempBackupsDir -ChildPath $backupDir.Name
+            Move-Item -Path $backupDir.FullName -Destination $tempBakDir
         }
     }
 
-    # Clean game folder, backup if necessary
+    # Clean game directory, backup if necessary
     if ($zelda3Exists -And -Not $zelda3Empty) {
         
         # Remove reference save files
@@ -73,7 +73,7 @@ if (-Not $unzipDirExists) {
             Remove-Item $saveDirRef -Recurse -Force
         }
 
-        # Set backup folder name
+        # Set backup directory name
         $lastModified = (Get-Date).ToString("yyyy-MM-dd_HHmmss") # Initialize variable
         $configDate = $lastModified # Initialize variable
         $saveDate = $lastModified # Initialize variable
@@ -95,12 +95,12 @@ if (-Not $unzipDirExists) {
             }
         } #>
         $lastModified = $lastModified.ToString("yyyy-MM-dd_HHmmss")
-        $zelda3BackupName = "zelda3.bak@$lastModified" # If the zelda3 folder exists, the launcher will think the game is built (perhaps a bug report should be submitted to the launcher repo for that), so we let the folder be named $zelda3BackupName istead. This, of course, lets us have multiple backups, each with a timestamp in folder name, arguably simplifying uninstallation when there are existing backup(s). We let the user deal with that manually instead.
+        $zelda3BackupName = "zelda3.bak@$lastModified" # If the zelda3 directory exists, the launcher will think the game is built (perhaps a bug report should be submitted to the launcher repo for that), so we let the directory be named $zelda3BackupName istead. This, of course, lets us have multiple backups, each with a timestamp in directory name, arguably simplifying uninstallation when there are existing backup(s). We let the user deal with that manually instead.
         $tempBakDir = Join-Path $tempBackupsDir -ChildPath $zelda3BackupName
         $tempBakDirExists = Test-PathBool $tempBakDir
         $saveDirExists = Test-PathBool $saveDir
         
-        # Move save data to backup folder in temporary location
+        # Move save data to backup directory in temporary location
         if ($saveDirExists) {
             $tempZelda3BackupSaves = Join-Path $tempBakDir -ChildPath 'saves'
             if (-Not $tempBackupsDirExists) {
@@ -119,7 +119,7 @@ if (-Not $unzipDirExists) {
             Move-Item -Path $saveDir -Destination $tempZelda3BackupSaves
         }
 
-        # Move config to backup folder in temporary location
+        # Move config to backup directory in temporary location
         if ($configExists) {
             $tempBakDirExists = Test-PathBool $tempBakDir
             if (-Not $tempBackupsDirExists) {
@@ -141,10 +141,10 @@ if (-Not $unzipDirExists) {
     # Move backup(s) back to the game directory
     $tempBackupsDirExists = Test-PathBool $tempBackupsDir
     if ($tempBackupsDirExists) {
-        $tempBackupFolders = Get-ChildItem -Path $tempBackupsDir -Directory
-        foreach ($backupFolder in $tempBackupFolders) {
-            $bakDir = Join-Path $unzipDir -ChildPath $backupFolder.Name
-            Move-Item -Path $backupFolder.FullName -Destination $bakDir
+        $tempBackupDirs = Get-ChildItem -Path $tempBackupsDir -Directory
+        foreach ($backupDir in $tempBackupDirs) {
+            $bakDir = Join-Path $unzipDir -ChildPath $backupDir.Name
+            Move-Item -Path $backupDir.FullName -Destination $bakDir
         }
         Remove-Item $tempBackupsDir
         Write-Warning 'Manually remove the configuration and save data backup if desired. (See this package''s description for more details.)'
