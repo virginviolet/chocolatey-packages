@@ -21,13 +21,6 @@ if (-Not $unzipDirExists) {
     Write-Warning "Installation directory does not exist. The software may have been removed manually."
 } else {
 
-    # Remove reference save files directory
-    $exists = Test-PathBool $saveDirRef
-    $empty = -Not (Test-PathBool $saveDirRef\*)
-    if ($exists -And $empty) {
-        Remove-Item $saveDirRef
-    }
-
     # Remove save directory if empty
     $exists = Test-PathBool $saveDir
     $empty = -Not (Test-PathBool $saveDir\*)
@@ -48,7 +41,7 @@ if (-Not $unzipDirExists) {
         Pause # Pause so that the user have time to read, and can abort if desired. Chocolatey stops Pause after 30 seconds by default.
     }
     
-    # Detour to move existing backup directories to temporary location. I have to do this _before_ cleaning the launcher directory (or backups will get removed), but _after_ the "Zelda 3 will be removed" output and associated Pause, because if the user aborts the script during the pause, they wouldn't be able to find their backups if we had silently moved them away to $TEMP already.
+    # Detour to move existing backup directories to temporary location. We have to do this _before_ cleaning the launcher directory (or backups will get removed), but _after_ the "Zelda 3 will be removed" output and associated Pause, because otherwise, if the user aborts the script during the pause, they wouldn't be able to find their backups because we would have silently moved them away to the $TEMP already.
     $backupDirs = Get-ChildItem -Path $unzipDir -Directory -Filter "zelda3.bak*"
     $backupDirsExists = [bool]($backupDirs)
     $tempBackupsDir = Join-Path $env:TEMP -ChildPath 'zelda3baks'
@@ -68,7 +61,7 @@ if (-Not $unzipDirExists) {
     # Clean game directory, backup if necessary
     if ($zelda3Exists -And -Not $zelda3Empty) {
         
-        # Remove reference save files
+        # Remove reference save files directory
         $saveDirRefexists = Test-PathBool $saveDirRef
         if ($saveDirRefexists) {
             Remove-Item $saveDirRef -Recurse -Force
