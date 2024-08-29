@@ -51,8 +51,8 @@ To restore files from the backup, follow these steps in order:
 1. Download/build the game from the launcher
 2. Close the launcher.
 3. In Explorer, go to the Launcher's directory (default: `C:\Games\Zelda 3 Launcher`)
-4. Move the contents of the `zelda3.bak@\<save date\>` folder into the `zelda3` folder (there will be a timestamp in place of `\<save date\>`). Replace all files when prompted.
-5. Delete the now empty `zelda3.bak\<save date\>` folder.
+4. Move the contents of the `zelda3.bak@[save date]` folder into the `zelda3` folder (there will be a timestamp in place of `[save date]`). Replace all files when prompted.
+5. Delete the now empty `zelda3.bak[save date]` folder.
 
 ## Backup removal
 
@@ -60,7 +60,7 @@ If you want to remove save data and configuration file backup after uninstallati
 
 ## Game data
 
-Default backup location: `C:\Games\Zelda 3 Launcher\zelda3.bak\<save date\>` (but instead of `\<save date\>`, there will be a timestamp)
+Default backup location: `C:\Games\Zelda 3 Launcher\zelda3.bak[save date]` (but instead of `[save date]`, there will be a timestamp)
 Default configuration file location: `C:\Games\Zelda 3 Launcher\zelda3\zelda3.ini`
 Default save data location: `C:\Games\Zelda 3 Launcher\zelda3\Saves`</description>
     <releaseNotes>- Made a change to closing settings window behavior so that it is consistent between the cancel button and the close (X) button.
