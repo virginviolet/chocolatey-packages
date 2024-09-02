@@ -34,7 +34,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <projectSourceUrl>Software Source Code Location</projectSourceUrl>
     <docsUrl>At what url are the software docs located?</docsUrl>
     <!--<mailingListUrl></mailingListUrl>-->
-    <bugTrackerUrl></bugTrackerUrl>
+    <bugTrackerUrl>https://_Software_Bug_Tracker_Location_REPLACE_</bugTrackerUrl>
     <tags>meta-package.template SPACE_SEPARATED</tags>
     <summary>__REPLACE__</summary>
     <description>__REPLACE__MarkDown_Okay </description>
