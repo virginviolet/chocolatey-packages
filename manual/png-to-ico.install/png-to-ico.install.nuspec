@@ -12,7 +12,7 @@
     <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/png-to-ico.install/icon/convert-icon-128px.png</iconUrl>
     <copyright>Public domain</copyright>
     <licenseUrl>https://github.com/FoxP/PNG-to-ICO?tab=Unlicense-1-ov-file</licenseUrl>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/FoxP/PNG-to-ICO</projectSourceUrl>
     <docsUrl>https://github.com/FoxP/PNG-to-ICO?tab=readme-ov-file</docsUrl>
     <bugTrackerUrl>https://github.com/FoxP/PNG-to-ICO/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
