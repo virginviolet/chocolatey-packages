@@ -5,56 +5,35 @@
 - "Create Packages". <https://docs.chocolatey.org/en-us/create/create-packages>
 - "How To Create a Chocolatey Meta Package". <https://docs.chocolatey.org/en-us/guides/create/create-meta-package/>
 
-3. Fill out the package contents:
+## To do
 
-- tools\chocolateyBeforeModify.ps1 - remove if you have no processes
-  or services to shut down before upgrade/uninstall
-- tools\LICENSE.txt / tools\VERIFICATION.txt - Remove if you are not
-  embedding binaries. Keep and fill out if you are embedding binaries
-  in the package AND pushing to the community repository, even if you
-  are the author of software. The file becomes easier to fill out
-  (does not require changes each version) if you are the software
-  vendor. If you are building packages for internal use (organization,
-  etc), you don't need these files as you are not subject to
-  distribution rights internally.
-- tools\chocolateyUninstall.ps1 - remove if autouninstaller can
-  automatically uninstall and you have nothing additional to do during
-  uninstall
-- Readme.txt - delete this file once you have read over and used
-  anything you've needed from here
-- nuspec - fill this out, then clean out all the comments (you may wish
-  to leave the headers for the package vs software metadata)
-- tools\chocolateyInstall.ps1 - instructions in next section.
+1. [ ] Search the Community Repository to make sure there isn't a package for this already: <https://community.chocolatey.org/packages>
+2. [ ] Delete the `tools` folder.
+3. [ ] Fill out nuspec.
+4. [ ] Test the package to ensure install/uninstall work appropriately.
+5. [ ] Add nupkg to .gitignore.
+6. [ ] Commit.
+7. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
+8. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
+9. [ ] Test the package again to ensure install/uninstall work appropriately.
+10. [ ] Commit and publish to GitHub.
+11. [ ] Merge branch with main.
+12. [ ] Test the package yet again to ensure install/uninstall work appropriately.
+13. [ ] Delete this file.
+14. [ ] Merge branch with main again.
+15. [ ] Commit and publish to GitHub again.
+16. [ ] Pack and push to Chocolatey Community Repository.
 
-4. ChocolateyInstall.ps1:
+## Learn more
 
-- For embedded binaries - use `$fileLocation` (`$file`/`$file64`) and
-  `Install-ChocolateyInstallPackage`/ `Get-ChocolateyUnzip`.
-- Downloading binaries at runtime - use `$url`/`$url64` and
-  `Install-ChocolateyPackage` / `Install-ChocolateyZipPackage`.
-- Other needs (creating files, setting registry keys), use regular
-  PowerShell to do so or see if there is a function already defined:
-  https://docs.chocolatey.org/en-us/create/functions
-- There may also be functions available in extension packages, see
-  https://community.chocolatey.org/packages?q=id%3A.extension for examples and
-  availability.
-- Clean out the comments and sections you are not using.
+To learn more about Chocolatey packaging, go through the workshop at <https://github.com/chocolatey/chocolatey-workshop>
+You will learn about
 
-5. Test the package to ensure install/uninstall work appropriately.
- There is a test environment you can use for this -
- https://github.com/chocolatey/chocolatey-test-environment
-
-6. Learn more about Chocolatey packaging - go through the workshop at
- https://github.com/chocolatey/chocolatey-workshop
- You will learn about
- - General packaging
- - Customizing package behavior at runtime (package parameters)
- - Extension packages
- - Custom packaging templates
- - Setting up an internal Chocolatey.Server repository
- - Adding and using internal repositories
- - Reporting
- - Advanced packaging techniques when installers are not friendly to
-   automation
-
-7. Delete this file.
+- General packaging
+- Customizing package behavior at runtime (package parameters)
+- Extension packages
+- Custom packaging templates
+- Setting up an internal Chocolatey.Server repository
+- Adding and using internal repositories
+- Reporting
+- Advanced packaging techniques when installers are not friendly to automation
