@@ -52,5 +52,4 @@ You will learn about
 - Setting up an internal Chocolatey.Server repository
 - Adding and using internal repositories
 - Reporting
-- Advanced packaging techniques when installers are not friendly to
-   automation
+- Advanced packaging techniques when installers are not friendly to automation
