@@ -15,20 +15,21 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!-- id is lowercase and if you want a good separator for words, use '-', not '.'. Dots are only acceptable as suffixes for certain types of packages, e.g. .install, .portable, .extension, .template -->
     <!-- If the software is cross-platform, attempt to use the same id as the debian/rpm package(s) if possible. Check a service like Repology. https://repology.org/ -->
     <id>embedded-portable-zip.template</id>
-    <!-- version should MATCH as closely as possible with the underlying software -->
+    <!-- version should match as closely as possible with the underlying software -->
     <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
     <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
     <version>__REPLACE__</version>
     <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>
-    owners basically means you.
+    <!-- owners basically means you. -->
     <owners>__REPLACE_YOUR_NAME__</owners>
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <!-- This section is about the software itself -->
+    <!-- title should normally end with `(Install)` or `(Portable)` -->
     <title>embedded-portable-zip.template (Portable)</title>
     <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
-    <projectUrl>https://_Software_Location_REMOVE_OR_FILL_OUT_</projectUrl>
+    <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
     <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
     <!-- Here is an example using Githack -->
     <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/embedded-portable-zip.template.png</iconUrl>-->
@@ -36,9 +37,9 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <licenseUrl>Software License Location</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>Software Source Code Location</projectSourceUrl>
-    <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
+    <docsUrl>At what url are the software docs located?</docsUrl>
     <!--<mailingListUrl></mailingListUrl>-->
-    <!--<bugTrackerUrl></bugTrackerUrl>-->
+    <bugTrackerUrl></bugTrackerUrl>
     <tags>embedded-portable-zip.template SPACE_SEPARATED</tags>
     <summary>__REPLACE__</summary>
     <description>__REPLACE__MarkDown_Okay </description>
