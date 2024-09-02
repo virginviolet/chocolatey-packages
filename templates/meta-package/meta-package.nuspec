@@ -13,7 +13,6 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!-- == PACKAGE SPECIFIC SECTION == -->
     <!-- This section is about this package, although id and version have ties back to the software -->
     <id>meta-package.template</id>
-    
     <!-- If the meta-package only has one dependency, version should match with that dependency -->
     <version>__REPLACE__</version>
     <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>
