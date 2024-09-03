@@ -10,36 +10,6 @@ packages wiki link above.
 Consider making this package an automatic package, for the best
 maintainability over time. Read up at <https://docs.chocolatey.org/en-us/create/automatic-packages>
 
-## Shim Generation
-
-Any executables you include in the package or download (but don't call
-install against using the built-in functions) will be automatically shimmed.
-
-This means those executables will automatically be included on the path.
-Shim generation runs whether the package is self-contained or uses automation
-scripts.
-
-By default, these are considered console applications.
-
-If the application is a GUI, you should create an empty file next to the exe
-named 'name.exe.gui' e.g. 'bob.exe' would need a file named 'bob.exe.gui'.
-See <https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-set-up-shims-for-applications-that-have-a-gui>
-
-If you want to ignore the executable, create an empty file next to the exe
-named 'name.exe.ignore' e.g. 'bob.exe' would need a file named
-'bob.exe.ignore'.
-See <https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims>
-
-## Self-Contained?
-
-If you have a self-contained package, you can remove the automation scripts
-entirely and just include the executables, they will automatically get shimmed,
-which puts them on the path. Ensure you have the legal right to distribute
-the application though. See <https://docs.chocolatey.org/en-us/information/legal>.
-
-You should read up on the Shim Generation section to familiarize yourself
-on what to do with GUI applications and/or ignoring shims.
-
 ## Automation Scripts
 
 You have a powerful use of Chocolatey, as you are using PowerShell. So you
