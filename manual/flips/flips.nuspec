@@ -16,7 +16,7 @@ enclosed in quotation marks, you should use an editor that supports UTF-8, not t
     <projectSourceUrl>https://github.com/Alcaro/Flips</projectSourceUrl>
     <docsUrl>https://github.com/Alcaro/Flips</docsUrl>
     <bugTrackerUrl>https://github.com/Alcaro/Flips/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
-    <tags>flips floating-ips ips international-patching-system bps beat-protocol-system rom-patch rom patcher rom-hacking</tags>
+    <tags>flips floating-ips ips international-patching-system bps beat-patch rom-patch rom patcher rom-hacking</tags>
     <summary>Tool for applying IPS and BPS patches</summary>
     <description>Floating IPS (Flips) is a fully featured GUI program for applying IPS and BPS patches.
 
