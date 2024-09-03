@@ -81,7 +81,7 @@ if (-Not $unzipDirExists) {
             $saveDate = (Get-Item $saveFile).LastWriteTime
             $lastModified = $saveDate
         }
-        # It would make sense to here set $lastModified to whichever was modified last ($saveDate or $configDate). However, in an edge case scenario, this might cause save data to be unintentionally overwritten when config is newer than save data. This could be alternatively solved via prompting, but that seems suboptimal for Chocolatey. So let's just prioritize last modified date of save file (i.e. $saveDate) over the config file's date ($configDate). We might lose config in rare cases, but at least save data won't be lost.
+        # It would make sense to here set $lastModified to whichever was modified last ($saveDate or $configDate). However, in an edge case scenario, this might cause save data to be unintentionally overwritten when config is newer than save data. This could be alternatively solved via prompting, but that is not desirable for Chocolatey. So let's just prioritize last modified date of save file (i.e. $saveDate) over the config file's date ($configDate). We might lose config in rare cases, but at least save data won't be lost.
         $lastModified = $lastModified.ToString("yyyy-MM-dd_HHmmss")
         $zelda3BackupName = "zelda3.bak@$lastModified" # If the zelda3 directory exists, the launcher will think the game is built (perhaps a bug report should be submitted to the launcher repo for that), so we let the directory be named $zelda3BackupName istead. This, of course, lets us have multiple backups, each with a timestamp in directory name, arguably simplifying uninstallation when there are existing backup(s). We let the user deal with that manually instead.
         $tempBakDir = Join-Path $tempBackupsDir -ChildPath $zelda3BackupName
@@ -135,7 +135,7 @@ if (-Not $unzipDirExists) {
             Move-Item -Path $backupDir.FullName -Destination $bakDir
         }
         Remove-Item $tempBackupsDir
-        Write-Warning 'Manually remove the configuration and save data backup if desired. (See this package''s description for more details.)'
+        Write-Warning 'Manually remove the configuration and save data backup if desired. (See this package''s description for details.)'
         Start-Sleep -Seconds 5 # time to read
     }
 
