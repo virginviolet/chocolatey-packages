@@ -18,7 +18,9 @@
     <bugTrackerUrl>https://github.com/FoxP/PNG-to-ICO/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
     <tags>png-to-ico ico icon convert conversion</tags>
     <summary>Convert image to ICO from context menu</summary>
-    <description>A program that converts images from PNG, GIF, BMP, SVG or JPG to multi-resolution ICO files, and is run simply by right-clicking on an image and selecting "PNG to ICO". You can batch convert many images by selecting them before right clicking, or run the program on a folder with images.
+    <description>Meta package for [png-to-ico.install](https://community.chocolatey.org/packages/png-to-ico.install).
+
+A program that converts images from PNG, GIF, BMP, SVG or JPG to multi-resolution ICO files, and is run simply by right-clicking on an image and selecting "PNG to ICO". You can batch convert many images by selecting them before right clicking, or run the program on a folder with images.
 
 The default installation directory is `%AppData%\PNG-to-ICO`. </description>
     <releaseNotes>- Fix stretching of non-square icons
