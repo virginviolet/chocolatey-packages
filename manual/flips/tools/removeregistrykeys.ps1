@@ -467,6 +467,6 @@ Remove-FileAssocSetByUser "bin"; Write-Verbose "..."; Write-Verbose "..."; Write
 Remove-FileAssocSetByUser "md"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 Remove-FileAssocSetByUser "gen"; Write-Verbose "..."; Write-Verbose "..."; Write-Verbose "..."
 
-$exe = "flips.exe" # Default
+$exe = "flips.exe"
 $targetValueName = Join-Path $executableDir -ChildPath "$exe.FriendlyAppName"
 Remove-MuiCacheEntry $targetValueName
