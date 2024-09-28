@@ -1,7 +1,5 @@
 ﻿
-Note: Include this file if including binaries you have the right to distribute.
-Otherwise delete. this file. If you are the software author, you can mention
-this.
+Note: If you are the software author, you can mention this.
 
 ===DELETE ABOVE THIS LINE AND THIS LINE===
 
