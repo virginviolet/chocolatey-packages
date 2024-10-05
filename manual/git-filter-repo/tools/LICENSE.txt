@@ -25,4 +25,3 @@ Exceptions:
 [2] https://git.kernel.org/pub/scm/git/git.git/tree/COPYING
 [3] https://github.com/libgit2/libgit2/blob/master/COPYING
 [4] https://github.com/libgit2/libgit2/blob/master/examples/COPYING
-

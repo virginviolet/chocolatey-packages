@@ -15,7 +15,7 @@ Portable packages should be possible to install without administrative rights.
 2. [x] Make sure the total nupkg package will be under 200MB.
 3. [x] Add zip file(s) to the tools directory.
 4. [x] Fill out LICENSE.txt
-5. [ ] Fill out VERIFICATION.txt
+5. [x] Fill out VERIFICATION.txt
 6. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 7. [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 8. [ ] Fill out tools\chocolateyInstall.ps1.
