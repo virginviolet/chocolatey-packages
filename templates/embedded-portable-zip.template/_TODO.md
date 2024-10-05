@@ -19,8 +19,8 @@ Portable packages should be possible to install without administrative rights.
 6. [ ] Fill out LICENSE.txt
 7. [ ] Fill out VERIFICATION.txt
 8. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
-9. [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
-10. [ ] Fill out tools\chocolateyInstall.ps1.
+9. [ ] Fill out tools\chocolateyInstall.ps1.
+10. [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 11. [ ] If you want to ignore an executable, create an empty file next to the exe named 'name.exe.ignore'.
 12. [ ] Test the package to ensure install/uninstall work appropriately.
 13. [ ] Add nupkg to .gitignore.
