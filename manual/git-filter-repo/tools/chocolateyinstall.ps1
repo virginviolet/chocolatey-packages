@@ -64,43 +64,21 @@ if (Test-Administrator) {
   Write-Debug "Process does not seem to be elevated."
   $isAdmin = $false
 }
-$execPath = & git --exec-path
-$scriptGit = Join-Path $execPath -ChildPath 'git-filter-repo'
-# IMPROVE Warn if this fails or is $null
-$pythonSitePackages = Convert-Path -Path "$(& python -c "import site; print(site.getsitepackages()[1])")"
-$scriptPython = Join-Path $pythonSitePackages -ChildPath 'git-filter-repo.py'
-$documentationDir = Join-Path $scriptDir -ChildPath 'Documentation'
-$manPage = Join-Path $documentationDir -ChildPath 'git-filter-repo.1'
-$manPath = [System.IO.Path]::GetFullPath($(& git --man-path)) # Convert-Path only works on existing paths, so we do this
-$man1Path = Join-Path $manPath -ChildPath 'man1'
-$manPageGit = Join-Path $man1Path -ChildPath 'git-filter-repo.1'
-exit
-# Success messages
-$messageInstalledAsGit = "Installed $packageName as a Git program at '$scriptGit'."
-$messageInstalledAsPython = "Installed $packageName as a Python module/library at '$scriptPython'."
 
 # TODO Install man
 # TODO Install help patch
-# [ ] Test
+
+# Install as Git program
+
+$execPath = & git --exec-path
+$scriptGit = Join-Path $execPath -ChildPath 'git-filter-repo'
+# Success message
+$messageInstalledAsGit = "Installed $packageName as a Git program at '$scriptGit'."
 if ($isAdmin) {
-  # Install as Git program
   # Creating symlinks natively with PowerShell is only available in Windows PowerShell >= 5.0
   & cmd /c mklink "$scriptGit" "$script" 1>$null 2>&1 # suppress success stream; use cmd's error output as error
   Write-Host $messageInstalledAsGit
-
-  # Install as Python module/library
-  & cmd /c mklink "$scriptPython" "$script" 1>$null 2>&1
-  Write-Host $messageInstalledAsPython
-
-  # Install as Python module/library
-  & cmd /c mklink "$scriptPython" "$script" 1>$null 2>&1
-  Write-Host $messageInstalledAsPython
-
-  # Install man page for Git
-  & cmd /c mklink "$manPage" "$script" 1>$null 2>&1
-
 } else {
-  # Install as Git program
   try {
     # Try to make symlink
     # (Admin rigths is not required to make symlinks on Windows >= 10 build 14972 with Developer Mode enabled)
@@ -122,11 +100,19 @@ if ($isAdmin) {
       Write-Warning "Colud not install $packageName as a Git program."
     }
   }
+}
 
-  # XXX
-  # TODO Test
-  # Install as Python module/library
+# Install as Python module/library
 
+# Success message
+$messageInstalledAsPython = "Installed $packageName as a Python module/library at '$scriptPython'."
+# IMPROVE Warn if this fails or is $null
+$pythonSitePackages = Convert-Path -Path "$(& python -c "import site; print(site.getsitepackages()[1])")"
+$scriptPython = Join-Path $pythonSitePackages -ChildPath 'git-filter-repo.py'
+if ($isAdmin) {
+  & cmd /c mklink "$scriptPython" "$script" 1>$null 2>&1
+  Write-Host $messageInstalledAsPython
+} else {
   try {
     # [x] Test
     # Try to make symlink
@@ -213,6 +199,19 @@ if ($isAdmin) {
   elseif ($null -eq $env:PYTHONPATH) {
     Write-Debug "PYTHONPATH variable not found."
   }
+}
+
+# Install man page for Git
+
+$documentationDir = Join-Path $scriptDir -ChildPath 'Documentation'
+$manPage = Join-Path $documentationDir -ChildPath 'git-filter-repo.1'
+$manPath = [System.IO.Path]::GetFullPath($(& git --man-path)) # Convert-Path only works on existing paths, so we do this
+$man1Path = Join-Path $manPath -ChildPath 'man1'
+$manPageGit = Join-Path $man1Path -ChildPath 'git-filter-repo.1'
+if ($isAdmin) { 
+  & cmd /c mklink "$manPage" "$script" 1>$null 2>&1
+} else {
+
 }
 
 # TODO Shortcut to demo scripts dir
