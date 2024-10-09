@@ -57,162 +57,164 @@ $unzipArgsTar = @{
   Install-ChocolateyPath "$scriptDir" "User"
 } #>
 
-if (Test-Administrator) {
-  Write-Debug "Elevated instance detected."
-  $isAdmin = $true
-} else {
-  Write-Debug "Process does not seem to be elevated."
-  $isAdmin = $false
-}
-
-# TODO Install man
-# TODO Install help patch
-
-# Install as Git program
-
-$execPath = & git --exec-path
-$scriptGit = Join-Path $execPath -ChildPath 'git-filter-repo'
-# Success message
-$messageInstalledAsGit = "Installed $packageName as a Git program at '$scriptGit'."
-if ($isAdmin) {
-  # Creating symlinks natively with PowerShell is only available in Windows PowerShell >= 5.0
-  & cmd /c mklink "$scriptGit" "$script" 1>$null 2>&1 # suppress success stream; use cmd's error output as error
-  Write-Host $messageInstalledAsGit
-} else {
-  try {
-    # Try to make symlink
-    # (Admin rigths is not required to make symlinks on Windows >= 10 build 14972 with Developer Mode enabled)
-    Write-Debug "Attempting to make a symlink for '$scriptGit' <<===>> '$script'."
-    & cmd /c mklink "$scriptGit" "$script" 1>$null 2>&1
-    Write-Debug "Symlink created for '$scriptGit' <<===>> '$script'."
-    Write-Host $messageInstalledAsGit
-  } catch {
-    $message = "$_`n" + $_.ScriptStackTrace
-    Write-Debug $message
+function Install-File {
+  param (
+    [string]$Path,
+    [string]$Destination,
+    [string]$SuccessMessage,
+    [string]$FailMessage,
+    [bool]$ThrowOnFailure = $false
+  )
+  # Remove file if it exists first, so don't get an error if it exists
+  $exists = [bool](Test-Path -Path $Destination)
+  if ($exists) {
+    # [x] Test
+    Write-Warning "File already exists: '$Destination'.`n$_"
     try {
-      # [x] Test
-      # If we cannot make a symlink, try copy instead
-      Copy-Item -Path "$script" -Destination "$scriptGit"
-      Write-Host $messageInstalledAsGit
+      # [ ] Test
+      Remove-Item -Path $Destination
     } catch {
-      # [x] Test
-      Write-Warning $_
-      Write-Warning "Colud not install $packageName as a Git program."
-    }
-  }
-}
-
-# Install as Python module/library
-
-# Success message
-$messageInstalledAsPython = "Installed $packageName as a Python module/library at '$scriptPython'."
-# IMPROVE Warn if this fails or is $null
-$pythonSitePackages = Convert-Path -Path "$(& python -c "import site; print(site.getsitepackages()[1])")"
-$scriptPython = Join-Path $pythonSitePackages -ChildPath 'git-filter-repo.py'
-if ($isAdmin) {
-  & cmd /c mklink "$scriptPython" "$script" 1>$null 2>&1
-  Write-Host $messageInstalledAsPython
-} else {
-  try {
-    # [x] Test
-    # Try to make symlink
-    Write-Debug "Attempting to make a symlink for '$scriptPython' <<===>> '$script'."
-    & cmd /c mklink "$scriptPython" "$script" 1>$null 2>&1
-    # [x] Test
-    Write-Debug "Symlink created for '$scriptPython' <<===>> '$script'."
-    $installedToPythonSitePackages = $true
-    Write-Host $messageInstalledAsPython
-  } catch {
-    # [x] Test
-    $message = "$_`n" + $_.ScriptStackTrace
-    Write-Debug $message
-    try {
-      Copy-Item -Path "$script" -Destination "$scriptPython"
-      $installedToPythonSitePackages = $true
-      Write-Host $messageInstalledAsPython
-      } catch {
+      if ($ThrowOnFailure) {
         # [x] Test
-        $message = "$_`n" + $_.ScriptStackTrace
-        Write-Debug $message
-        $installedToPythonSitePackages = $false
+        Write-Error $_
+      } else {
+        # [x] Test
+        Write-Warning "Cannot remove file '$Destination'.`n$_"
+        Write-Warning $FailMessage
+        return
       }
     }
-  # If previous step failed
-  # Try install to PYTHONPATH
-  # Message that will be displayed if this also fails
-  $messageCouldNotInstallAsPython = "Colud not install $packageName as a Python module/library, which is however _not needed_ for using git-filter-repo.`nYou will be able to use git-filter-repo normally, but not create your own Python filtering scripts using git-filter-repo as a module,`nnor make use of some of the scripts in '$contribDemosDir'."
-  # echo $installedToPythonSitePackages
-  # $installedToPythonSitePackages = $false
-  # If PYTHONPATH is set
-  # 1 0
-  # [x] Test
-  if ($null -ne $env:PYTHONPATH -and -not $installedToPythonSitePackages) {
-    Pause
-    Write-Debug "PYTHONPATH variable found."
-    $scriptPython = Join-Path $env:PYTHONPATH -ChildPath 'git-filter-repo.py'
-    # Message to display if it succeeds
-    $messageInstalledAsPython = "Installed $packageName as a Python module/library at '$scriptPython'."
+  }
+  # Check if admininstrator
+  # [ ] Test
+  if ($null -eq $script:isAdmin) {
+    if (Test-Administrator) {
+      Write-Debug "Elevated instance detected."
+      # Set variable in the Script scope so that we do not need to run Test-Administrator every time Install-File is run 
+      $script:isAdmin = $true
+    } else {
+      Write-Debug "Process does not seem to be elevated."
+      $script:isAdmin = $false
+    }
+  }
+  # Install file
+  if ($isAdmin) {
+    # [x] Test
+    # Create symlink
+    # Creating symlinks natively with PowerShell is only available in Windows PowerShell >= 5.0
+    & cmd /c mklink "$Destination" "$Path" 1>$null 2>&1 # suppress success stream; use cmd's error output as error
+    Write-Debug "Symlink created for '$Destination' <<===>> '$Path'."
+    Write-Host $SuccessMessage
+  } else {
     try {
       # [x] Test
-      # Try to make symlink
-      Write-Debug "Attempting to make a symlink for '$scriptPython' <<===>> '$script'."
-      & cmd /c mklink "$scriptPython" "$script" 1>$null 2>&1
-      # [x] Test
-      Pause
-      Write-Debug "Symlink created for '$scriptPython' <<===>> '$script'."
-      Write-Host $messageInstalledAsPython
+      # Create symlink
+      # (Admin rigths is not required to make symlinks on Windows >= 10 build 14972 with Developer Mode enabled)
+      Write-Debug "Attempting to make a symlink for '$Destination' <<===>> '$Path'."
+      & cmd /c mklink "$Destination" "$Path" 1>$null 2>&1
+      Write-Debug "Symlink created for '$Destination' <<===>> '$Path'."
+      Write-Host $SuccessMessage
     } catch {
-      # [x] Test
-      $message2 = "$_`n" + $_.ScriptStackTrace
-      Write-Debug $message2
+      $message = "$_`n" + $_.ScriptStackTrace
+      Write-Debug $message
       try {
         # [x] Test
         # If we cannot make a symlink, try copy instead
-        Copy-Item -Path "$script" -Destination "$scriptPython"
-        Write-Host $messageInstalledAsPython
-      }
-      catch {
-        # [x] Test
-        Write-Warning $message
-        Write-Warning $_
-        Write-Warning $messageCouldNotInstallAsPython
+        Write-Debug "Will attempt to copy '$Path' to '$Destination'."
+        Copy-Item -Path "$Path" -Destination "$Destination"
+        Write-Debug "Copied '$Path' to '$Destination'."
+        Write-Host $SuccessMessage
+      } catch {
+        if ($ThrowOnFailure) {
+          # [ ] Test
+          Write-Error $_
+        } else {
+          # [ ] Test
+          Write-Warning $_
+          Write-Warning $FailMessage
+        }
       }
     }
   }
-  # If PYTHONPATH is *not* set
-  # 0 0
+}
+
+# Install as Git program
+Write-Debug "------------------------------"
+Write-Debug "Will attempt to install $packageName as a Git program."
+$execPath = & git --exec-path
+$scriptGit = Join-Path $execPath -ChildPath 'git-filter-repo'
+$messageSuccess = "Installed $packageName as a Git program at '$scriptGit'."
+$messageFail = "Colud not install $packageName as a Git program."
+$installFileArgs = @{
+  Path           = $script
+  Destination    = $scriptGit
+  SuccessMessage = $messageSuccess
+  FailMessage    = $messageFail
+}
+Install-File @installFileArgs
+
+# Install as Python module/library
+Write-Debug "------------------------------"
+Write-Debug "Will attempt to install $packageName as a Python module/library."
+# IMPROVE Warn if this fails or is $null
+$pythonSitePackages = Convert-Path -Path "$(& python -c "import site; print(site.getsitepackages()[1])")"
+$scriptPython = Join-Path $pythonSitePackages -ChildPath 'git-filter-repo.py'
+# Success message
+$messageSuccess = "Installed $packageName as a Python module/library at '$scriptPython'."
+# Fail message
+$messageFail = "Colud not install $packageName as a Python module/library, which is however _not needed_ for using git-filter-repo.`nYou will be able to use git-filter-repo normally, but not create your own Python filtering scripts using git-filter-repo as a module,`nnor make use of some of the scripts in '$contribDemosDir'."
+try {
   # [x] Test
-  elseif ($null -eq $env:PYTHONPATH -and -not $installedToPythonSitePackages) {
-    Write-Warning $message
-    Write-Warning "PYTHONPATH variable not found."
-    Write-Warning $messageCouldNotInstallAsPython
-  }
-  # If PYTHONPATH is set and previous step didn't actually fail
-  # 1 1
-  # [x] Test
-  elseif ($null -ne $env:PYTHONPATH) {
+  Install-File -Path $script `
+    -Destination $scriptPython `
+    -SuccessMessage $messageSuccess `
+    -ThrowOnFailure $true
+} catch {
+  if ($null -ne $env:PYTHONPATH) {
+    # [x] Test
     Write-Debug "PYTHONPATH variable found."
-  }
-  # If PYTHONPATH is *not* set, but the previous step didn't actually fail, so it's ok
-  # 0 1
-  # [x] Test
-  elseif ($null -eq $env:PYTHONPATH) {
+    $scriptPython = Join-Path $env:PYTHONPATH -ChildPath 'git-filter-repo.py'
+    $messageSuccess = "Installed $packageName as a Python module/library at '$scriptPython'."
+    Install-File -Path $script `
+      -Destination $scriptPython `
+      -SuccessMessage $messageSuccess `
+      -FailMessage $messageFail
+  } else {
+    # [x] Test
     Write-Debug "PYTHONPATH variable not found."
+    Write-Warning $messageFail
   }
 }
 
 # Install man page for Git
-
+Write-Debug "------------------------------"
+Write-Debug "Will attempt to install $packageName's man page for Git."
 $documentationDir = Join-Path $scriptDir -ChildPath 'Documentation'
 $manPage = Join-Path $documentationDir -ChildPath 'git-filter-repo.1'
-$manPath = [System.IO.Path]::GetFullPath($(& git --man-path)) # Convert-Path only works on existing paths, so we do this
+$manPath = [System.IO.Path]::GetFullPath($(& git --man-path)) # Convert-Path only works on real existing paths, so we do this
 $man1Path = Join-Path $manPath -ChildPath 'man1'
 $manPageGit = Join-Path $man1Path -ChildPath 'git-filter-repo.1'
-if ($isAdmin) { 
-  & cmd /c mklink "$manPage" "$script" 1>$null 2>&1
-} else {
-
+$messageSuccess = "Installed $packeName's man page for Git."
+$messageFail = "Colud not install $packageName's man page for Git."
+$installFileArgs = @{
+  Path = $manPage
+  Destination = $manPageGit
+  SuccessMessage = $messageSuccess
+  FailMessage = $messageFail
 }
+try {
+  # [x] Test
+  # Create necessary directories if missing
+  New-Item -Path $man1Path -ItemType Directory -Force > $null
+  Install-File @installFileArgs
+}
+catch {
+  # [x] Test
+  Write-Warning "Could not create directories.`n$_"
+  Write-Warning $messageFail
+}
+
+# TODO Install help patch
 
 # TODO Shortcut to demo scripts dir
 
