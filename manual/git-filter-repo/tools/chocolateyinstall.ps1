@@ -8,34 +8,33 @@ function Test-Administrator {
   }
 }
 
+# Extract archive
 $ErrorActionPreference = 'Stop' # stop on all errors
-$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-# $tarXzArchive = Join-Path $toolsDir -ChildPath 'git-filter-repo-2.45.0.zip'
-$tarXzArchive = Join-Path $toolsDir -ChildPath 'git-filter-repo-2.45.0.tar.xz'
-$tarArchive = Join-Path $toolsDir -ChildPath 'git-filter-repo-2.45.0.tar'
-$scriptDir = Join-Path $toolsDir -ChildPath 'git-filter-repo-2.45.0'
-$script = Join-Path $scriptDir -ChildPath "git-filter-repo"
-$contribDir = Join-Path $scriptDir "contrib"
-$contribDemosDir = Join-Path $contribDir "filter-repo-demos"
-
-$unzipArgsTarXz = @{
-  FileFullPath = $tarXzArchive
-  Destination  = $toolsDir
+$packageToolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$packageTarXzArchive = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0.tar.xz'
+$packaceTarArchive = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0.tar'
+$packagePyScriptDir = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0'
+$packagePyScript = Join-Path $packagePyScriptDir -ChildPath "git-filter-repo"
+$packageContribDir = Join-Path $packagePyScriptDir "contrib"
+$contribDemosDir = Join-Path $packageContribDir "filter-repo-demos"
+$packageUnzipArgsTarXz = @{
+  FileFullPath = $packageTarXzArchive
+  Destination  = $packageToolsDir
 }
-
-$unzipArgsTar = @{
-  FileFullPath = $tarArchive
-  Destination  = $toolsDir
+$packageUnzipArgsTar = @{
+  FileFullPath = $packaceTarArchive
+  Destination  = $packageToolsDir
 }
+## Extract tar.xz file to the specified location
+## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
+# Get-ChocolateyUnzip @packageUnzipArgsTarXz
+## Extract tar file to the specified location
+# Get-ChocolateyUnzip @packageUnzipArgsTar
+# Remove one of the two copies of the archive
+# Remove-Item $packaceTarArchive
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
-
-## Unzip file to the specified location - auto overwrites existing content
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-# Get-ChocolateyUnzip @unzipArgsTarXz
-# Remove-Item $tarArchive
-# Get-ChocolateyUnzip @unzipArgsTar
 
 ## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
 #$appPath = "$env:ProgramFiles\appname"
@@ -52,10 +51,12 @@ $unzipArgsTar = @{
 
 # Add script to the path
 <# if (Test-Administrator) {
-  Install-ChocolateyPath "$scriptDir" "Machine" # Machine will assert administrative rights
+  Install-ChocolateyPath "$packagePyScriptDir" "Machine" # Machine will assert administrative rights
 } else {
-  Install-ChocolateyPath "$scriptDir" "User"
+  Install-ChocolateyPath "$packagePyScriptDir" "User"
 } #>
+
+# TODO Move function to the top
 
 function Install-File {
   param (
@@ -141,42 +142,47 @@ function Install-File {
 # Install as Git program
 Write-Debug "------------------------------"
 Write-Debug "Will attempt to install $packageName as a Git program."
-$execPath = & git --exec-path
-$scriptGit = Join-Path $execPath -ChildPath 'git-filter-repo'
-$messageSuccess = "Installed $packageName as a Git program at '$scriptGit'."
+# Destination
+$installGitExecPath = & git --exec-path
+$installGitPyScript = Join-Path $installGitExecPath -ChildPath 'git-filter-repo'
+# Messages
+$messageSuccess = "Installed $packageName as a Git program at '$installGitPyScript'."
 $messageFail = "Colud not install $packageName as a Git program."
-$installFileArgs = @{
-  Path           = $script
-  Destination    = $scriptGit
+# Arguments
+$installGitFileArgs = @{
+  Path           = $packagePyScript
+  Destination    = $installGitPyScript
   SuccessMessage = $messageSuccess
   FailMessage    = $messageFail
 }
-Install-File @installFileArgs
+# Install file
+Install-File @installGitFileArgs
 
 # Install as Python module/library
 Write-Debug "------------------------------"
 Write-Debug "Will attempt to install $packageName as a Python module/library."
+# Destination
 # IMPROVE Warn if this fails or is $null
-$pythonSitePackages = Convert-Path -Path "$(& python -c "import site; print(site.getsitepackages()[1])")"
-$scriptPython = Join-Path $pythonSitePackages -ChildPath 'git-filter-repo.py'
-# Success message
-$messageSuccess = "Installed $packageName as a Python module/library at '$scriptPython'."
-# Fail message
+$installPythonSitePackages = Convert-Path -Path "$(& python -c "import site; print(site.getsitepackages()[1])")"
+$installPythonPyScript = Join-Path $installPythonSitePackages -ChildPath 'git-filter-repo.py'
+# Messages
+$messageSuccess = "Installed $packageName as a Python module/library at '$installPythonPyScript'."
 $messageFail = "Colud not install $packageName as a Python module/library, which is however _not needed_ for using git-filter-repo.`nYou will be able to use git-filter-repo normally, but not create your own Python filtering scripts using git-filter-repo as a module,`nnor make use of some of the scripts in '$contribDemosDir'."
+# Install file
 try {
   # [x] Test
-  Install-File -Path $script `
-    -Destination $scriptPython `
+  Install-File -Path $packagePyScript `
+    -Destination $installPythonPyScript `
     -SuccessMessage $messageSuccess `
     -ThrowOnFailure $true
 } catch {
   if ($null -ne $env:PYTHONPATH) {
     # [x] Test
     Write-Debug "PYTHONPATH variable found."
-    $scriptPython = Join-Path $env:PYTHONPATH -ChildPath 'git-filter-repo.py'
-    $messageSuccess = "Installed $packageName as a Python module/library at '$scriptPython'."
-    Install-File -Path $script `
-      -Destination $scriptPython `
+    $installPythonPyScript = Join-Path $env:PYTHONPATH -ChildPath 'git-filter-repo.py'
+    $messageSuccess = "Installed $packageName as a Python module/library at '$installPythonPyScript'."
+    Install-File -Path $packagePyScript `
+      -Destination $installPythonPyScript `
       -SuccessMessage $messageSuccess `
       -FailMessage $messageFail
   } else {
@@ -189,23 +195,29 @@ try {
 # Install man page for Git
 Write-Debug "------------------------------"
 Write-Debug "Will attempt to install $packageName's man page for Git."
-$documentationDir = Join-Path $scriptDir -ChildPath 'Documentation'
-$manPage = Join-Path $documentationDir -ChildPath 'git-filter-repo.1'
-$manPath = [System.IO.Path]::GetFullPath($(& git --man-path)) # Convert-Path only works on real existing paths, so we do this
-$man1Path = Join-Path $manPath -ChildPath 'man1'
-$manPageGit = Join-Path $man1Path -ChildPath 'git-filter-repo.1'
+# Path
+$packageDocumentationDir = Join-Path $packagePyScriptDir -ChildPath 'Documentation'
+$packageMan1Dir = Join-Path $packageDocumentationDir -ChildPath 'man1'
+$packageManPage = Join-Path $packageMan1Dir -ChildPath 'git-filter-repo.1'
+# Destination
+$installManPath = [System.IO.Path]::GetFullPath($(& git --man-path)) # Convert-Path only works on real existing paths, so we do this
+$installMan1Path = Join-Path $installManPath -ChildPath 'man1'
+$installManPage = Join-Path $installMan1Path -ChildPath 'git-filter-repo.1'
+# Messages
 $messageSuccess = "Installed $packeName's man page for Git."
 $messageFail = "Colud not install $packageName's man page for Git."
+# Arguments
 $installFileArgs = @{
-  Path = $manPage
-  Destination = $manPageGit
+  Path = $packageManPage
+  Destination = $installManPage
   SuccessMessage = $messageSuccess
   FailMessage = $messageFail
 }
+# Install file
 try {
   # [x] Test
   # Create necessary directories if missing
-  New-Item -Path $man1Path -ItemType Directory -Force > $null
+  New-Item -Path $installMan1Path -ItemType Directory -Force > $null
   Install-File @installFileArgs
 }
 catch {
@@ -214,7 +226,13 @@ catch {
   Write-Warning $messageFail
 }
 
-# TODO Install help patch
+# Install html documentation
+Write-Debug "------------------------------"
+Write-Debug "Will attempt to install $packageName's html documentation file for Git."
+# Path
+$packageHtmlDocumentation = Join-Path $packageDocumentationDir -ChildPath
+# Destination
+$installHtmlDocumentationDir = Convert-Path -Path $(& git --html-path)
 
 # TODO Shortcut to demo scripts dir
 
@@ -229,7 +247,7 @@ catch {
 ## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
 ## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
 ## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-# Install-BinFile -Name "git_filter_repo.py" -Path "$script"
+# Install-BinFile -Name "git_filter_repo.py" -Path "$packagePyScript"
 
 ## Other needs: use regular PowerShell to do so or see if there is a function already defined
 ## - https://docs.chocolatey.org/en-us/create/functions
