@@ -16,7 +16,8 @@ $packaceTarArchive = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45
 $packagePyScriptDir = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0'
 $packagePyScript = Join-Path $packagePyScriptDir -ChildPath "git-filter-repo"
 $packageContribDir = Join-Path $packagePyScriptDir "contrib"
-$contribDemosDir = Join-Path $packageContribDir "filter-repo-demos"
+$packageContribDemosDir = Join-Path $packageContribDir "filter-repo-demos"
+$contribDemosDirShortcutName = "git-filter-repo contrib scripts"
 $packageUnzipArgsTarXz = @{
   FileFullPath = $packageTarXzArchive
   Destination  = $packageToolsDir
@@ -27,11 +28,11 @@ $packageUnzipArgsTar = @{
 }
 ## Extract tar.xz file to the specified location
 ## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-# Get-ChocolateyUnzip @packageUnzipArgsTarXz
+Get-ChocolateyUnzip @packageUnzipArgsTarXz
 ## Extract tar file to the specified location
-# Get-ChocolateyUnzip @packageUnzipArgsTar
+Get-ChocolateyUnzip @packageUnzipArgsTar
 # Remove one of the two copies of the archive
-# Remove-Item $packaceTarArchive
+Remove-Item $packaceTarArchive
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
@@ -66,6 +67,19 @@ function Install-File {
     [string]$FailMessage,
     [bool]$ThrowOnFailure = $false
   )
+  # TODO Do not print empty messages
+  # Check if admininstrator
+  # [ ] Test
+  if ($null -eq $script:isAdmin) {
+    if (Test-Administrator) {
+      Write-Debug "Elevated instance detected."
+      # Set variable in the Script scope so that we do not need to run Test-Administrator every time Install-File is run 
+      $script:isAdmin = $true
+    } else {
+      Write-Debug "Process does not seem to be elevated."
+      $script:isAdmin = $false
+    }
+  }
   # Remove file if it exists first, so don't get an error if it exists
   $exists = [bool](Test-Path -Path $Destination)
   if ($exists) {
@@ -84,18 +98,6 @@ function Install-File {
         Write-Warning $FailMessage
         return
       }
-    }
-  }
-  # Check if admininstrator
-  # [ ] Test
-  if ($null -eq $script:isAdmin) {
-    if (Test-Administrator) {
-      Write-Debug "Elevated instance detected."
-      # Set variable in the Script scope so that we do not need to run Test-Administrator every time Install-File is run 
-      $script:isAdmin = $true
-    } else {
-      Write-Debug "Process does not seem to be elevated."
-      $script:isAdmin = $false
     }
   }
   # Install file
@@ -147,16 +149,71 @@ $installGitExecPath = & git --exec-path
 $installGitPyScript = Join-Path $installGitExecPath -ChildPath 'git-filter-repo'
 # Messages
 $messageSuccess = "Installed $packageName as a Git program at '$installGitPyScript'."
-$messageFail = "Colud not install $packageName as a Git program."
+$messageFail = "Colud not install $packageName as a Git program. This needs to be installed to run $packageName with ""git filter-repo""."
 # Arguments
 $installGitFileArgs = @{
   Path           = $packagePyScript
   Destination    = $installGitPyScript
   SuccessMessage = $messageSuccess
   FailMessage    = $messageFail
+  ThrowOnFailure = $true
 }
 # Install file
-Install-File @installGitFileArgs
+
+try {
+  # [x] Test
+  # throw # TODO Remove
+  Install-File @installGitFileArgs
+} catch {
+  # [ ] Test
+  # XXX
+  # FIXME
+  Write-Host $messageFail
+  <# # Not working
+  Write-Debug "------------------------------"
+  Write-Debug "Will attempt to create a shim for $packageName."
+  Install-BinFile -Name "git_filter_repo.py" -Path "$packagePyScript" #>
+  Write-Debug "------------------------------"
+  Write-Debug "Will install $packageName to ""git_filter_repo.py""."
+  # TODO maybe do this even if able to install as git program
+  # Destination
+  $installPyScript = Join-Path $packagePyScriptDir -ChildPath 'git_filter_repo.py'
+  # Messages
+  $messageSuccess = "Installed $packageName to '$installPyScript'."
+  $messageFail = "Colud not symlink or copy $packageName to $installPyScript. You will need to do this manually or run the program with 'python ""$packagePyScript""'."
+  # Variable
+  $installedPyScript = $false 
+  # Arguments
+  $installPyScriptArgs = @{
+    Path           = $packagePyScript
+    Destination    = $installPyScript
+    SuccessMessage = $messageSuccess
+    FailMessage    = $messageFail
+    ThrowOnFailure = $true
+  }
+  try {
+    # [x] Test
+    Install-File @installPyScriptArgs
+    $installedPyScript = $true
+  } catch { }
+  Write-Debug "------------------------------"
+  Write-Debug "Will add $packageName to the PATH."
+  # Messages
+  $messageSuccessMinor = "Added $packageName to the PATH variable."
+  $messageSuccessMajor = "$messageSuccessMinor`nYou will be able to run $packageName with ""git_filter_repo""."
+  # Add script directory to the path
+  if ($isAdmin) {
+    Install-ChocolateyPath "$packagePyScriptDir" "Machine" # Machine will assert administrative rights
+  } else {
+    Install-ChocolateyPath "$packagePyScriptDir" "User"
+  }
+  if ($installedPyScript) {
+    Write-Host $messageSuccessMajor
+  }
+  else {
+    Write-Host $messageSuccessMinor
+  }
+}
 
 # Install as Python module/library
 Write-Debug "------------------------------"
@@ -167,7 +224,14 @@ $installPythonSitePackages = Convert-Path -Path "$(& python -c "import site; pri
 $installPythonPyScript = Join-Path $installPythonSitePackages -ChildPath 'git-filter-repo.py'
 # Messages
 $messageSuccess = "Installed $packageName as a Python module/library at '$installPythonPyScript'."
-$messageFail = "Colud not install $packageName as a Python module/library, which is however _not needed_ for using git-filter-repo.`nYou will be able to use git-filter-repo normally, but not create your own Python filtering scripts using git-filter-repo as a module,`nnor make use of some of the scripts in '$contribDemosDir'."
+$messageFail = "Colud not install $packageName as a Python module/library, which is however *not needed* for using git-filter-repo.`nYou will be able to use git-filter-repo normally, but not create your own Python filtering scripts using git-filter-repo as a module,`nnor make use of some of the scripts in '$packageContribDemosDir'."
+# Arguments for shortcut installation
+$shortcut = "$env:UserProfile\Desktop\$contribDemosDirShortcutName.lnk"
+$contribDemosDirShortcutArgs = @{
+  shortcutFilePath = $shortcut
+  targetPath       = $packageContribDemosDir
+  description      = "Examples showing the breadth of what can be done with git-filter-repo as a library."
+}
 # Install file
 try {
   # [x] Test
@@ -175,6 +239,11 @@ try {
     -Destination $installPythonPyScript `
     -SuccessMessage $messageSuccess `
     -ThrowOnFailure $true
+  # [ ] Test
+  # Add desktop shortcut to the contrib demos directory
+  Write-Debug "Will attempt to add desktop shortcut for '$shortcut' --> '$packageContribDemosDir'."
+  Install-ChocolateyShortcut @contribDemosDirShortcutArgs
+  Write-Debug "Shortcut added for '$shortcut' --> '$packageContribDemosDir'."
 } catch {
   if ($null -ne $env:PYTHONPATH) {
     # [x] Test
@@ -185,6 +254,11 @@ try {
       -Destination $installPythonPyScript `
       -SuccessMessage $messageSuccess `
       -FailMessage $messageFail
+    # [ ] Test
+    # Add desktop shortcut to the contrib demos directory
+    Write-Debug "Will attempt to add desktop shortcut for '$shortcut' --> '$packageContribDemosDir'."
+    Install-ChocolateyShortcut @contribDemosDirShortcutArgs
+    Write-Debug "Shortcut added for '$shortcut' --> '$packageContribDemosDir'."
   } else {
     # [x] Test
     Write-Debug "PYTHONPATH variable not found."
@@ -205,13 +279,13 @@ $installMan1Path = Join-Path $installManPath -ChildPath 'man1'
 $installManPage = Join-Path $installMan1Path -ChildPath 'git-filter-repo.1'
 # Messages
 $messageSuccess = "Installed $packeName's man page for Git."
-$messageFail = "Colud not install $packageName's man page for Git."
+$messageFail = "Colud not install $packageName's man page for Git. This needs to be installed if you want ""git filter-repo --help"" to succeed in displaying the manpage, when help.format is ""man"" (not the default on Windows).`nNote that ""git filter-repo -h"" will show a more limited built-in set of instructions even if the manpage isn't installed."
 # Arguments
 $installFileArgs = @{
-  Path = $packageManPage
-  Destination = $installManPage
+  Path           = $packageManPage
+  Destination    = $installManPage
   SuccessMessage = $messageSuccess
-  FailMessage = $messageFail
+  FailMessage    = $messageFail
 }
 # Install file
 try {
@@ -219,8 +293,7 @@ try {
   # Create necessary directories if missing
   New-Item -Path $installMan1Path -ItemType Directory -Force > $null
   Install-File @installFileArgs
-}
-catch {
+} catch {
   # [x] Test
   Write-Warning "Could not create directories.`n$_"
   Write-Warning $messageFail
@@ -230,24 +303,24 @@ catch {
 Write-Debug "------------------------------"
 Write-Debug "Will attempt to install $packageName's html documentation file for Git."
 # Path
-$packageHtmlDocumentation = Join-Path $packageDocumentationDir -ChildPath
+$packageHtmlDir = Join-Path $packageDocumentationDir -ChildPath 'html'
+$packageHtmlFile = Join-Path $packageHtmlDir -ChildPath 'git-filter-repo.html'
 # Destination
 $installHtmlDocumentationDir = Convert-Path -Path $(& git --html-path)
-
-# TODO Shortcut to demo scripts dir
-
-## Outputs the bitness of the OS (either "32" or "64")
-## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-#$osBitness = Get-ProcessorBits
-
-## Set persistent Environment variables
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
-#Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
-
-## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
-## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
-## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-# Install-BinFile -Name "git_filter_repo.py" -Path "$packagePyScript"
+$installHtmlDocumentation = Join-Path $installHtmlDocumentationDir -ChildPath 'git-filter-repo.html'
+# Messages
+$messageSuccess = "Installed $packageName's html documentation file for Git."
+$messageFail = "Colud not install $packageName's html documentation file for Git. This needs to be installed if you want ""git filter-repo --help"" to succeed in displaying the html version of the help, when help.format is set to ""html"" (the default on Windows).`nNote that ""git filter-repo -h"" will show a more limited built-in set of instructions even if the manpage isn't installed."
+# Arguments
+$installFileArgs = @{
+  Path           = $packageHtmlFile
+  Destination    = $installHtmlDocumentation
+  SuccessMessage = $messageSuccess
+  FailMessage    = $messageFail
+}
+# Install file
+# [x] Test
+Install-File @installFileArgs
 
 ## Other needs: use regular PowerShell to do so or see if there is a function already defined
 ## - https://docs.chocolatey.org/en-us/create/functions
