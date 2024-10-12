@@ -8,6 +8,100 @@ function Test-Administrator {
   }
 }
 
+# Install a file
+# First tries to symlink, and if that fails, tries to copy
+function Install-File {
+  param (
+    [string]$Path,
+    [string]$Destination,
+    [string]$SuccessMessage,
+    [string]$FailMessage,
+    [bool]$ThrowOnFailure = $false
+  )
+  # Check if admininstrator
+  if ($null -eq $script:isAdmin) {
+    if (Test-Administrator) {
+      # [x] Test
+      Write-Debug "Elevated instance detected."
+      # Set variable in the Script scope so that we do not need to run Test-Administrator every time Install-File is run 
+      $script:isAdmin = $true
+    } else {
+      # [x] Test
+      Write-Debug "Instance does not seem to be elevated."
+      $script:isAdmin = $false
+    }
+  }
+  # Remove file if it exists first, so don't get an error if it exists
+  $exists = [bool](Test-Path -Path $Destination)
+  if ($exists) {
+    # [x] Test
+    Write-Warning "File already exists: '$Destination'.`n$_"
+    try {
+      # [x] Test
+      Remove-Item -Path $Destination
+    } catch {
+      if ($ThrowOnFailure) {
+        # [x] Test
+        Write-Error $_
+      } else {
+        # [x] Test
+        Write-Warning "Cannot remove file '$Destination'.`n$_"
+        if ("" -ne $FailMessage) {
+          Write-Warning $FailMessage
+        }
+        return
+      }
+    }
+  }
+  # Install file
+  if ($isAdmin) {
+    # [x] Test
+    # Create symlink
+    # Creating symlinks natively with PowerShell is only available in PowerShell >= 5.0
+    & cmd /c mklink "$Destination" "$Path" 1>$null 2>&1 # suppress success stream; use cmd's error output as error
+    Write-Debug "Symlink created for '$Destination' <<===>> '$Path'."
+    if ("" -ne $SuccessMessage) {
+      Write-Host $SuccessMessage
+    }
+  } else {
+    try {
+      # [x] Test
+      # Create symlink
+      # (Admin rigths is not required to make symlinks on Windows >= 10 build 14972 with Developer Mode enabled)
+      Write-Debug "Attempting to make a symlink for '$Destination' <<===>> '$Path'."
+      & cmd /c mklink "$Destination" "$Path" 1>$null 2>&1
+      Write-Debug "Symlink created for '$Destination' <<===>> '$Path'."
+      if ("" -ne $SuccessMessage) {
+        Write-Host $SuccessMessage
+      }
+    } catch {
+      $message = "$_`n" + $_.ScriptStackTrace
+      Write-Debug $message
+      try {
+        # [x] Test
+        # If we cannot make a symlink, try copy instead
+        Write-Debug "Will attempt to copy '$Path' to '$Destination'."
+        Copy-Item -Path "$Path" -Destination "$Destination"
+        Write-Debug "Copied '$Path' to '$Destination'."
+        if ("" -ne $SuccessMessage) {
+          Write-Host $SuccessMessage
+        }
+      } catch {
+        if ($ThrowOnFailure) {
+          # [x] Test
+          Write-Error $_
+        } else {
+          # [x] Test
+          Write-Warning $_
+          if ("" -ne $FailMessage) {
+            Write-Warning $FailMessage
+          }
+        }
+      }
+    }
+  }
+}
+
 # Extract archive
 $ErrorActionPreference = 'Stop' # stop on all errors
 $packageToolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
@@ -27,119 +121,11 @@ $packageUnzipArgsTar = @{
   Destination  = $packageToolsDir
 }
 ## Extract tar.xz file to the specified location
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 Get-ChocolateyUnzip @packageUnzipArgsTarXz
 ## Extract tar file to the specified location
 Get-ChocolateyUnzip @packageUnzipArgsTar
 # Remove one of the two copies of the archive
 Remove-Item $packaceTarArchive
-
-## Helper functions - these have error handling tucked into them already
-## see https://docs.chocolatey.org/en-us/create/functions
-
-## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
-#$appPath = "$env:ProgramFiles\appname"
-##Will resolve to C:\Program Files\appname
-#$statementsToRun = "/C `"$appPath\bin\installservice.bat`""
-#Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
-
-## add specific folders to the path - any executables found in the chocolatey package
-## folder will already be on the path.
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
-#Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
-
-
-
-# Add script to the path
-<# if (Test-Administrator) {
-  Install-ChocolateyPath "$packagePyScriptDir" "Machine" # Machine will assert administrative rights
-} else {
-  Install-ChocolateyPath "$packagePyScriptDir" "User"
-} #>
-
-# TODO Move function to the top
-
-function Install-File {
-  param (
-    [string]$Path,
-    [string]$Destination,
-    [string]$SuccessMessage,
-    [string]$FailMessage,
-    [bool]$ThrowOnFailure = $false
-  )
-  # TODO Do not print empty messages
-  # Check if admininstrator
-  # [ ] Test
-  if ($null -eq $script:isAdmin) {
-    if (Test-Administrator) {
-      Write-Debug "Elevated instance detected."
-      # Set variable in the Script scope so that we do not need to run Test-Administrator every time Install-File is run 
-      $script:isAdmin = $true
-    } else {
-      Write-Debug "Process does not seem to be elevated."
-      $script:isAdmin = $false
-    }
-  }
-  # Remove file if it exists first, so don't get an error if it exists
-  $exists = [bool](Test-Path -Path $Destination)
-  if ($exists) {
-    # [x] Test
-    Write-Warning "File already exists: '$Destination'.`n$_"
-    try {
-      # [ ] Test
-      Remove-Item -Path $Destination
-    } catch {
-      if ($ThrowOnFailure) {
-        # [x] Test
-        Write-Error $_
-      } else {
-        # [x] Test
-        Write-Warning "Cannot remove file '$Destination'.`n$_"
-        Write-Warning $FailMessage
-        return
-      }
-    }
-  }
-  # Install file
-  if ($isAdmin) {
-    # [x] Test
-    # Create symlink
-    # Creating symlinks natively with PowerShell is only available in Windows PowerShell >= 5.0
-    & cmd /c mklink "$Destination" "$Path" 1>$null 2>&1 # suppress success stream; use cmd's error output as error
-    Write-Debug "Symlink created for '$Destination' <<===>> '$Path'."
-    Write-Host $SuccessMessage
-  } else {
-    try {
-      # [x] Test
-      # Create symlink
-      # (Admin rigths is not required to make symlinks on Windows >= 10 build 14972 with Developer Mode enabled)
-      Write-Debug "Attempting to make a symlink for '$Destination' <<===>> '$Path'."
-      & cmd /c mklink "$Destination" "$Path" 1>$null 2>&1
-      Write-Debug "Symlink created for '$Destination' <<===>> '$Path'."
-      Write-Host $SuccessMessage
-    } catch {
-      $message = "$_`n" + $_.ScriptStackTrace
-      Write-Debug $message
-      try {
-        # [x] Test
-        # If we cannot make a symlink, try copy instead
-        Write-Debug "Will attempt to copy '$Path' to '$Destination'."
-        Copy-Item -Path "$Path" -Destination "$Destination"
-        Write-Debug "Copied '$Path' to '$Destination'."
-        Write-Host $SuccessMessage
-      } catch {
-        if ($ThrowOnFailure) {
-          # [ ] Test
-          Write-Error $_
-        } else {
-          # [ ] Test
-          Write-Warning $_
-          Write-Warning $FailMessage
-        }
-      }
-    }
-  }
-}
 
 # Install as Git program
 Write-Debug "------------------------------"
@@ -151,7 +137,7 @@ $installGitPyScript = Join-Path $installGitExecPath -ChildPath 'git-filter-repo'
 $messageSuccess = "Installed $packageName as a Git program at '$installGitPyScript'."
 $messageFail = "Colud not install $packageName as a Git program. This needs to be installed to run $packageName with ""git filter-repo""."
 # Arguments
-$installGitFileArgs = @{
+$installFileArgs = @{
   Path           = $packagePyScript
   Destination    = $installGitPyScript
   SuccessMessage = $messageSuccess
@@ -159,10 +145,9 @@ $installGitFileArgs = @{
   ThrowOnFailure = $true
 }
 # Install file
-
 try {
   # [x] Test
-  Install-File @installGitFileArgs
+  Install-File @installFileArgs
 } catch {
   Write-Host $messageFail
   <# # Not working
@@ -290,8 +275,3 @@ $installFileArgs = @{
 # Install file
 # [x] Test
 Install-File @installFileArgs
-
-## Other needs: use regular PowerShell to do so or see if there is a function already defined
-## - https://docs.chocolatey.org/en-us/create/functions
-## There may also be functions available in extension packages
-## - https://community.chocolatey.org/packages?q=id%3A.extension for examples and availability.
