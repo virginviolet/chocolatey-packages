@@ -223,7 +223,7 @@ $installManPath = [System.IO.Path]::GetFullPath($(& git --man-path)) # Convert-P
 $installMan1Path = Join-Path $installManPath -ChildPath 'man1'
 $installManPage = Join-Path $installMan1Path -ChildPath 'git-filter-repo.1'
 # Messages
-$messageSuccess = "Installed $packeName's man page for Git."
+$messageSuccess = "Installed $packageName's man page for Git."
 $messageFail = "Colud not install $packageName's man page for Git. This needs to be installed if you want ""git filter-repo --help"" to succeed in displaying the manpage, when help.format is ""man"" (not the default on Windows).`nNote that ""git filter-repo -h"" will show a more limited built-in set of instructions even if the manpage isn't installed."
 # Arguments
 $installFileArgs = @{
