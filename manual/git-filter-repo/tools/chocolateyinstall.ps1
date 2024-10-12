@@ -162,57 +162,26 @@ $installGitFileArgs = @{
 
 try {
   # [x] Test
-  # throw # TODO Remove
   Install-File @installGitFileArgs
 } catch {
-  # [ ] Test
-  # XXX
-  # FIXME
   Write-Host $messageFail
   <# # Not working
   Write-Debug "------------------------------"
   Write-Debug "Will attempt to create a shim for $packageName."
   Install-BinFile -Name "git_filter_repo.py" -Path "$packagePyScript" #>
   Write-Debug "------------------------------"
-  Write-Debug "Will install $packageName to ""git_filter_repo.py""."
-  # TODO maybe do this even if able to install as git program
-  # Destination
-  $installPyScript = Join-Path $packagePyScriptDir -ChildPath 'git_filter_repo.py'
-  # Messages
-  $messageSuccess = "Installed $packageName to '$installPyScript'."
-  $messageFail = "Colud not symlink or copy $packageName to $installPyScript. You will need to do this manually or run the program with 'python ""$packagePyScript""'."
-  # Variable
-  $installedPyScript = $false 
-  # Arguments
-  $installPyScriptArgs = @{
-    Path           = $packagePyScript
-    Destination    = $installPyScript
-    SuccessMessage = $messageSuccess
-    FailMessage    = $messageFail
-    ThrowOnFailure = $true
-  }
-  try {
-    # [x] Test
-    Install-File @installPyScriptArgs
-    $installedPyScript = $true
-  } catch { }
-  Write-Debug "------------------------------"
   Write-Debug "Will add $packageName to the PATH."
-  # Messages
-  $messageSuccessMinor = "Added $packageName to the PATH variable."
-  $messageSuccessMajor = "$messageSuccessMinor`nYou will be able to run $packageName with ""git_filter_repo""."
+  # Message
+  # IMPROVE Check PATHEXT variable
+  $messageSuccess = "Added $packageName to the PATH variable.`nYou will be able to be able to run $packageName with ""git_filter_repo"" (as long as the PATHEXT variable has "".PY"".)."
   # Add script directory to the path
   if ($isAdmin) {
+    # [x] Test
     Install-ChocolateyPath "$packagePyScriptDir" "Machine" # Machine will assert administrative rights
   } else {
     Install-ChocolateyPath "$packagePyScriptDir" "User"
   }
-  if ($installedPyScript) {
-    Write-Host $messageSuccessMajor
-  }
-  else {
-    Write-Host $messageSuccessMinor
-  }
+  Write-Host $messageSuccess
 }
 
 # Install as Python module/library
@@ -239,7 +208,7 @@ try {
     -Destination $installPythonPyScript `
     -SuccessMessage $messageSuccess `
     -ThrowOnFailure $true
-  # [ ] Test
+  # [x] Test
   # Add desktop shortcut to the contrib demos directory
   Write-Debug "Will attempt to add desktop shortcut for '$shortcut' --> '$packageContribDemosDir'."
   Install-ChocolateyShortcut @contribDemosDirShortcutArgs
@@ -254,7 +223,7 @@ try {
       -Destination $installPythonPyScript `
       -SuccessMessage $messageSuccess `
       -FailMessage $messageFail
-    # [ ] Test
+    # [x] Test
     # Add desktop shortcut to the contrib demos directory
     Write-Debug "Will attempt to add desktop shortcut for '$shortcut' --> '$packageContribDemosDir'."
     Install-ChocolateyShortcut @contribDemosDirShortcutArgs
