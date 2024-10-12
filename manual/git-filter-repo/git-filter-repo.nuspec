@@ -1,68 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Reference. Chocolatey uses a special version of NuGet.Core that allows us to do more than was initially possible. As such there are certain things to be aware of:
-
-* the package xmlns schema url may cause issues with nuget.exe
-* Any of the following elements can ONLY be used by choco tools - projectSourceUrl, docsUrl, mailingListUrl, bugTrackerUrl, packageSourceUrl, provides, conflicts, replaces
-* nuget.exe can still install packages with those elements but they are ignored. Any authoring tools or commands will error on those elements
--->
-
-<!-- Do not remove this test for UTF-8: if â€œÎ©â€ doesnâ€™t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
-    <!-- This section is about this package, although id and version have ties back to the software -->
-    <!-- id is lowercase and if you want a good separator for words, use '-', not '.'. Dots are only acceptable as suffixes for certain types of packages, e.g. .install, .portable, .extension, .template -->
-    <!-- If the software is cross-platform, attempt to use the same id as the debian/rpm package(s) if possible. Check a service like Repology. https://repology.org/ -->
-    <id>embedded-portable-zip.template</id>
-    <!-- version should match as closely as possible with the underlying software -->
-    <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
-    <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
-    <version>__REPLACE__</version>
-    <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>
-    <!-- owners basically means you. -->
-    <owners>__REPLACE_YOUR_NAME__</owners>
+    <id>git-filter-repo</id>
+    <version>2.45.0</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/manual/git-filter-repo</packageSourceUrl>
+    <owners>virginviolet</owners>
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <!-- This section is about the software itself -->
-    <!-- title should normally end with `(Install)` or `(Portable)` -->
-    <title>embedded-portable-zip.template (Portable)</title>
-    <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
-    <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!-- Here is an example using Githack -->
-    <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/embedded-portable-zip.template.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
-    <licenseUrl>Software License Location</licenseUrl>
+    <title>git-filter-repo (Portable)</title>
+    <authors>Elijah Newren</authors>
+    <projectUrl>https://github.com/newren/git-filter-repo</projectUrl>
+    <licenseUrl>https://github.com/newren/git-filter-repo?tab=License-1-ov-file</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <projectSourceUrl>Software Source Code Location</projectSourceUrl>
-    <docsUrl>At what url are the software docs located?</docsUrl>
-    <!--<mailingListUrl></mailingListUrl>-->
-    <bugTrackerUrl>https://_Software_Bug_Tracker_Location_REPLACE_</bugTrackerUrl>
-    <tags>embedded-portable-zip.template SPACE_SEPARATED</tags>
-    <summary>__REPLACE__</summary>
-    <description>__REPLACE__MarkDown_Okay </description>
-    <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
+    <projectSourceUrl>https://github.com/newren/git-filter-repo</projectSourceUrl>
+    <docsUrl>https://github.com/newren/git-filter-repo</docsUrl>
+    <bugTrackerUrl>https://github.com/newren/git-filter-repo</bugTrackerUrl>
+    <tags>git-filter-repo git-repository git-repo git-history filter-branch repo-cleaner</tags>
+    <summary>Tool for rewriting Git repository history</summary>
+    <description>**git filter-repo** is a versatile tool for rewriting history, which includes capabilities I have not found anywhere else. It roughly falls into the same space of tool as git filter-branch but without the capitulation-inducing poor performance, with far more capabilities, and with a design that scales usability-wise beyond trivial rewriting cases. git filter-repo is now recommended by the git project instead of git filter-branch.
+
+      While most users will probably just use filter-repo as a simple command line tool (and likely only use a few of its flags), at its core filter-repo contains a library for creating history rewriting tools. As such, users with specialized needs can leverage it to quickly create entirely new history rewriting tools.</description>
     <!-- =============================== -->
 
-    <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
-    <!--<dependencies>
-      <dependency id="" version="__MINIMUM_VERSION__" />
-      <dependency id="" version="[__EXACT_VERSION__]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)" />
-      <dependency id="" />
-      <dependency id="chocolatey-core.extension" version="1.1.0" />
-    </dependencies>-->
-    <!-- chocolatey-core.extension - https://community.chocolatey.org/packages/chocolatey-core.extension -->
-
-    <!--<provides>NOT YET IMPLEMENTED</provides>-->
-    <!--<conflicts>NOT YET IMPLEMENTED</conflicts>-->
-    <!--<replaces>NOT YET IMPLEMENTED</replaces>-->
+    <dependencies>
+      <dependency id="git" version="2.22.0" />
+      <dependency id="python3" version="3.6" />
+    </dependencies>
   </metadata>
   <files>
-    <!-- this section controls what actually gets packaged into the Chocolatey package -->
     <file src="tools\**" target="tools" />
   </files>
 </package>

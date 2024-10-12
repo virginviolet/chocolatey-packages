@@ -23,12 +23,10 @@ function Install-File {
   # Check if admininstrator
   if ($null -eq $script:isAdmin) {
     if (Test-Administrator) {
-      # [x] Test
       Write-Debug "Elevated instance detected."
       # Set variable in the Script scope so that we do not need to run Test-Administrator every time Install-File is run 
       $script:isAdmin = $true
     } else {
-      # [x] Test
       Write-Debug "Instance does not seem to be elevated."
       $script:isAdmin = $false
     }
@@ -36,17 +34,13 @@ function Install-File {
   # Remove file if it exists first, so don't get an error if it exists
   $exists = [bool](Test-Path -Path $Destination)
   if ($exists) {
-    # [x] Test
     Write-Warning "File already exists: '$Destination'.`n$_"
     try {
-      # [x] Test
       Remove-Item -Path $Destination
     } catch {
       if ($ThrowOnFailure) {
-        # [x] Test
         Write-Error $_
       } else {
-        # [x] Test
         Write-Warning "Cannot remove file '$Destination'.`n$_"
         if ("" -ne $FailMessage) {
           Write-Warning $FailMessage
@@ -57,7 +51,6 @@ function Install-File {
   }
   # Install file
   if ($isAdmin) {
-    # [x] Test
     # Create symlink
     # Creating symlinks natively with PowerShell is only available in PowerShell >= 5.0
     & cmd /c mklink "$Destination" "$Path" 1>$null 2>&1 # suppress success stream; use cmd's error output as error
@@ -67,7 +60,6 @@ function Install-File {
     }
   } else {
     try {
-      # [x] Test
       # Create symlink
       # (Admin rigths is not required to make symlinks on Windows >= 10 build 14972 with Developer Mode enabled)
       Write-Debug "Attempting to make a symlink for '$Destination' <<===>> '$Path'."
@@ -80,7 +72,6 @@ function Install-File {
       $message = "$_`n" + $_.ScriptStackTrace
       Write-Debug $message
       try {
-        # [x] Test
         # If we cannot make a symlink, try copy instead
         Write-Debug "Will attempt to copy '$Path' to '$Destination'."
         Copy-Item -Path "$Path" -Destination "$Destination"
@@ -90,10 +81,8 @@ function Install-File {
         }
       } catch {
         if ($ThrowOnFailure) {
-          # [x] Test
           Write-Error $_
         } else {
-          # [x] Test
           Write-Warning $_
           if ("" -ne $FailMessage) {
             Write-Warning $FailMessage
@@ -152,7 +141,6 @@ $installFileArgs = @{
 }
 # Install file
 try {
-  # [x] Test
   Install-File @installFileArgs
 } catch {
   Write-Host $messageFail
@@ -167,7 +155,6 @@ try {
   $messageSuccess = "Added $packageName to the PATH variable.`nYou will be able to be able to run $packageName with ""git_filter_repo"" (as long as the PATHEXT variable has "".PY"".)."
   # Add script directory to the path
   if ($isAdmin) {
-    # [x] Test
     Install-ChocolateyPath "$packagePyScriptDir" "Machine" # Machine will assert administrative rights
   } else {
     Install-ChocolateyPath "$packagePyScriptDir" "User"
@@ -197,19 +184,16 @@ $contribDemosDirShortcutArgs = @{
 }
 # Install file
 try {
-  # [x] Test
   Install-File -Path $packagePyScript `
     -Destination $installPythonPyScript `
     -SuccessMessage $messageSuccess `
     -ThrowOnFailure $true
-  # [x] Test
   # Add desktop shortcut to the contrib demos directory
   Write-Debug "Will attempt to add desktop shortcut for '$shortcut' --> '$packageContribDemosDir'."
   Install-ChocolateyShortcut @contribDemosDirShortcutArgs
   Write-Debug "Shortcut added for '$shortcut' --> '$packageContribDemosDir'."
 } catch {
   if ($null -ne $env:PYTHONPATH) {
-    # [x] Test
     Write-Debug "PYTHONPATH variable found."
     $installPythonPyScript = Join-Path $env:PYTHONPATH -ChildPath 'git_filter_repo.py'
     $messageSuccess = "Installed $packageName as a Python module/library at '$installPythonPyScript'."
@@ -217,13 +201,11 @@ try {
       -Destination $installPythonPyScript `
       -SuccessMessage $messageSuccess `
       -FailMessage $messageFail
-    # [x] Test
     # Add desktop shortcut to the contrib demos directory
     Write-Debug "Will attempt to add desktop shortcut for '$shortcut' --> '$packageContribDemosDir'."
     Install-ChocolateyShortcut @contribDemosDirShortcutArgs
     Write-Debug "Shortcut added for '$shortcut' --> '$packageContribDemosDir'."
   } else {
-    # [x] Test
     Write-Debug "PYTHONPATH variable not found."
     Write-Warning $messageFail
   }
@@ -252,12 +234,10 @@ $installFileArgs = @{
 }
 # Install file
 try {
-  # [x] Test
   # Create necessary directories if missing
   New-Item -Path $installMan1Path -ItemType Directory -Force > $null
   Install-File @installFileArgs
 } catch {
-  # [x] Test
   Write-Warning "Could not create directories.`n$_"
   Write-Warning $messageFail
 }
@@ -282,5 +262,4 @@ $installFileArgs = @{
   FailMessage    = $messageFail
 }
 # Install file
-# [x] Test
 Install-File @installFileArgs
