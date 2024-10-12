@@ -30,10 +30,10 @@ Portable packages should be possible to install without administrative rights.
 17. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
 18. [x] Delete ReadMe.md file once you have read over and used anything you've needed from here.
 19. [x] Test the package again to ensure install/uninstall work appropriately.
-20. [ ] Commit and publish to GitHub.
-21. [ ] Merge branch with main.
-22. [ ] Add icon key to nuspec.
-23. [ ] Test the package yet again to ensure install/uninstall work appropriately.
+20. [x] Commit and publish to GitHub.
+21. [x] Merge branch with main.
+22. [x] Add icon key to nuspec.
+23. [x] Test the package yet again to ensure install/uninstall work appropriately.
 24. [ ] Delete this file.
 25. [ ] Merge branch with main again.
 26. [ ] Commit and publish to GitHub again.
