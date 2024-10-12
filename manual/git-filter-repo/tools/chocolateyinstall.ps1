@@ -1,4 +1,6 @@
-﻿# Check if running in administrative shell
+﻿# Install git-filter-repo
+
+# Check if running in administrative shell
 function Test-Administrator {  
   [OutputType([bool])]
   param()
@@ -102,16 +104,20 @@ function Install-File {
   }
 }
 
-# Extract archive
+# Install settings
 $ErrorActionPreference = 'Stop' # stop on all errors
+$contribDemosDirShortcutName = "git-filter-repo contrib scripts"
+
+# Tools directory
 $packageToolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$packageTarXzArchive = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0.tar.xz'
-$packaceTarArchive = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0.tar'
+
+# Python script
 $packagePyScriptDir = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0'
 $packagePyScript = Join-Path $packagePyScriptDir -ChildPath "git-filter-repo"
-$packageContribDir = Join-Path $packagePyScriptDir "contrib"
-$packageContribDemosDir = Join-Path $packageContribDir "filter-repo-demos"
-$contribDemosDirShortcutName = "git-filter-repo contrib scripts"
+
+# Extract archive
+$packageTarXzArchive = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0.tar.xz'
+$packaceTarArchive = Join-Path $packageToolsDir -ChildPath 'git-filter-repo-2.45.0.tar'
 $packageUnzipArgsTarXz = @{
   FileFullPath = $packageTarXzArchive
   Destination  = $packageToolsDir
@@ -175,7 +181,10 @@ Write-Debug "Will attempt to install $packageName as a Python module/library."
 # Destination
 # IMPROVE Warn if this fails or is $null
 $installPythonSitePackages = Convert-Path -Path "$(& python -c "import site; print(site.getsitepackages()[1])")"
-$installPythonPyScript = Join-Path $installPythonSitePackages -ChildPath 'git-filter-repo.py'
+$installPythonPyScript = Join-Path $installPythonSitePackages -ChildPath 'git_filter_repo.py'
+# Shorctcut target path
+$packageContribDir = Join-Path $packagePyScriptDir "contrib"
+$packageContribDemosDir = Join-Path $packageContribDir "filter-repo-demos"
 # Messages
 $messageSuccess = "Installed $packageName as a Python module/library at '$installPythonPyScript'."
 $messageFail = "Colud not install $packageName as a Python module/library, which is however *not needed* for using git-filter-repo.`nYou will be able to use git-filter-repo normally, but not create your own Python filtering scripts using git-filter-repo as a module,`nnor make use of some of the scripts in '$packageContribDemosDir'."
@@ -202,7 +211,7 @@ try {
   if ($null -ne $env:PYTHONPATH) {
     # [x] Test
     Write-Debug "PYTHONPATH variable found."
-    $installPythonPyScript = Join-Path $env:PYTHONPATH -ChildPath 'git-filter-repo.py'
+    $installPythonPyScript = Join-Path $env:PYTHONPATH -ChildPath 'git_filter_repo.py'
     $messageSuccess = "Installed $packageName as a Python module/library at '$installPythonPyScript'."
     Install-File -Path $packagePyScript `
       -Destination $installPythonPyScript `
