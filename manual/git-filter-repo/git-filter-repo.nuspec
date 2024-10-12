@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- == PACKAGE SPECIFIC SECTION == -->
+    <id>git-filter-repo</id>
+    <version>2.45.0</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/git-filter-repo</packageSourceUrl>
+    <owners>virginviolet</owners>
+    <!-- ============================== -->
+
+    <!-- == SOFTWARE SPECIFIC SECTION == -->
+    <title>git-filter-repo (Portable)</title>
+    <authors>Elijah Newren</authors>
+    <projectUrl>https://github.com/newren/git-filter-repo</projectUrl>
+    <licenseUrl>https://github.com/newren/git-filter-repo?tab=License-1-ov-file</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/newren/git-filter-repo</projectSourceUrl>
+    <docsUrl>https://github.com/newren/git-filter-repo</docsUrl>
+    <bugTrackerUrl>https://github.com/newren/git-filter-repo</bugTrackerUrl>
+    <tags>git-filter-repo git-repository git-repo git-history filter-branch repo-cleaner</tags>
+    <summary>Tool for rewriting Git repository history</summary>
+    <description>**git filter-repo** is a versatile tool for rewriting history, which includes capabilities I have not found anywhere else. It roughly falls into the same space of tool as git filter-branch but without the capitulation-inducing poor performance, with far more capabilities, and with a design that scales usability-wise beyond trivial rewriting cases. git filter-repo is now recommended by the git project instead of git filter-branch.
+
+      While most users will probably just use filter-repo as a simple command line tool (and likely only use a few of its flags), at its core filter-repo contains a library for creating history rewriting tools. As such, users with specialized needs can leverage it to quickly create entirely new history rewriting tools.</description>
+    <!-- =============================== -->
+
+    <dependencies>
+      <dependency id="git" version="2.22.0" />
+      <dependency id="python3" version="3.6" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
