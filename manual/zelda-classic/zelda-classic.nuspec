@@ -35,7 +35,7 @@
     <summary>Replica of Nintendo’s The Legend of Zelda and a game editor</summary>
     <description>Zelda Classic is a tribute to Nintendo’s 1991/1992 video game, The Legend of Zelda. It is an exact replica of the game, but is also comes with a game editor called ZQuest that allows you to make completely new quests, with either the same or enhanced graphics, as well as play the many quests that others have made.
       
-    The default installation directory is `%ChocolateyInstall%\lib\zelda-classic`.</description>
+    The default installation directory is `C:\Games\Zelda Classic\`.</description>
     <releaseNotes>## Changes Over Gamma 8
      ```
      Added Arigatou/ path, and included files on request by contributors and core testers.
