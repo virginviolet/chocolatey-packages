@@ -2,25 +2,43 @@
 #   $f='c:\path\to\thisFile.ps1'
 #   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
 
-# In Chocolatey scripts, ALWAYS use absolute paths - $toolsDir gets you to the package's tools directory.
+# Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors
-$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$zipArchive = Join-Path $toolsDir -ChildPath 'example.zip'
-$executableDir = $toolsDir
-$executable = Join-Path $executableDir "$($packageName).exe"
-$shortcutName = "$packageName"
+$installDesktopShortcuts = $true
+$installStartMenuShortcuts = $true
+$shortcutNameGame = "Zelda Classic"
+$shortcutNameLauncher = "Zelda Classic Launcher"
+$shortcutNameZQuest = "ZQuest"
+$StartMenuDirectory = "Zelda Classic\"
+$desktopDirectory = ""
 
+# Prevent uninstall if the game is running, so that no progress is lost
+# This cannot be moved to chocolateybeforemodify.ps1 unless the feature suggested in the following issue is added:
+# https://github.com/chocolatey/choco/issues/1731
+# [ ] Test
+Start-CheckandThrow "zelda" > $null
+
+# Prevent uninstall if the quest editor is running, so that no progress is lost
+# [ ] Test
+Start-CheckandThrow "zquest" > $null
+
+# Stop the launcher
+# [ ] Test
+Start-CheckandStop "zlaunch" > $null
+
+# Extract archive
+# [ ] Test
+$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$zipArchive = Join-Path $toolsDir -ChildPath '2.53_Win_Release_2-17APRIL2019.zip'
+$executableDir = $toolsDir
 $unzipArgs = @{
   FileFullPath = $zipArchive
-  Destination = $toolsDir
+  Destination  = $toolsDir
 }
+Get-ChocolateyUnzip @unzipArgs
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
-
-## Unzip file to the specified location - auto overwrites existing content
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-Get-ChocolateyUnzip @unzipArgs
 
 ## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
 #$appPath = "$env:ProgramFiles\appname"
@@ -33,12 +51,36 @@ Get-ChocolateyUnzip @unzipArgs
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
 #Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
 
-## Add desktop shortcut
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
-Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$shortcutName.lnk" -targetPath $executable -workingDirectory $executableDir -arguments "C:\test.txt" -iconLocation "C:\test.ico" -description "This is the description."
+## Add desktop shortcuts
+# Paths
+if ($installDesktopShortcuts -or $installStartMenuShortcuts) {
+  # Targets
+  $executableGame = Join-Path $executableDir "zelda.exe"
+  $executableLauncher = Join-Path $executableDir "zlaunch.exe"
+  $executableZQuest = Join-Path $executableDir "zquest.exe"
+  # Descriptions
+  $descriptionGame = "A tribute to the greatest video game of all time."
+  $descriptionLauncher = "Launcher for Zelda Classic."
+  $descriptionZQuest = "Game editor for Zelda Classic."
+}
+# TODO Remove comments
+if ($installDesktopShortcuts) {
+  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameGame.lnk" -targetPath $executableGame -workingDirectory $executableDir -description $descriptionGame
+  
+  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameLauncher.lnk" -targetPath $executableLauncher -workingDirectory $executableDir -description $descriptionLauncher
 
-## Add start menu shortcut
-Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk" -targetPath $executable -workingDirectory $executableDir -description "This is the description."
+  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameZQuest.lnk" -targetPath $executableZQuest -workingDirectory $executableDir -description $descriptionZQuest
+}
+
+if ($installStartMenuShortcuts) {
+  ## Add start menu shortcut
+  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameGame.lnk" -targetPath $executableGame -workingDirectory $executableDir -description $descriptionGame
+
+  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameLauncher.lnk" -targetPath $executableLauncher -workingDirectory $executableDir -description $descriptionLauncher
+
+  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameZQuest.lnk" -targetPath $executableZQuest -workingDirectory $executableDir -description $descriptionZQuest
+}
+
 
 ## Outputs the bitness of the OS (either "32" or "64")
 ## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
