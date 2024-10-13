@@ -20,26 +20,27 @@ Portable packages should be possible to install without administrative rights.
 7. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 8. [ ] Fill out tools\chocolateyInstall.ps1.
 9.  [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
-10. [ ] If you want to ignore an executable, create an empty file next to the exe named 'name.exe.ignore'.
-11. [ ] Test the package to ensure install/uninstall work appropriately.
-12. [ ] Add nupkg and zip file(s) and to .gitignore.
-13. [ ] Fill out nuspec.
-14. [ ] Fill out legal\VERIFICATION.txt
+10. [ ] If there is a GUI executable, create an empty file next to the exe named 'name.exe.gui'.
+11. [ ] If you want to ignore an executable, create an empty file next to the exe named 'name.exe.ignore'.
+12. [ ] Test the package to ensure install/uninstall work appropriately.
+13. [ ] Add nupkg and zip file(s) and to .gitignore.
+14. [ ] Fill out nuspec.
 15. [ ] Commit.
 16. [ ] Clean out the comments you are not using in tools\chocolateybeforeModify.ps1.
 17. [ ] Clean out the comments and sections you are not using in tools\chocolateyInstall.ps1.
 18. [ ] Clean out the comments and sections you are not using in tools\chocolateyUninstall.ps1.
 19. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-20. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
-21. [ ] Test the package again to ensure install/uninstall work appropriately.
-22. [ ] Commit and publish to GitHub.
-23. [ ] Merge branch with main.
-24. [ ] Add icon key to nuspec.
-25. [ ] Test the package yet again to ensure install/uninstall work appropriately.
-26. [ ] Delete this file.
-27. [ ] Merge branch with main again.
-28. [ ] Commit and publish to GitHub again.
-29. [ ] Pack and push to Chocolatey Community Repository.
+20. [ ] Finish legal\VERIFICATION.txt
+21. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
+22. [ ] Test the package again to ensure install/uninstall work appropriately.
+23. [ ] Commit and publish to GitHub.
+24. [ ] Merge branch with main.
+25. [ ] Add icon key to nuspec.
+26. [ ] Test the package yet again to ensure install/uninstall work appropriately.
+27. [ ] Delete this file.
+28. [ ] Merge branch with main again.
+29. [ ] Commit and publish to GitHub again.
+30. [ ] Pack and push to Chocolatey Community Repository.
 
 ## Learn more
 
