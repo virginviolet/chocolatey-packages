@@ -3,7 +3,8 @@
 #   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
 
 # Preferences
-$ErrorActionPreference = 'Stop' # stop on all errors
+$ErrorActionPreference = 'Stop' # stop on all error
+$installationDir = "C:\Games\Zelda Classic\" # I had issues when installed to package directory
 $installDesktopShortcuts = $true
 $installStartMenuShortcuts = $true
 $shortcutNameGame = "Zelda Classic"
@@ -15,26 +16,30 @@ $desktopDirectory = ""
 # Prevent uninstall if the game is running, so that no progress is lost
 # This cannot be moved to chocolateybeforemodify.ps1 unless the feature suggested in the following issue is added:
 # https://github.com/chocolatey/choco/issues/1731
-# [ ] Test
+# [x] Test
 Start-CheckandThrow "zelda" > $null
 
 # Prevent uninstall if the quest editor is running, so that no progress is lost
-# [ ] Test
-Start-CheckandThrow "zquest" > $null
+# [x] Test
+Start-CheckandStop "zquest" > $null
 
 # Stop the launcher
-# [ ] Test
+# [x] Test
 Start-CheckandStop "zlaunch" > $null
 
+# Stop the launcher
+# [x] Test
+Start-CheckandStop "romview-w" > $null
+
 # Extract archive
-# [ ] Test
+# [x] Test
 $toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $zipArchive = Join-Path $toolsDir -ChildPath '2.53_Win_Release_2-17APRIL2019.zip'
-$executableDir = $toolsDir
 $unzipArgs = @{
   FileFullPath = $zipArchive
-  Destination  = $toolsDir
+  Destination  = $installationDir
 }
+# Extract archive
 Get-ChocolateyUnzip @unzipArgs
 
 ## Helper functions - these have error handling tucked into them already
@@ -55,9 +60,9 @@ Get-ChocolateyUnzip @unzipArgs
 # Paths
 if ($installDesktopShortcuts -or $installStartMenuShortcuts) {
   # Targets
-  $executableGame = Join-Path $executableDir "zelda.exe"
-  $executableLauncher = Join-Path $executableDir "zlaunch.exe"
-  $executableZQuest = Join-Path $executableDir "zquest.exe"
+  $executableGame = Join-Path $installationDir "zelda.exe"
+  $executableLauncher = Join-Path $installationDir "zlaunch.exe"
+  $executableZQuest = Join-Path $installationDir "zquest.exe"
   # Descriptions
   $descriptionGame = "A tribute to the greatest video game of all time."
   $descriptionLauncher = "Launcher for Zelda Classic."
@@ -65,41 +70,18 @@ if ($installDesktopShortcuts -or $installStartMenuShortcuts) {
 }
 # TODO Remove comments
 if ($installDesktopShortcuts) {
-  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameGame.lnk" -targetPath $executableGame -workingDirectory $executableDir -description $descriptionGame
+  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameGame.lnk" -targetPath $executableGame -workingDirectory $installationDir -description $descriptionGame
   
-  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameLauncher.lnk" -targetPath $executableLauncher -workingDirectory $executableDir -description $descriptionLauncher
+  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameLauncher.lnk" -targetPath $executableLauncher -workingDirectory $installationDir -description $descriptionLauncher
 
-  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameZQuest.lnk" -targetPath $executableZQuest -workingDirectory $executableDir -description $descriptionZQuest
+  Install-ChocolateyShortcut -shortcutFilePath "$env:UserProfile\Desktop\$desktopDirectory$shortcutNameZQuest.lnk" -targetPath $executableZQuest -workingDirectory $installationDir -description $descriptionZQuest
 }
 
 if ($installStartMenuShortcuts) {
   ## Add start menu shortcut
-  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameGame.lnk" -targetPath $executableGame -workingDirectory $executableDir -description $descriptionGame
+  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameGame.lnk" -targetPath $executableGame -workingDirectory $installationDir -description $descriptionGame
 
-  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameLauncher.lnk" -targetPath $executableLauncher -workingDirectory $executableDir -description $descriptionLauncher
+  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameLauncher.lnk" -targetPath $executableLauncher -workingDirectory $installationDir -description $descriptionLauncher
 
-  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameZQuest.lnk" -targetPath $executableZQuest -workingDirectory $executableDir -description $descriptionZQuest
+  Install-ChocolateyShortcut -ShortcutFilePath "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutNameZQuest.lnk" -targetPath $executableZQuest -workingDirectory $installationDir -description $descriptionZQuest
 }
-
-
-## Outputs the bitness of the OS (either "32" or "64")
-## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-#$osBitness = Get-ProcessorBits
-
-## Set persistent Environment variables
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
-#Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
-
-## Set up a file association
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
-#Install-ChocolateyFileAssociation
-
-## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
-## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
-## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-#Install-BinFile
-
-## Other needs: use regular PowerShell to do so or see if there is a function already defined
-## - https://docs.chocolatey.org/en-us/create/functions
-## There may also be functions available in extension packages
-## - https://community.chocolatey.org/packages?q=id%3A.extension for examples and availability.

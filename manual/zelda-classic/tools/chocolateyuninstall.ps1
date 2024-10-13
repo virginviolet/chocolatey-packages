@@ -9,12 +9,13 @@
 ## and https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
 
 $ErrorActionPreference = 'Stop' # stop on all errors
-Uninstall-ChocolateyZipPackage -Packagename $env:ChocolateyPackageName -ZipFileName 'example.zip' # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
+
+Uninstall-ChocolateyZipPackage -Packagename $env:ChocolateyPackageName -ZipFileName '2.53_Win_Release_2-17APRIL2019.zip' # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
 
 
 # Uninstall-ChocolateyZipPackage will remove the FILES from the archive.
 # This removes the DIRECTORY they were extracted too.
-Remove-Item 'C:\example'
+# Remove-Item 'C:\example'
 
 ## OTHER POWERSHELL FUNCTIONS
 ## https://docs.chocolatey.org/en-us/create/functions
