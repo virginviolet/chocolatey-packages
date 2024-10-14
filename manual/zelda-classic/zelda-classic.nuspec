@@ -13,9 +13,7 @@
     <title>zelda-classic (Portable)</title>
     <authors>Armageddon Games</authors>
     <projectUrl>https://www.zeldaclassic.com/</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!-- Here is an example using Githack -->
-    <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/zelda-classic.png</iconUrl>-->
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda-classic/icon/icon-128px.png</iconUrl>
     <licenseUrl>https://github.com/ZeldaClassic/ZeldaClassic/blob/main/license.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/ZeldaClassic/ZeldaClassic</projectSourceUrl>
