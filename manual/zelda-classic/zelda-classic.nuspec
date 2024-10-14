@@ -3,29 +3,19 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
-    <!-- This section is about this package, although id and version have ties back to the software -->
-    <!-- id is lowercase and if you want a good separator for words, use '-', not '.'. Dots are only acceptable as suffixes for certain types of packages, e.g. .install, .portable, .extension, .template -->
-    <!-- If the software is cross-platform, attempt to use the same id as the debian/rpm package(s) if possible. Check a service like Repology. https://repology.org/ -->
-    <id>zelda-classic</id>
-    <!-- version should match as closely as possible with the underlying software -->
-    <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
-    <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
+    <id>zelda-classic</id> <!-- Matches AUR package name. Repology results: https://repology.org/projects/?search=zelda -->
     <version>2.53.0</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/zelda-classic/</packageSourceUrl>
-    <!-- owners basically means you. -->
     <owners>virginviolet</owners>
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <!-- This section is about the software itself -->
-    <!-- title should normally end with `(Install)` or `(Portable)` -->
     <title>zelda-classic (Portable)</title>
     <authors>Armageddon Games</authors>
     <projectUrl>https://www.zeldaclassic.com/</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
+    <!-- There are a number of CDN Services that can be used for hosting the icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
     <!-- Here is an example using Githack -->
     <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/zelda-classic.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
     <licenseUrl>https://github.com/ZeldaClassic/ZeldaClassic/blob/main/license.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/ZeldaClassic/ZeldaClassic</projectSourceUrl>
@@ -35,7 +25,11 @@
     <summary>Replica of Nintendo’s The Legend of Zelda and a game editor</summary>
     <description>Zelda Classic is a tribute to Nintendo’s 1991/1992 video game, The Legend of Zelda. It is an exact replica of the game, but is also comes with a game editor called ZQuest that allows you to make completely new quests, with either the same or enhanced graphics, as well as play the many quests that others have made.
       
-    The default installation directory is `C:\Games\Zelda Classic\`.</description>
+    The default installation directory is `C:\Games\Zelda Classic\`.
+  
+    Custom quests and save data will *not* be removed on uninstallation. Settings *will* be removed.
+  
+    Upgrade, force installation and uninstallation will not proceed if zelda.exe or zquest.exe is running.</description>
     <releaseNotes>## Changes Over Gamma 8
      ```
      Added Arigatou/ path, and included files on request by contributors and core testers.
