@@ -9,14 +9,13 @@
 ## and https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
 
 # Preferences
-$ErrorActionPreference = 'Stop' # stop on all errors
-$installationDirName = "Zelda Classic" # Used for $installationDir and $tempBakDir
-$installationDirPath = "C:\Games\$installationDirName\" # I had issues when installed to package directory
+$ErrorActionPreference = 'Stop' # Stop on all errors
+$installationDirPath = "C:\Games\Zelda Classic\"
 
 # Archive name
 $zipName = '2.53_Win_Release_2-17APRIL2019.zip'
 
-# Look for user data, and if found, inform that it will not be removed
+# Inform that user data will not be removed
 # (This isn't important, but it's code that I salvaged from an earlier
 # version of this script that I learned was needlessly complex.)
 # Paths
@@ -30,45 +29,36 @@ $questsDirExists = Test-Path $questsDirPath -PathType Container
 $empty = -not (Test-Path $questsDirPath\*)
 # Inform of user data non-removal
 if ($questsDirExists -and $empty) {
-    # [ ] Test
-    Write-Debug "Removing empty 'Quests' directory."
+    # [x] Test
+    Write-Verbose "Removing empty 'Quests' directory."
     Remove-Item $questsDirPath
+    Write-Verbose "Removed empty 'Quests' directory."
 } elseif ($saveExists -and $questsDirExists) {
-    # [ ] Test
+    # [x] Test
     Write-Debug "Save found."
     Write-Debug "Quests dir found."
-    $message = "Custom quests and save data will *not* be removed. `n" `
-        + "Manually remove the installation directory if you do not wish to keep the data.`n" `
-        + "Installation directory: $installationDirPath"
-    Write-Warning $message
-    $userDataExists = $true
+    Write-Warning "Quests and save data will *not* be removed."
+    # Pause so that the user have time to read, and can abort if desired. Chocolatey stops Pause after 30 seconds by default.
+    Pause
 } elseif ($saveExists) {
-    # [ ] Test
+    # [x] Test
     Write-Debug "Save found."
-    $message = "Save data will *not* be removed. `n" `
-        + "Manually remove the installation directory if you do not wish to keep the data.`n" `
-        + "Installation directory: $installationDirPath"
-    Write-Warning $message
-    $userDataExists = $true
+    Write-Warning "Save data will *not* be removed."
+    Pause
 } elseif ($questsDirExists) {
-    # [ ] Test
+    # [x] Test
     Write-Debug "Quests dir found."
-    $message = "Custom quests will *not* be removed. `n" `
-        + "Manually remove the installation directory if you do not wish to keep the data.`n" `
-        + "Installation directory: $installationDirPath"
-    Write-Warning $message
-    $userDataExists = $true
+    Write-Warning "Custom quests will *not* be removed."
+    Pause
 }
-# Pause so that the user have time to read, and can abort if desired. Chocolatey stops Pause after 30 seconds by default.
-Pause
 
-# Uninstall files
+# Uninstall extracted files
 Uninstall-ChocolateyZipPackage -PackageName $env:ChocolateyPackageName -ZipFileName $zipName
 
-# Inform user if installation directory is not empty (only if we haven't already informed.).
+# Inform user if installation directory is not empty.
 $empty = -not (Test-Path $installationDirPath\*)
-if ($empty -and -not $userDataExists) {
-    # [ ] Test
+if (-not $empty) {
+    # [x] Test
     $message = "User data remains in the installation directory. `n" `
         + "Manually remove the installation directory if you do not wish to keep the data.`n" `
         + "Installation directory: $installationDirPath"
@@ -76,31 +66,42 @@ if ($empty -and -not $userDataExists) {
     Start-Sleep -Seconds 5 # time to read
 }
 # Remove installation directory if empty
-if ($empty) {
-    # [ ] Test
+else {
+    # [x] Test
+    Write-Debug "Installation directory is empty."
+    Write-Debug "Removing installation directory."
     Remove-Item $installationDirPath
+    Write-Debug "Installation directory removed."
 }
 
 # Remove shortcuts
-# Find shortcuts log
-$shortcutsLogPath = Join-Path "$env:ChocolateyPackageFolder" -ChildPath 'shortcuts.txt'
+# Look for shortcuts log
+$shortcutsLogPath = Join-Path "$env:ChocolateyPackageName" -ChildPath 'shortcuts.txt'
 $exists = Test-Path -Path $shortcutsLogPath -PathType Leaf
 if ($exists) {
-    # $shortcutsLogPath
+    # [x] Test
+    Write-Debug "Shortcuts log found."
+    # Read log line-per-line and remove files
     $shortcutsLog = Get-Content $shortcutsLogPath
     foreach ($fileInLog in $shortcutsLog) {
         if ($null -ne $fileInLog -and '' -ne $fileInLog.Trim()) {
             try {
+                # [x] Test
                 Write-Debug "Removing shortcut '$fileInLog'."
                 Remove-Item -Path "$fileInLog" -Force
+                # [x] Test
+                Write-Debug "Removed shortcut '$fileInLog'."
             }
             catch {
-                Write-Warning "Could not remove shortcut $fileInLog.`n" `
-                + $_
+                # [x] Test
+                Write-Warning "Could not remove shortcut '$fileInLog'.`n$_"
             }
-            Write-Debug "Removed shortcut '$fileInLog'."
         }
     }
+}
+else {
+    # [x] Test
+    Write-Warning "Cannot uninstall shortcuts.`nShortcuts log not found."
 }
 
 ## OTHER POWERSHELL FUNCTIONS
