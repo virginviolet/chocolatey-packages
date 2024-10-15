@@ -10,7 +10,7 @@
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <title>git-filter-repo (Portable)</title>
+    <title>git-filter-repo</title>
     <authors>Elijah Newren</authors>
     <projectUrl>https://github.com/newren/git-filter-repo</projectUrl>
     <licenseUrl>https://github.com/newren/git-filter-repo?tab=License-1-ov-file</licenseUrl>
