@@ -6,7 +6,7 @@
     <version>7.7.0</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/parallel-launcher</packageSourceUrl>
     <owners>virginviolet</owners>
-    <title>parallel-launcher (Install)</title>
+    <title>Parallel Launcher</title>
     <authors>Matt Pharoah</authors>
     <projectUrl>https://parallel-launcher.ca</projectUrl>
     <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher/appicon.png</iconUrl>
