@@ -7,7 +7,7 @@ enclosed in quotation marks, you should use an editor that supports UTF-8, not t
     <version>183</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/flips</packageSourceUrl>
     <owners>virginviolet</owners>
-    <title>flips (Portable)</title>
+    <title>Floating IPS</title>
     <authors>Alcaro</authors>
     <projectUrl>https://github.com/Alcaro/Flips</projectUrl>
     <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/flips/icon/flips-48px.png</iconUrl>
