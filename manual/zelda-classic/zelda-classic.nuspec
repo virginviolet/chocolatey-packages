@@ -10,12 +10,10 @@
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <title>zelda-classic (Portable)</title>
+    <title>Zelda Classic</title>
     <authors>Armageddon Games</authors>
     <projectUrl>https://www.zeldaclassic.com/</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!-- Here is an example using Githack -->
-    <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/zelda-classic.png</iconUrl>-->
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda-classic/icon/icon-128px.png</iconUrl>
     <licenseUrl>https://github.com/ZeldaClassic/ZeldaClassic/blob/main/license.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/ZeldaClassic/ZeldaClassic</projectSourceUrl>
@@ -23,7 +21,7 @@
     <bugTrackerUrl>https://www.armageddongames.net/forumdisplay.php?217-ZC-Bugs</bugTrackerUrl>
     <tags>zelda-classic action-adventure fantasy fantasy-rpg rpg video-game game the-legend-of-zelda legend-of-zelda the-legend-of-zelda-1 zelda zelda1 zelda-1 los nes replica clone reimplementation pc-port game-engine game-development game-development-platform zquest editor quest-editor</tags>
     <summary>Replica of Nintendo’s The Legend of Zelda and a game editor</summary>
-    <description>Zelda Classic is a tribute to Nintendo’s 1991/1992 video game, The Legend of Zelda. It is an exact replica of the game, but is also comes with a game editor called ZQuest that allows you to make completely new quests, with either the same or enhanced graphics, as well as play the many quests that others have made.
+    <description>Zelda Classic is a tribute to Nintendo’s 1991/1992 video game, The Legend of Zelda. It is an exact replica of the game, but is also comes with a game editor called ZQuest that allows you to make completely new quests, with either the same or enhanced graphics, or you can play the many quests that other people have made.
       
     The default installation directory is `C:\Games\Zelda Classic\`.
   
