@@ -8,22 +8,48 @@
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
+$removeShortcuts = $true
 
 # Remove extracted files
 # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
 # Arguments
 $uninstallZipArgs = @{
     Packagename = "$($packageName)"
-    ZipFileName = 'example.zip'
+    ZipFileName = "example.zip"
 }
 Uninstall-ChocolateyZipPackage @uninstallZipArgs
 
 # Uninstall-ChocolateyZipPackage will remove the FILES from the archive.
 # This removes the DIRECTORY they were extracted too.
-Remove-Item 'C:\tools\example\'
+Remove-Item "C:\tools\example\"
 
 ## OTHER POWERSHELL FUNCTIONS
 ## https://docs.chocolatey.org/en-us/create/functions
 #Uninstall-ChocolateyEnvironmentVariable - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
 #Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-## Remove any shortcuts you added in the install script.
+
+# Remove shortcuts
+# Look for shortcuts log
+$packagePath = $env:ChocolateyPackageFolder
+$shortcutsLogPath = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
+$exists = Test-Path -Path "$shortcutsLogPath" -PathType Leaf
+if ($removeShortcuts -and -not $exists) {
+    Write-Warning "Cannot uninstall shortcuts.`nShortcuts log not found."
+}
+elseif ($exists) {
+    Write-Debug "Shortcuts log found."
+    # Read log line-per-line and remove files
+    $shortcutsLog = Get-Content "$shortcutsLogPath"
+    foreach ($fileInLog in $shortcutsLog) {
+        if ($null -ne $fileInLog -and '' -ne $fileInLog.Trim()) {
+            try {
+                Write-Debug "Removing shortcut '$fileInLog'."
+                Remove-Item -Path "$fileInLog" -Force
+                Write-Debug "Removed shortcut '$fileInLog'."
+            }
+            catch {
+                Write-Warning "Could not remove shortcut '$fileInLog'.`n$_"
+            }
+        }
+    }
+}
