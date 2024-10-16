@@ -26,8 +26,8 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <!-- This section is about the software itself -->
-    <!-- title should normally end with `(Install)` or `(Portable)` -->
-    <title>[[PackageName]] (Portable)</title>
+    <!-- If the software is also distributed as a portable program, the software title here should end with " (Install)" -->
+    <title>[[PackageName]] (Install)</title>
     <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
     <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
     <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
