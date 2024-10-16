@@ -22,7 +22,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <!-- This section is about the software itself -->
-    <!-- For meta-packages, the software title should *not* end with " (Install)" or " (Portable)" -->
+    <!-- For meta-packages, the software title should *not* end with '(Install)' or '(Portable) -->
     <title>[[PackageNameLower]]</title>
     <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
     <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
