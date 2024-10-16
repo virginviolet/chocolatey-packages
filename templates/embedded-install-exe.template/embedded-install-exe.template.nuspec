@@ -71,7 +71,8 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!--<replaces>NOT YET IMPLEMENTED</replaces>-->
   </metadata>
   <files>
-    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <!-- Contents -->
     <file src="tools\**" target="tools" />
+    <file src="legal\**" target="legal" />
   </files>
 </package>
