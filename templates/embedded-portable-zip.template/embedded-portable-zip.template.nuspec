@@ -26,7 +26,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <!-- This section is about the software itself -->
-    <!-- title should normally end with `(Install)` or `(Portable)` -->
+    <!-- If the software is also distributed as an installer, the software title here should end with " (Portable)" -->
     <title>[[PackageName]] (Portable)</title>
     <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
     <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
