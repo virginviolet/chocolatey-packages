@@ -33,7 +33,6 @@ if ($exists) {
 } else {
     Write-Debug "$packageName Python module/library not found in site-packages."
 }
-$env:PYTHONPATH = "C:\Tools\pythonprograms"
 # Uninstall from PYTHONPATH
 if ($null -ne $env:PYTHONPATH) {
     Write-Debug "PYTHONPATH variable found."
