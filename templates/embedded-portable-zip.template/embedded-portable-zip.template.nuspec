@@ -13,6 +13,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!-- == PACKAGE SPECIFIC SECTION == -->
     <!-- This section is about this package, although id and version have ties back to the software -->
     <!-- id is lowercase and if you want a good separator for words, use '-', not '.'. Dots are only acceptable as suffixes for certain types of packages, e.g. .install, .portable, .extension, .template -->
+    <!-- If the software is also distributed as an installer, id should end with '.portable' and a separate meta-package without the suffix should be made -->
     <!-- If the software is cross-platform, attempt to use the same id as the debian/rpm package(s) if possible. Check a service like Repology. https://repology.org/ -->
     <id>[[PackageNameLower]]</id>
     <!-- version should match as closely as possible with the underlying software -->
@@ -26,7 +27,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <!-- This section is about the software itself -->
-    <!-- If the software is also distributed as an installer, the software title here should end with " (Portable)" -->
+    <!-- If the software is also distributed as an installer, the software title here should end with ' (Portable)' -->
     <title>[[PackageName]] (Portable)</title>
     <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
     <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
