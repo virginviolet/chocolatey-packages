@@ -5,6 +5,7 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 $shortcutName = "$($packageName)"
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
+$logShortcuts = $true
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
@@ -25,8 +26,8 @@ $executablePath = Join-Path $executableDirPath "$($packageName).exe"
 # Arguments
 $unzipArgs = @{
   PackageName  = "$($packageName)"
-  FileFullPath = $zipArchivePath
-  Destination  = $toolsDirPath
+  FileFullPath = "$zipArchivePath"
+  Destination  = "$toolsDirPath"
 }
 # Unzip file to the specified location - auto overwrites existing content
 # - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
@@ -65,31 +66,43 @@ if ($addDesktopShortcut -or $addStartMenuShortcut) {
   # Paths
   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
   $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk"
-  $iconPath = Join-Path $executableDirPath -ChildPath "$($packageName).ico"
+  $iconPath = Join-Path "$executableDirPath" -ChildPath "$($packageName).ico"
+  if ($logShortcuts) {
+    $packagePath = $env:ChocolateyPackageFolder
+    $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
+  }
 }
 # Add desktop shortcut
 if ($addDesktopShortcut) {
   # Arguments
   $desktopShortcutArgs = @{
-    shortcutFilePath = $desktopShortcutPath
-    targetPath       = $executablePath
-    workingDirectory = $executableDirPath
+    shortcutFilePath = "$desktopShortcutPath"
+    targetPath       = "$executablePath"
+    workingDirectory = "$executableDirPath"
     arguments        = "C:\test.txt"
-    iconLocation     = $iconPath
+    iconLocation     = "$iconPath"
     description      = "This is the description."
   }
   Install-ChocolateyShortcut @desktopShortcutArgs
+  # Log
+  if ($logShortcuts) {
+    "$desktopShortcutPath" | Out-File "$shortcutsLog" -Append
+  }
 }
 # Add start menu shortcut
 if ($addStartMenuShortcut) {
   # Arguments
-  $desktopShortcutArgs = @{
-    shortcutFilePath = $startMenuShortcutPath
-    targetPath       = $executablePath
-    workingDirectory = $executableDirPath
+  $startMenuShortcutArgs = @{
+    shortcutFilePath = "$startMenuShortcutPath"
+    targetPath       = "$executablePath"
+    workingDirectory = "$executableDirPath"
     arguments        = "C:\test.txt"
-    iconLocation     = $iconPath
+    iconLocation     = "$iconPath"
     description      = "This is the description."
   }
-  Install-ChocolateyShortcut @startMenuShortcutPath
+  Install-ChocolateyShortcut @startMenuShortcutArgs
+  # Log
+  if ($logShortcuts) {
+    "$startMenuShortcutPath" | Out-File "$shortcutsLog" -Append
+  }
 }
