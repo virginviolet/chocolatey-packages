@@ -1,4 +1,4 @@
-﻿# Additional uninstallation steps for Chocolatey
+﻿# Additional steps for uninstalling [[PackageName]] with Chocolatey
 
 ## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
 ## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.
@@ -10,11 +10,17 @@
 $ErrorActionPreference = 'Stop' # Stop on all errors
 
 # Remove extracted files
-Uninstall-ChocolateyZipPackage -Packagename $env:ChocolateyPackageName -ZipFileName 'example.zip' # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
+# Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
+# Arguments
+$uninstallZipArgs = @{
+    Packagename = "$($packageName)"
+    ZipFileName = 'example.zip'
+}
+Uninstall-ChocolateyZipPackage @uninstallZipArgs
 
 # Uninstall-ChocolateyZipPackage will remove the FILES from the archive.
 # This removes the DIRECTORY they were extracted too.
-Remove-Item 'C:\example\'
+Remove-Item 'C:\tools\example\'
 
 ## OTHER POWERSHELL FUNCTIONS
 ## https://docs.chocolatey.org/en-us/create/functions

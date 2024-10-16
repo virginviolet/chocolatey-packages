@@ -1,8 +1,8 @@
-﻿# Additional installation steps for Chocolatey
+﻿# Additional steps for installing [[PackageName]] with Chocolatey
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
-$shortcutName = "$packageName"
+$shortcutName = "$($packageName)"
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
 
@@ -24,6 +24,7 @@ $executableDirPath = $toolsDirPath
 $executablePath = Join-Path $executableDirPath "$($packageName).exe"
 # Arguments
 $unzipArgs = @{
+  PackageName  = "$($packageName)"
   FileFullPath = $zipArchivePath
   Destination  = $toolsDirPath
 }
@@ -61,12 +62,6 @@ Get-ChocolateyUnzip @unzipArgs
 # Add shortcuts
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
 if ($addDesktopShortcut -or $addStartMenuShortcut) {
-  # XXX
-  # TODO Arguments to array
-  # TODO Fix unzip call to enable logging
-  # TODO Save to log
-  # TODO Remove from log in chocolateyuninstall.ps1
-  # TODO Rename scripts for letter casing
   # Paths
   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
   $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk"
