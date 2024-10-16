@@ -32,7 +32,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
     <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
     <!-- Here is an example using Githack -->
-    <!--<iconUrl>http://rawcdn.githack.com/__REPLACE_YOUR_REPO__/master/icons/[[PackageName]].png</iconUrl>-->
+    <!--<iconUrl>https://rawcdn.githack.com/[[MaintainerName]]/__REPLACE_YOUR_REPO__/main/icons/[[PackageName]].png</iconUrl>-->
     <!-- <copyright>Year Software Vendor</copyright> -->
     <licenseUrl>Software License Location</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -62,7 +62,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!--<replaces>NOT YET IMPLEMENTED</replaces>-->
   </metadata>
   <files>
-    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <!-- Contents -->
     <file src="tools\**" target="tools" />
     <file src="legal\**" target="legal" />
   </files>
