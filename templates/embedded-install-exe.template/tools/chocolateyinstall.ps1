@@ -1,4 +1,6 @@
-﻿# Preferences
+﻿# Additional steps for installing [[PackageName]] with Chocolatey
+
+# Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors
 # $shortcutName = "$($packageName)"
 # $addDesktopShortcut = $true
