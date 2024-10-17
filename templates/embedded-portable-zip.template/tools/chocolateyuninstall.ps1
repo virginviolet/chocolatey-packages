@@ -23,11 +23,6 @@ Uninstall-ChocolateyZipPackage @uninstallZipArgs
 # This removes the DIRECTORY they were extracted too.
 Remove-Item "C:\tools\example\"
 
-## OTHER POWERSHELL FUNCTIONS
-## https://docs.chocolatey.org/en-us/create/functions
-#Uninstall-ChocolateyEnvironmentVariable - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
-#Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-
 # Remove shortcuts
 # Look for shortcuts log
 $packagePath = $env:ChocolateyPackageFolder
@@ -53,3 +48,8 @@ elseif ($exists) {
         }
     }
 }
+
+## OTHER HELPER FUNCTIONS
+## https://docs.chocolatey.org/en-us/create/functions
+#Uninstall-ChocolateyEnvironmentVariable - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
+#Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
