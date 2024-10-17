@@ -20,9 +20,9 @@ Portable packages should be possible to install without administrative rights.
 7. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 8. [ ] Fill out tools\chocolateyInstall.ps1.
 9.  [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
-10. [ ] Test the package to ensure install/uninstall work appropriately.
-11. [ ] Add nupkg and installer and to .gitignore.
-12. [ ] Fill out nuspec.
+10. [ ] Fill out nuspec.
+11. [ ] Test the package to ensure install/uninstall work appropriately.
+12. [ ] Add nupkg and installer and to .gitignore.
 13. [ ] Commit.
 14. [ ] Clean out the comments you are not using in tools\chocolateybeforeModify.ps1.
 15. [ ] Clean out the comments and sections you are not using in tools\chocolateyInstall.ps1.
