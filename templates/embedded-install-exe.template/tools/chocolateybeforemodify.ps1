@@ -7,3 +7,17 @@
 # NOTE: For upgrades - like the uninstall script, this script always runs from
 #  the currently installed version, not from the new upgraded package version.
 
+# Terminate process
+$terminateArgs = @{
+    # RegEx expression of process name, returned by Get-Process function
+    NameFilter = "executable"
+    ## RegEx expression of process path, returned by Get-Process function
+    # $PathFilter = "C:\tools\software\" # Untested
+    ## Wait for process to start number of seconds
+    # $WaitFor = 5
+    ## Close/Kill child processes
+    # $WithChildren = $true # Untested
+}
+# This helper function requires chocolatey-core extension
+# - https://community.chocolatey.org/packages/chocolatey-core.extension
+Remove-Process @terminateArgs
