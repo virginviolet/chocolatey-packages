@@ -1,5 +1,5 @@
-﻿From: <insert applicable license url here>
+﻿From: <INSERT APPLICABLE LICENSE URL HERE>
 
 LICENSE
 
-<Insert License Here>
+<INSERT LICENSE HERE>
