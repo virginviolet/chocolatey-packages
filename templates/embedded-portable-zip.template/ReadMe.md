@@ -23,19 +23,19 @@ By default, these are considered console applications.
 
 If the application is a GUI, you should create an empty file next to the exe
 named 'name.exe.gui' e.g. 'bob.exe' would need a file named 'bob.exe.gui'.
-See <https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-set-up-shims-for-applications-that-have-a-gui>
+See https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-set-up-shims-for-applications-that-have-a-gui
 
 If you want to ignore the executable, create an empty file next to the exe
 named 'name.exe.ignore' e.g. 'bob.exe' would need a file named
 'bob.exe.ignore'.
-See <https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims>
+See https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
 
 ## Self-Contained?
 
 If you have a self-contained package, you can remove the automation scripts
 entirely and just include the executables, they will automatically get shimmed,
 which puts them on the path. Ensure you have the legal right to distribute
-the application though. See <https://docs.chocolatey.org/en-us/information/legal>.
+the application though. See https://docs.chocolatey.org/en-us/information/legal.
 
 You should read up on the Shim Generation section to familiarize yourself
 on what to do with GUI applications and/or ignoring shims.
@@ -48,17 +48,17 @@ functions that you can use, these are sometimes called the helpers.
 
 ### Built-In Functions
 
-<https://docs.chocolatey.org/en-us/create/functions>
+https://docs.chocolatey.org/en-us/create/functions
 
 A note about a couple:
 
-* Get-ToolsLocation - used to get you the 'tools' root, which by default is set to 'c:\tools', not the chocolateyInstall bin folder - see <https://docs.chocolatey.org/en-us/create/functions/get-toolslocation>
-* Install-BinFile - used for non-exe files - executables are automatically shimmed... - see <https://docs.chocolatey.org/en-us/create/functions/install-binfile>
-* Uninstall-BinFile - used for non-exe files - executables are automatically shimmed - see <https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile>
+* Get-ToolsLocation - used to get you the 'tools' root, which by default is set to 'c:\tools', not the chocolateyInstall bin folder - see https://docs.chocolatey.org/en-us/create/functions/get-toolslocation
+* Install-BinFile - used for non-exe files - executables are automatically shimmed... - see https://docs.chocolatey.org/en-us/create/functions/install-binfile
+* Uninstall-BinFile - used for non-exe files - executables are automatically shimmed - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
 
 ### Getting package specific information
 
-Use the package parameters pattern - see <https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument>
+Use the package parameters pattern - see https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument
 
 ### Environment Variables
 
