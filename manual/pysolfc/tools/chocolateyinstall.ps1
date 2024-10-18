@@ -1,4 +1,6 @@
-﻿# Preferences
+﻿# Additional steps for installing pysolfc with Chocolatey
+
+# Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors
 # $shortcutName = "$($packageName)"
 # $addDesktopShortcut = $true
@@ -34,7 +36,7 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # Run EXE installer
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$ExeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
+$ExeInstallerPath = Join-Path $toolsDirPath 'PySolFC_3.0.0_setup.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
@@ -43,24 +45,13 @@ $packageArgs = @{
   file           = $ExeInstallerPath
   softwareName   = 'pysolfc*' # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique.
   # Checksums
-  checksum       = 'INSERT_CHECKSUM'
+  checksum       = '66DEB447B2FDC9EA1B32E4E1A920A4BE69301C11CB8337E10CCFBA76AB5CB42F'
   checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
-  checksum64     = 'INSERT_CHECKSUM'
+  checksum64     = '66DEB447B2FDC9EA1B32E4E1A920A4BE69301C11CB8337E10CCFBA76AB5CB42F' # TODO CHECK
   checksumType64 = 'sha256' # Default is checksumType
   # Silent arguments
-  # Uncomment matching EXE type (sorted by most to least common)
-  #silentArgs   = '/S'           # NSIS
-  #silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
-  #silentArgs   = '/s'           # InstallShield
-  #silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
-  #silentArgs   = '/s'           # Wise InstallMaster
-  #silentArgs   = '-s'           # Squirrel
-  #silentArgs   = '-q'           # Install4j
-  #silentArgs   = '-s'           # Ghost
-  # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
-  #silentArgs   = ''             # None; make silent with input macro script like AutoHotKey (AHK)
-  #       https://community.chocolatey.org/packages/autohotkey.portable
-  validExitCodes = @(0) # Insert other valid exit codes here
+  silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  validExitCodes = @(0)
 }
 ## Installer, will assert administrative rights
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage

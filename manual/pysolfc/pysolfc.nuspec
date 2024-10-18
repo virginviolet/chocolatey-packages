@@ -8,6 +8,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 -->
 
 <!-- Test for UTF-8: if â€œÎ©â€ doesnâ€™t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
@@ -19,32 +20,44 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!-- version should match as closely as possible with the underlying software -->
     <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
     <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
-    <version>__REPLACE__</version>
-    <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>
+    <version>3.0.0</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/pysolfc/</packageSourceUrl>
     <!-- owners basically means you. -->
-    <owners>__REPLACE_YOUR_NAME__</owners>
+    <owners>virginviolet</owners>
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <!-- This section is about the software itself -->
     <!-- If the software is also distributed as a portable program, the software title here should end with ' (Install)' -->
-    <title>pysolfc (Install)</title>
-    <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
-    <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
+    <title>PySolFC</title>
+    <authors>joeraz1962, shlomif, skomoroh</authors>
+    <projectUrl>https://pysolfc.sourceforge.io/</projectUrl>
     <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!-- Here is an example using Githack -->
     <!--<iconUrl>https://rawcdn.githack.com/__REPLACE_YOUR_NAME__/__REPLACE_YOUR_REPO__/main/icons/pysolfc.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
-    <licenseUrl>Software License Location</licenseUrl>
+    <licenseUrl>https://github.com/shlomif/PySolFC/blob/master/COPYING</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <projectSourceUrl>Software Source Code Location</projectSourceUrl>
-    <docsUrl>At what url are the software docs located?</docsUrl>
-    <!--<mailingListUrl></mailingListUrl>-->
-    <bugTrackerUrl>https://_Software_Bug_Tracker_Location_REPLACE_</bugTrackerUrl>
-    <tags>pysolfc SPACE_SEPARATED</tags>
-    <summary>__REPLACE__</summary>
-    <description>__REPLACE__MarkDown_Okay  The default installation directory is `%ChocolateyInstall%\lib\pysolfc`. </description>
-    <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
+    <projectSourceUrl>https://github.com/shlomif/PySolFC</projectSourceUrl>
+    <docsUrl>https://pysolfc.sourceforge.io/doc/index.html</docsUrl>
+    <bugTrackerUrl>https://pysolfc.sourceforge.io/doc/report_bug.html</bugTrackerUrl>
+    <tags>pysolfc pysol solitaire card-games games game video-game video-games opensource free-software mahjongg hanafuda tarock trumps-only hex-a-deck dashavatara ganjifa-mughal ganjifa-ishido puzzle matching baker's-dozen beleaguered-castle canfield cribbage fan forty-thieves four-deck-game freecell golf gypsy klondike lights-out matrix memory montana napoleon numerica one-deck-game pairing pegged picture-gallery poker raglan samegame shisen-sho spider spider-solitaire tarock terrace three-deck-game tower-of-shanoi two-deck-game yukon pyramid spiderette</tags>
+    <summary>Featuring over 1200 solitaire card games</summary>
+    <!-- TODO Correct? -->
+    <description>PySol Fan Club Edition (PySolFC) is a collection of more than 1200 solitaire card games. It is a fork of PySol Solitaire.
+
+There are games that use the 52 card International Pattern deck, games for the 78 card Tarock deck, eight and ten suit Ganjifa games,Hanafuda games, Matrix games, Mahjongg games, and games for an original hexadecimal-based deck.
+
+Its features include a modern look and feel (uses the TTk widget set), multiple card sets and tableau backgrounds, sound, unlimited undo,player statistics, a hint system, demo games, a solitaire wizard, support for user written plug-ins, an integrated HTML help browser, andlots of documentation. 
+
+### Installation
+
+The default installation directory is `%ChocolateyInstall%\lib\pysolfc`. </description> 
+    <releaseNotes>* 120 new games.
+* Support for several new types of games/decks, including tile puzzles, Ishido-type tile matching games, joker deck games, and more.
+* New game and cardset categories.
+* Ability to change the style of virtually any of the graphics in PySol.
+* Some UI/Quality of Life improvements.
+* Bugfixes.
+  </releaseNotes>
     <!-- =============================== -->
 
     <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
@@ -57,10 +70,6 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
       <dependency id="chocolatey-core.extension" version="1.1.0" />
     </dependencies>-->
     <!-- chocolatey-core.extension - https://community.chocolatey.org/packages/chocolatey-core.extension -->
-
-    <!--<provides>NOT YET IMPLEMENTED</provides>-->
-    <!--<conflicts>NOT YET IMPLEMENTED</conflicts>-->
-    <!--<replaces>NOT YET IMPLEMENTED</replaces>-->
   </metadata>
   <files>
     <!-- Contents -->
