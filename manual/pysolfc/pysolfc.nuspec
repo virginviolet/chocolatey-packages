@@ -4,13 +4,9 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
-    <id>pysolfc</id>
-    <!-- version should match as closely as possible with the underlying software -->
-    <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
-    <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
+    <id>pysolfc</id> <!-- https://repology.org/projects/?search=pysol -->
     <version>3.0.0</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/pysolfc/</packageSourceUrl>
-    <!-- owners basically means you. -->
     <owners>virginviolet</owners>
     <!-- ============================== -->
 
@@ -19,8 +15,7 @@
     <title>PySol Fan Club Edition</title>
     <authors>joeraz1962, shlomif, skomoroh</authors>
     <projectUrl>https://pysolfc.sourceforge.io/</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the Icon for a package. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!--<iconUrl>https://rawcdn.githack.com/__REPLACE_YOUR_NAME__/__REPLACE_YOUR_REPO__/main/icons/pysolfc.png</iconUrl>-->
+    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/pysolfc/icon/pysol-96px.png</iconUrl>
     <licenseUrl>https://github.com/shlomif/PySolFC/blob/master/COPYING</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/shlomif/PySolFC</projectSourceUrl>
