@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- == PACKAGE SPECIFIC SECTION == -->
+    <id>pysolfc</id> <!-- https://repology.org/projects/?search=pysol -->
+    <version>3.0.0</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/pysolfc/</packageSourceUrl>
+    <owners>virginviolet</owners>
+    <!-- ============================== -->
+
+    <!-- == SOFTWARE SPECIFIC SECTION == -->
+    <!-- This section is about the software itself -->
+    <title>PySol Fan Club Edition</title>
+    <authors>joeraz1962, shlomif, skomoroh</authors>
+    <projectUrl>https://pysolfc.sourceforge.io/</projectUrl>
+    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/pysolfc/icon/pysol-96px.png</iconUrl>
+    <licenseUrl>https://github.com/shlomif/PySolFC/blob/master/COPYING</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/shlomif/PySolFC</projectSourceUrl>
+    <docsUrl>https://pysolfc.sourceforge.io/doc/index.html</docsUrl>
+    <bugTrackerUrl>https://pysolfc.sourceforge.io/doc/report_bug.html</bugTrackerUrl>
+    <tags>pysolfc pysol solitaire card-games games game video-game video-games opensource free-software mahjongg hanafuda tarock trumps-only hex-a-deck dashavatara ganjifa-mughal ganjifa-ishido puzzle matching baker's-dozen beleaguered-castle canfield cribbage fan forty-thieves four-deck-game freecell golf gypsy klondike lights-out matrix memory montana napoleon numerica one-deck-game pairing pegged picture-gallery poker raglan samegame shisen-sho spider spider-solitaire tarock terrace three-deck-game tower-of-shanoi two-deck-game yukon pyramid spiderette</tags>
+    <summary>A solitaire game collection</summary>
+    <description>**PySol Fan Club Edition** (**PySolFC**), a fork of PySol Solitaire, is a collection of more than 1200 solitaire card games.
+
+There are games that use the 52 card International Pattern deck, games for the 78 card Tarock deck, eight and ten suit Ganjifa games, Hanafuda games, Matrix games, Mahjongg games, and games for an original hexadecimal-based deck.
+
+Its features include a modern look and feel (uses the TTk widget set), multiple card sets and tableau backgrounds, sound, unlimited undo, player statistics, a hint system, demo games, a solitaire wizard, support for user written plug-ins, an integrated HTML help browser, and lots of documentation. 
+
+### Installation
+
+The default installation directory is `C:\Program Files (x86)\PySol Fan Club edition`. </description> 
+    <releaseNotes>* 120 new games.
+* Support for several new types of games/decks, including tile puzzles, Ishido-type tile matching games, joker deck games, and more.
+* New game and cardset categories.
+* Ability to change the style of virtually any of the graphics in PySol.
+* Some UI/Quality of Life improvements.
+* Bugfixes.
+  </releaseNotes>
+    <!-- =============================== -->
+
+  </metadata>
+  <files>
+    <!-- Contents -->
+    <file src="tools\**" target="tools" />
+    <file src="legal\**" target="legal" />
+  </files>
+</package>
