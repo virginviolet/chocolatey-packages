@@ -1,4 +1,4 @@
-﻿# TODO (embedded - portable - zip)
+﻿# TODO
 
 ## Guides
 
