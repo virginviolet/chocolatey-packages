@@ -34,6 +34,7 @@ $packageArgs = @{
 # If 1 match was found
 if ($keys.Count -eq 1) {
   $keys | % {
+    # Adjust arguments
     # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
     # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"
     $packageArgs['file'] = "$($_.UninstallString)" # NOTE: You may need to split this if it contains spaces

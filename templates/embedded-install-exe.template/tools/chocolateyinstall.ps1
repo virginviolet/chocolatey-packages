@@ -61,7 +61,7 @@ $packageArgs = @{
   # silentArgs   = '-q'           # Install4j
   # silentArgs   = '-s'           # Ghost
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
-  #silentArgs   = ''             # None; make silent with input macro script like AutoHotKey (AHK)
+  # silentArgs   = ''             # None; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
   # validExitCodes = @(0) # Inno Setup
   validExitCodes = @(0) # Insert other valid exit codes here
@@ -71,12 +71,12 @@ Install-ChocolateyInstallPackage @packageArgs
 
 ## Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
 ## - https://docs.chocolatey.org/en-us/create/functions/start-chocolateyprocessasadmin
-#Start-ChocolateyProcessAsAdmin 'STATEMENTS_TO_RUN' 'Optional_Application_If_Not_PowerShell' -validExitCodes $validExitCodes
+# Start-ChocolateyProcessAsAdmin 'STATEMENTS_TO_RUN' 'Optional_Application_If_Not_PowerShell' -validExitCodes $validExitCodes
 ## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
-#$appPath = "$env:ProgramFiles\appname"
-##Will resolve to C:\Program Files\appname
-#$statementsToRun = "/C `"$appPath\bin\installservice.bat`""
-#Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
+# $appPath = "$env:ProgramFiles\appname"
+# #Will resolve to C:\Program Files\appname
+# $statementsToRun = "/C `"$appPath\bin\installservice.bat`""
+# Start-ChocolateyProcessAsAdmin $statementsToRun cmd -validExitCodes $validExitCodes
 
 ## Add specific folders to the path
 ## Any executables found in the chocolatey package folder will
@@ -87,16 +87,16 @@ Install-ChocolateyInstallPackage @packageArgs
 
 ## Set persistent Environment variables
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
-#Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
+# Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
 
 ## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
 ## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
 ## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-#Install-BinFile
+# Install-BinFile
 
 ## Set up file association
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
-#Install-ChocolateyFileAssociation
+# Install-ChocolateyFileAssociation
 
 ## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
 ## - https://docs.chocolatey.org/en-us/create/functions
