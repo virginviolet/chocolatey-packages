@@ -12,11 +12,11 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 
 ## Outputs the bitness of the OS (either "32" or "64")
 ## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-#$osBitness = Get-ProcessorBits
+# $osBitness = Get-ProcessorBits
 
 ## Install Visual Studio Package - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyvsixpackage
-#Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
-#Install-ChocolateyVsixPackage @packageArgs
+# Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
+# Install-ChocolateyVsixPackage @packageArgs
 
 ## Extract archive
 ## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
@@ -50,18 +50,19 @@ $packageArgs = @{
   checksum64     = 'INSERT_CHECKSUM'
   checksumType64 = 'sha256' # Default is checksumType
   # Silent arguments
-  # Uncomment matching EXE type (sorted by most to least common)
-  #silentArgs   = '/S'           # NSIS
-  #silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
-  #silentArgs   = '/s'           # InstallShield
-  #silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
-  #silentArgs   = '/s'           # Wise InstallMaster
-  #silentArgs   = '-s'           # Squirrel
-  #silentArgs   = '-q'           # Install4j
-  #silentArgs   = '-s'           # Ghost
+  # Uncomment matching installer type (sorted by most to least common)
+  # silentArgs   = '/S'           # NSIS
+  # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  # silentArgs   = '/s'           # InstallShield
+  # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
+  # silentArgs   = '/s'           # Wise InstallMaster
+  # silentArgs   = '-s'           # Squirrel
+  # silentArgs   = '-q'           # Install4j
+  # silentArgs   = '-s'           # Ghost
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   #silentArgs   = ''             # None; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
+  # validExitCodes = @(0) # Inno Setup
   validExitCodes = @(0) # Insert other valid exit codes here
 }
 ## Installer, will assert administrative rights
@@ -82,7 +83,7 @@ Install-ChocolateyInstallPackage @packageArgs # https://docs.chocolatey.org/en-u
 ## already be on the path. This is used in addition to that or
 ## for cases when a native installer doesn't add things to the path.
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
-#Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
+# Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
 
 ## Set persistent Environment variables
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
