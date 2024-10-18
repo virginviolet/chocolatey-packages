@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>parallel-launcher</id>
@@ -26,7 +27,7 @@ The default installation directory is C:/Program Files (x86)/parallel-launcher (
 - Fixed the incorrect error code being logged when an SD card fails to mount on Windows</releaseNotes>
     <dependencies>
       <!-- Extension for Start-CheckandStop and Start-CheckandThrow commands. -->
-      <dependency id="chocolatey-misc-helpers.extension" />
+      <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" />
     </dependencies>
   </metadata>
   <files>

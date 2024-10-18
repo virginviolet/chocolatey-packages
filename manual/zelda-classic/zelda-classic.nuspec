@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- == PACKAGE SPECIFIC SECTION == -->
+    <id>zelda-classic</id> <!-- Matches AUR package name. Repology results: https://repology.org/projects/?search=zelda -->
+    <version>2.53.0</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/zelda-classic/</packageSourceUrl>
+    <owners>virginviolet</owners>
+    <!-- ============================== -->
+
+    <!-- == SOFTWARE SPECIFIC SECTION == -->
+    <title>Zelda Classic</title>
+    <authors>Armageddon Games</authors>
+    <projectUrl>https://www.zeldaclassic.com/</projectUrl>
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda-classic/icon/icon-128px.png</iconUrl>
+    <licenseUrl>https://github.com/ZeldaClassic/ZeldaClassic/blob/main/license.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/ZeldaClassic/ZeldaClassic</projectSourceUrl>
+    <docsUrl>https://www.zeldaclassic.com/faq/</docsUrl>
+    <bugTrackerUrl>https://www.armageddongames.net/forumdisplay.php?217-ZC-Bugs</bugTrackerUrl>
+    <tags>zelda-classic action-adventure fantasy fantasy-rpg rpg video-game game the-legend-of-zelda legend-of-zelda the-legend-of-zelda-1 zelda zelda1 zelda-1 los nes replica clone reimplementation pc-port game-engine game-development game-development-platform zquest editor quest-editor</tags>
+    <summary>Replica of Nintendo’s The Legend of Zelda and a game editor</summary>
+    <description>**Zelda Classic** is a tribute to Nintendo’s 1991 video game, The Legend of Zelda. It is an exact replica of the game, but is also comes with a game editor called ZQuest that allows you to make completely new quests, with either the same or enhanced graphics, or you can play the many quests that other people have made.
+
+### Installation, upgrade and uninstallation
+
+The default installation directory is `C:\Games\Zelda Classic\`.
+
+Custom quests and save data will *not* be removed on uninstallation. Settings *will* be removed.
+
+Upgrade, force installation and uninstallation will not proceed if zelda.exe or zquest.exe is running.</description>
+    <releaseNotes>### Changes Over Gamma 8
+```
+Added Arigatou/ path, and included files on request by contributors and core testers.
+    Thank you to all testers and to all contributors.
+Cleaned up the Cheat Modifier Key dialogue.
+Added 20th Anniversary banner.
+    ( ZoriaRPG, 3rd April, 2019 )
+```
+
+### Full Changelog
+
+See changelog.txt
+    </releaseNotes>
+    <!-- =============================== -->
+
+    <dependencies>
+      <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" />
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- Contents -->
+    <file src="tools\**" target="tools" />
+    <file src="legal\**" target="legal" />
+  </files>
+</package>
