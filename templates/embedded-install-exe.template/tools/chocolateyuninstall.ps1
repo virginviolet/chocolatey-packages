@@ -7,6 +7,9 @@
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
+
+# Uninstall
+# Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
   softwareName = 'embedded-install-exe.template*'  # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
@@ -26,26 +29,29 @@ $packageArgs = @{
   # validExitCodes = @(0) # Inno Setup
   # validExitCodes= @(0) # Insert other valid exit codes here
 }
-
-[array]$key = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
-
-if ($key.Count -eq 1) {
-  $key | % {
+# Get uninstall registry keys that match the softwareName pattern
+[array]$keys = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
+# If 1 match was found
+if ($keys.Count -eq 1) {
+  $keys | % {
     # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
     # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"
     $packageArgs['file'] = "$($_.UninstallString)" # NOTE: You may need to split this if it contains spaces
     # - Split args from exe in $packageArgs['file'] and pass those args through $packageArgs['silentArgs'] or ignore them
     # - Review the code for auto-uninstaller for all of the fun things it does in sanitizing - https://github.com/chocolatey/choco/blob/bfe351b7d10c798014efe4bfbb100b171db25099/src/chocolatey/infrastructure.app/services/AutomaticUninstallerService.cs#L142-L192
     $packageArgs['silentArgs'] = "$($_.PSChildName) $($packageArgs['silentArgs'])"
+    # Run uninstaller
     Uninstall-ChocolateyPackage @packageArgs
   }
-} elseif ($key.Count -eq 0) {
+# If 0 matches was found
+} elseif ($keys.Count -eq 0) {
   Write-Warning "$packageName has already been uninstalled by other means."
-} elseif ($key.Count -gt 1) {
-  Write-Warning "$($key.Count) matches found!"
+# If more than 1 matches were found
+} elseif ($keys.Count -gt 1) {
+  Write-Warning "$($keys.Count) matches found!"
   Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
   Write-Warning "Please alert package maintainer the following keys were matched:"
-  $key | % { Write-Warning "- $($_.DisplayName)" }
+  $keys | % { Write-Warning "- $($_.DisplayName)" }
 }
 
 ## Remove persistent Environment variable
