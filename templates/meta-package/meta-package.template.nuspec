@@ -12,7 +12,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
     <!-- This section is about this package, although id and version have ties back to the software -->
-    <id>[[PackageNameLower]]</id>
+    <id>[[PackageNameLower]]</id> <!-- https://repology.org/projects/?search=[[PackageNameLower]] -->
     <!-- If the meta-package only has one dependency, version should match with that dependency -->
     <version>[[PackageVersion]]</version>
     <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>
