@@ -6,7 +6,7 @@
     <version>1.1</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/png-to-ico.install</packageSourceUrl>
     <owners>virginviolet</owners>
-    <title>png-to-ico (Install)</title>
+    <title>PNG-to-ICO (Install)</title>
     <authors>Paul Renard</authors>
     <projectUrl>https://foxp.github.io/PNG-to-ICO/</projectUrl>
     <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/png-to-ico.install/icon/convert-icon-128px.png</iconUrl>
