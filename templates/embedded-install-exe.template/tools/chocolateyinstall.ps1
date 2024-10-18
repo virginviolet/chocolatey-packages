@@ -34,6 +34,7 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # Get-ChocolateyUnzip @unzipArgs
 
 # Run EXE installer
+# - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $ExeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
@@ -65,9 +66,8 @@ $packageArgs = @{
   # validExitCodes = @(0) # Inno Setup
   validExitCodes = @(0) # Insert other valid exit codes here
 }
-## Installer, will assert administrative rights
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
-Install-ChocolateyInstallPackage @packageArgs # https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
+# Installer, will assert administrative rights
+Install-ChocolateyInstallPackage @packageArgs
 
 ## Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
 ## - https://docs.chocolatey.org/en-us/create/functions/start-chocolateyprocessasadmin
