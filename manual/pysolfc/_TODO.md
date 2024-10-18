@@ -17,17 +17,17 @@ Portable packages should be possible to install without administrative rights.
 4. [x] Add installer EXE to the tools directory.
 5. [x] Fill out legal\LICENSE.txt
 6. [x] Fill out legal\VERIFICATION.txt
-7. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
+7. [x] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 8. [x] Fill out tools\chocolateyInstall.ps1.
 9.  [x] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 10. [x] Fill out nuspec.
 11. [x] Test the package to ensure install/uninstall work appropriately.
 12. [x] Add nupkg and installer and to .gitignore.
-13. [ ] Commit.
-14. [ ] Clean out the comments you are not using in tools\chocolateybeforeModify.ps1.
-15. [ ] Clean out the comments and sections you are not using in tools\chocolateyInstall.ps1.
-16. [ ] Clean out the comments and sections you are not using in tools\chocolateyUninstall.ps1.
-17. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
+13. [x] Commit.
+14. [x] Clean out the comments you are not using in tools\chocolateybeforeModify.ps1.
+15. [x] Clean out the comments and sections you are not using in tools\chocolateyInstall.ps1.
+16. [x] Clean out the comments and sections you are not using in tools\chocolateyUninstall.ps1.
+17. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
 18. [ ] Finish legal\VERIFICATION.txt
 19. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
 20. [ ] Test the package again to ensure install/uninstall work appropriately.
