@@ -1,4 +1,4 @@
-﻿# TODO (embedded - portable - zip)
+﻿# TODO
 
 ## Guides
 
@@ -20,6 +20,7 @@ Portable packages should be possible to install without administrative rights.
 7. [x] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 8. [x] Fill out tools\chocolateyInstall.ps1.
 9.  [x] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
+10. [x] Remove tools\.skipAutoUninstall if chocolateyUninstall.ps1 is used and auto-uninstaller is not desired.
 10. [x] Fill out nuspec.
 11. [x] Test the package to ensure install/uninstall work appropriately.
 12. [x] Add nupkg and installer and to .gitignore.
