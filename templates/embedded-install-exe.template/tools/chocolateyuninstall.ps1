@@ -8,9 +8,9 @@
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
 $packageArgs = @{
-  packageName   = $env:ChocolateyPackageName
-  softwareName  = 'embedded-install-exe.template*'  # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
-  fileType      = 'EXE' # Only one of these: MSI or EXE (ignore MSU for now)
+  packageName  = $env:ChocolateyPackageName
+  softwareName = 'embedded-install-exe.template*'  # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
+  fileType     = 'EXE'
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
   # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
@@ -22,8 +22,8 @@ $packageArgs = @{
   # silentArgs   = '-s -u'        # Ghost
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   # silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
-                                 #       https://community.chocolatey.org/packages/autohotkey.portable
-                                 # validExitCodes = @(0) # Inno Setup
+  #       https://community.chocolatey.org/packages/autohotkey.portable
+  # validExitCodes = @(0) # Inno Setup
   # validExitCodes= @(0) # Insert other valid exit codes here
 }
 
@@ -45,7 +45,7 @@ if ($key.Count -eq 1) {
   Write-Warning "$($key.Count) matches found!"
   Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
   Write-Warning "Please alert package maintainer the following keys were matched:"
-  $key | % {Write-Warning "- $($_.DisplayName)"}
+  $key | % { Write-Warning "- $($_.DisplayName)" }
 }
 
 ## Remove persistent Environment variable
