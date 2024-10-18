@@ -28,7 +28,7 @@ Portable packages should be possible to install without administrative rights.
 15. [x] Clean out the comments and sections you are not using in tools\chocolateyInstall.ps1.
 16. [x] Clean out the comments and sections you are not using in tools\chocolateyUninstall.ps1.
 17. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-18. [ ] Finish legal\VERIFICATION.txt
+18. [x] Finish legal\VERIFICATION.txt
 19. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
 20. [ ] Test the package again to ensure install/uninstall work appropriately.
 21. [ ] Commit and publish to GitHub.
