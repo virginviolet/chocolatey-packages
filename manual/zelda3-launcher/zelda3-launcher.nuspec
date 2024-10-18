@@ -8,7 +8,7 @@
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/zelda3-launcher</packageSourceUrl>
     <owners>virginviolet</owners>
 
-    <title>zelda3-launcher (Portable)</title>
+    <title>Zelda 3 Launcher</title>
     <authors>Anthony Johns</authors>
     <projectUrl>https://github.com/RadzPrower/Zelda-3-Launcher</projectUrl>
     <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/zelda3-launcher/icons/triforce.ico%20extracted%20(PNG)/triforce-2.PNG</iconUrl>
