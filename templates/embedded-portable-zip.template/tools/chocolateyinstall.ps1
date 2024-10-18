@@ -1,4 +1,4 @@
-﻿# Additional steps for installing [[PackageName]] with Chocolatey
+# Additional steps for installing [[PackageName]] with Chocolatey
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
@@ -12,11 +12,11 @@ $logShortcuts = $true
 
 ## Outputs the bitness of the OS (either "32" or "64")
 ## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-#$osBitness = Get-ProcessorBits
+# $osBitness = Get-ProcessorBits
 
 ## Install Visual Studio Package - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyvsixpackage
-#Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
-#Install-ChocolateyVsixPackage @packageArgs
+# Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
+# Install-ChocolateyVsixPackage @packageArgs
 
 # Extract archive
 # - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
@@ -47,11 +47,11 @@ Get-ChocolateyUnzip @unzipArgs
 ## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
 ## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
 ## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-#Install-BinFile
+# Install-BinFile
 
 ## Set up file association
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
-#Install-ChocolateyFileAssociation
+# Install-ChocolateyFileAssociation
 
 ## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
 ## - https://docs.chocolatey.org/en-us/create/functions
