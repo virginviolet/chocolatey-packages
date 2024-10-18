@@ -3,11 +3,6 @@
 ## Guides
 
 - "Create Packages". <https://docs.chocolatey.org/en-us/create/create-packages>
-- "How To Create a Zip Package". <https://docs.chocolatey.org/en-us/guides/create/create-zip-package/>
-
-## Note
-
-Portable packages should be possible to install without administrative rights.
 
 ## To do
 
