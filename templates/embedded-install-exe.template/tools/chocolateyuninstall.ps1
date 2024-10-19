@@ -27,6 +27,7 @@ $packageArgs = @{
   # silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
   # Exit codes indicating success
+  # validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
   # validExitCodes= @(0) # Insert other valid exit codes here
 }
