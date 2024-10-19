@@ -19,13 +19,13 @@
 11. [x] Fill out nuspec.
 12. [x] Test the package to ensure install/uninstall work appropriately.
 13. [x] Add nupkg and installer and to .gitignore.
-14. [ ] Commit.
-15. [ ] Clean out the comments you are not using in tools\chocolateybeforeModify.ps1.
-16. [ ] Clean out the comments and sections you are not using in tools\chocolateyInstall.ps1.
-17. [ ] Clean out the comments and sections you are not using in tools\chocolateyUninstall.ps1.
-18. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-19. [ ] Finish legal\VERIFICATION.txt
-20. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
+14. [x] Commit.
+15. [x] Clean out comments you are not using in tools\chocolateybeforeModify.ps1.
+16. [x] Clean out comments and sections you are not using in tools\chocolateyInstall.ps1.
+17. [x] Clean out comments and sections you are not using in tools\chocolateyUninstall.ps1.
+18. [x] Clean out comments in nuspec (you may wish to leave the headers for the package vs software metadata).
+19. [x] Finish legal\VERIFICATION.txt
+20. [x] Delete ReadMe.md file once you have read over and used anything you've needed from here.
 21. [ ] Test the package again to ensure install/uninstall work appropriately.
 22. [ ] Commit and publish to GitHub.
 23. [ ] Merge branch with main.
