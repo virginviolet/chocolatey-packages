@@ -6,6 +6,8 @@ $shortcutName = "$($packageName)"
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
 $logShortcuts = $true
+# $installationDirPath = 'C:\Tools\[[PackageName]]'
+$installationDirPath = $toolsDirPath
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
@@ -28,7 +30,7 @@ $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'NAME_OF_EMBEDDED_ZIP_FILE.
 $unzipArgs = @{
   PackageName  = "$($packageName)"
   FileFullPath = "$zipArchivePath"
-  Destination  = "$toolsDirPath"
+  Destination  = "$installationDirPath"
 }
 # Unzip file to the specified location - auto overwrites existing content
 Get-ChocolateyUnzip @unzipArgs
