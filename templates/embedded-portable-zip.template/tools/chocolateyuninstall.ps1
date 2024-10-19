@@ -9,6 +9,7 @@
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
 $removeShortcuts = $true
+# $installationDirPath = 'C:\Tools\[[PackageName]]' # Only necessary if you did not unpack to package directory
 
 # Remove extracted files
 # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
@@ -19,9 +20,18 @@ $uninstallZipArgs = @{
 }
 Uninstall-ChocolateyZipPackage @uninstallZipArgs
 
-# Uninstall-ChocolateyZipPackage will remove the FILES from the archive.
-# This removes the DIRECTORY they were extracted too.
-Remove-Item "C:\tools\example\"
+
+# Remove installation directory if empty.
+# Only necessary if you did not unpack to package directory
+# Inform user if installation directory is not empty.
+# $empty = -not (Test-Path $installationDirPath\*)
+# if (-not $empty) {
+#     $message = "Data remains in the installation directory. `n" `
+#         + "Manually remove the installation directory if you do not wish to keep the data.`n" `
+#         + "Installation directory: $installationDirPath"
+#     Write-Warning $message
+#     Start-Sleep -Seconds 5 # Time to read
+# }
 
 # Remove shortcuts
 # Look for shortcuts log
