@@ -26,6 +26,7 @@ $packageArgs = @{
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   # silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
+  # Exit codes indicating success
   # validExitCodes = @(0) # Inno Setup
   # validExitCodes= @(0) # Insert other valid exit codes here
 }
