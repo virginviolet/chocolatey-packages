@@ -6,11 +6,11 @@
 
 ## To do
 
-1. [ ] Search the Community Repository to make sure there isn't a package for this software already: <https://community.chocolatey.org/packages>
-2. [ ] Make sure the total nupkg package will be under 200MB.
-3. [ ] Commit.
-4. [ ] Add installer EXE to the tools directory.
-5. [ ] Fill out legal\LICENSE.txt
+1. [x] Search the Community Repository to make sure there isn't a package for this software already: <https://community.chocolatey.org/packages>
+2. [x] Make sure the total nupkg package will be under 200MB.
+3. [x] Commit.
+4. [x] Add installer EXE to the tools directory.
+5. [x] Fill out legal\LICENSE.txt
 6. [ ] Fill out legal\VERIFICATION.txt
 7. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 8. [ ] Fill out tools\chocolateyInstall.ps1.
