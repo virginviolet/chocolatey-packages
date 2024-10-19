@@ -11,14 +11,14 @@
 3. [x] Commit.
 4. [x] Add installer EXE to the tools directory.
 5. [x] Fill out legal\LICENSE.txt
-6. [X] Fill out legal\VERIFICATION.txt
-7. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
-8. [ ] Fill out tools\chocolateyInstall.ps1.
-9.  [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
-10. [ ] Remove tools\.skipAutoUninstall if chocolateyUninstall.ps1 is used and auto-uninstaller is not desired.
-11. [ ] Fill out nuspec.
-12. [ ] Test the package to ensure install/uninstall work appropriately.
-13. [ ] Add nupkg and installer and to .gitignore.
+6. [x] Fill out legal\VERIFICATION.txt
+7. [x] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
+8. [x] Fill out tools\chocolateyInstall.ps1.
+9.  [x] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
+10. [x] Remove tools\.skipAutoUninstall if chocolateyUninstall.ps1 is used and auto-uninstaller is not desired.
+11. [x] Fill out nuspec.
+12. [x] Test the package to ensure install/uninstall work appropriately.
+13. [x] Add nupkg and installer and to .gitignore.
 14. [ ] Commit.
 15. [ ] Clean out the comments you are not using in tools\chocolateybeforeModify.ps1.
 16. [ ] Clean out the comments and sections you are not using in tools\chocolateyInstall.ps1.

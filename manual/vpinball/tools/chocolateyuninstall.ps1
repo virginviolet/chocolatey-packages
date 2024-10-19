@@ -1,21 +1,37 @@
 ﻿# Additional steps for uninstalling vpinball with Chocolatey
 
-## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
-## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.
-## See https://docs.chocolatey.org/en-us/choco/commands/uninstall
-## and https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
+# Without this script, installation will not be silent, and patch would not be removed
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
+$patchInstallDirPath = 'C:\Visual Pinball' # Only necessary if you did not unpack to package directory
+
+# Prevent uninstall if the program is running (so that no progress is lost)
+# This cannot be moved to chocolateybeforemodify.ps1 unless the feature suggested in the following issue is added:
+# https://github.com/chocolatey/choco/issues/1731
+Start-CheckandThrow "VPinball8" > $null
+Start-CheckandThrow "VPinball99_PhysMod5_Updated" > $null
+Start-CheckandThrow "VPinball921" > $null
+Start-CheckandThrow "VPinball995" > $null
+Start-CheckandThrow "VPinballX" > $null
+Start-CheckandThrow "PinMAME" > $null
+Start-CheckandThrow "PinMAME32" > $null
+Start-CheckandThrow "UltraDMD" > $null
+
+# Prevent force install or upgrade if the FlexDMD install tool is running
+Start-CheckandThrow "FlexDMDUI" > $null
+
+# Stop VPinMame Test if it is running
+Start-CheckandStop "VPinMameTest" > $null
 
 # Uninstall
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'embedded-install-exe.template*'  # Part or all of the Display Name as it appears in Programs and Features.
+  softwareName = 'Visual Pinball*'  # Part or all of the Display Name as it appears in Programs and Features.
   fileType     = 'EXE'
   # Uncomment matching installer type (sorted by most to least common)
-  # silentArgs   = '/S'           # NSIS
+  silentArgs   = '/S'           # NSIS
   # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # silentArgs   = '/s'           # InstallShield
   # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
@@ -26,6 +42,7 @@ $packageArgs = @{
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   # silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
+  validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
   # validExitCodes= @(0) # Insert other valid exit codes here
 }
@@ -55,37 +72,39 @@ if ($keys.Count -eq 1) {
   $keys | % { Write-Warning "- $($_.DisplayName)" }
 }
 
+# Remove extracted files
+Write-Host "Uninstalling patch for $($packageName)..."
+# Arguments
+$uninstallZipArgs = @{
+  Packagename = "$($packageName)"
+  ZipFileName = "VPinballX73_Minimal.zip"
+}
+Uninstall-ChocolateyZipPackage @uninstallZipArgs
+Write-Host "Patch for $($packageName) has been uninstalled."
+
+# Remove installation directory
+# Inform user if the installation directory is not empty
+$empty = -not (Test-Path $patchInstallDirPath\*)
+if (-not $empty) {
+    $message = "Data remains in the installation directory. `n" `
+        + "Manually remove the installation directory if you do not wish to keep the data.`n" `
+        + "Installation directory: '$patchInstallDirPath'"
+    Write-Warning $message
+    Start-Sleep -Seconds 5 # Time to read
+}
+# Remove installation directory if it is empty
+else {
+    Write-Debug "Installation directory is empty."
+    Write-Debug "Removing installation directory."
+    Remove-Item $patchInstallDirPath
+    Write-Debug "Installation directory removed."
+}
+
 ## Remove persistent Environment variable
 # Uninstall-ChocolateyEnvironmentVariable - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
 
 ## Remove shim
 # Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-
-## Remove shortcuts
-## Look for shortcuts log
-# $packagePath = $env:ChocolateyPackageFolder
-# $shortcutsLogPath = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
-# $exists = Test-Path -Path "$shortcutsLogPath" -PathType Leaf
-# if ($removeShortcuts -and -not $exists) {
-#     Write-Warning "Cannot uninstall shortcuts.`nShortcuts log not found."
-# }
-# elseif ($exists) {
-#     Write-Debug "Shortcuts log found."
-#     # Read log line-per-line and remove files
-#     $shortcutsLog = Get-Content "$shortcutsLogPath"
-#     foreach ($fileInLog in $shortcutsLog) {
-#         if ($null -ne $fileInLog -and '' -ne $fileInLog.Trim()) {
-#             try {
-#                 Write-Debug "Removing shortcut '$fileInLog'."
-#                 Remove-Item -Path "$fileInLog" -Force
-#                 Write-Debug "Removed shortcut '$fileInLog'."
-#             }
-#             catch {
-#                 Write-Warning "Could not remove shortcut '$fileInLog'.`n$_"
-#             }
-#         }
-#     }
-# }
 
 ## OTHER HELPER FUNCTIONS
 ## https://docs.chocolatey.org/en-us/create/functions
