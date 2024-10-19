@@ -20,9 +20,9 @@ $uninstallZipArgs = @{
 }
 Uninstall-ChocolateyZipPackage @uninstallZipArgs
 
-# Remove installation directory if empty.
+# Remove installation directory
 # Only necessary if you did not unpack to package directory
-# Inform user if installation directory is not empty.
+# Inform user if installation directory is not empty
 $empty = -not (Test-Path $installationDirPath\*)
 if (-not $empty) {
     $message = "Data remains in the installation directory. `n" `
@@ -31,7 +31,7 @@ if (-not $empty) {
     Write-Warning $message
     Start-Sleep -Seconds 5 # Time to read
 }
-# Remove installation directory if empty
+# Remove installation directory if it is empty
 else {
     Write-Debug "Installation directory is empty."
     Write-Debug "Removing installation directory."
