@@ -23,7 +23,7 @@
     <bugTrackerUrl>https://pysolfc.sourceforge.io/doc/report_bug.html</bugTrackerUrl>
     <tags>pysolfc pysol solitaire card-games games game video-game video-games opensource free-software mahjongg hanafuda tarock trumps-only hex-a-deck dashavatara ganjifa-mughal ganjifa-ishido puzzle matching baker's-dozen beleaguered-castle canfield cribbage fan forty-thieves four-deck-game freecell golf gypsy klondike lights-out matrix memory montana napoleon numerica one-deck-game pairing pegged picture-gallery poker raglan samegame shisen-sho spider spider-solitaire tarock terrace three-deck-game tower-of-shanoi two-deck-game yukon pyramid spiderette</tags>
     <summary>A solitaire game collection</summary>
-    <description>PySol Fan Club Edition (PySolFC), a fork of PySol Solitaire, is a collection of more than 1200 solitaire card games.
+    <description>**PySol Fan Club Edition** (**PySolFC**), a fork of PySol Solitaire, is a collection of more than 1200 solitaire card games.
 
 There are games that use the 52 card International Pattern deck, games for the 78 card Tarock deck, eight and ten suit Ganjifa games, Hanafuda games, Matrix games, Mahjongg games, and games for an original hexadecimal-based deck.
 
@@ -31,7 +31,7 @@ Its features include a modern look and feel (uses the TTk widget set), multiple 
 
 ### Installation
 
-The default installation directory is `%ChocolateyInstall%\lib\pysolfc`. </description> 
+The default installation directory is `C:\Program Files (x86)\PySol Fan Club edition`. </description> 
     <releaseNotes>* 120 new games.
 * Support for several new types of games/decks, including tile puzzles, Ishido-type tile matching games, joker deck games, and more.
 * New game and cardset categories.
