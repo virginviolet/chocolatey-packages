@@ -1,4 +1,4 @@
-﻿# Additional steps for installing [[PackageName]] with Chocolatey
+﻿# Other steps for installing [[PackageName]] with Chocolatey
 
 # Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors
