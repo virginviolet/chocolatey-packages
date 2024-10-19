@@ -1,4 +1,4 @@
-﻿# Additional steps for uninstalling [[PackageName]] with Chocolatey
+﻿# Other steps for uninstalling [[PackageName]] with Chocolatey
 
 ## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
 ## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.

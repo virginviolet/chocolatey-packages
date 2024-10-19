@@ -1,4 +1,6 @@
-﻿# This runs before upgrade or uninstall.
+﻿# Steps to perform before upgrading [[PackageName]] with Chocolatey
+
+# This runs before upgrade or uninstall.
 # Use this file to do things like stop services prior to upgrade or uninstall.
 # NOTE: It is an anti-pattern to call chocolateyUninstall.ps1 from here. If you
 #  need to uninstall an MSI prior to upgrade, put the functionality in this

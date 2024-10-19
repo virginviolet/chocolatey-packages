@@ -13,7 +13,7 @@
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <!-- This section is about the software itself -->
     <title>PySol Fan Club Edition</title>
-    <authors>joeraz1962, shlomif, skomoroh</authors>
+    <authors>joeraz1962,shlomif,skomoroh</authors>
     <projectUrl>https://pysolfc.sourceforge.io/</projectUrl>
     <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/pysolfc/icon/pysol-96px.png</iconUrl>
     <licenseUrl>https://github.com/shlomif/PySolFC/blob/master/COPYING</licenseUrl>

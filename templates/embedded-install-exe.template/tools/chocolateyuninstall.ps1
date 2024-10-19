@@ -1,4 +1,4 @@
-﻿# Additional steps for uninstalling [[PackageName]] with Chocolatey
+﻿# Other steps for uninstalling [[PackageName]] with Chocolatey
 
 ## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
 ## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.
@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'embedded-install-exe.template*'  # Part or all of the Display Name as it appears in Programs and Features.
+  softwareName = 'embedded-install-exe.template*' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
@@ -26,6 +26,8 @@ $packageArgs = @{
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   # silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
+  # Exit codes indicating success
+  # validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
   # validExitCodes= @(0) # Insert other valid exit codes here
 }
