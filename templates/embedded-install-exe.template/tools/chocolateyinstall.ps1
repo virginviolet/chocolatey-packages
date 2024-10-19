@@ -44,7 +44,7 @@ $packageArgs = @{
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
   file           = $ExeInstallerPath
-  softwareName   = '[[PackageNameLower]]*' # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique.
+  softwareName   = '[[PackageName]]*' # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique.
   # Checksums
   checksum       = 'INSERT_CHECKSUM'
   checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
