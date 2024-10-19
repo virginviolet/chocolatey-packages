@@ -27,7 +27,7 @@ $empty = -not (Test-Path $installationDirPath\*)
 if (-not $empty) {
     $message = "Data remains in the installation directory. `n" `
         + "Manually remove the installation directory if you do not wish to keep the data.`n" `
-        + "Installation directory: $installationDirPath"
+        + "Installation directory: '$installationDirPath'"
     Write-Warning $message
     Start-Sleep -Seconds 5 # Time to read
 }
