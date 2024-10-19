@@ -1,4 +1,4 @@
-﻿# Additional steps for installing [[PackageName]] with Chocolatey
+﻿# Other steps for installing [[PackageName]] with Chocolatey
 
 # Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors
@@ -44,7 +44,7 @@ $packageArgs = @{
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
   file           = $ExeInstallerPath
-  softwareName   = '[[PackageNameLower]]*' # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique.
+  softwareName   = '[[PackageName]]*' # Display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = 'INSERT_CHECKSUM'
   checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
@@ -63,6 +63,8 @@ $packageArgs = @{
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   # silentArgs   = ''             # None; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
+  # Exit codes indicating success
+  # validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
   validExitCodes = @(0) # Insert other valid exit codes here
 }
