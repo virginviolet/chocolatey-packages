@@ -11,55 +11,72 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
-    <!-- This section is about this package, although id and version have ties back to the software -->
-    <!-- id is lowercase and if you want a good separator for words, use '-', not '.'. Dots are only acceptable as suffixes for certain types of packages, e.g. .install, .portable, .extension, .template -->
-    <!-- If the software is also distributed as a portable program, id should end with '.install' and a separate meta-package without the suffix should be made -->
-    <!-- If the software is cross-platform, attempt to use the same id as the debian/rpm package(s) if possible. Check a service like Repology. https://repology.org/ -->
-    <id>vpinball</id> <!-- https://repology.org/projects/?search=vpinball -->
+    <!-- https://repology.org/projects/?search=vpinball -->
+    <!-- https://repology.org/projects/?search=visual-pinball -->
+    <!-- https://repology.org/projects/?search=visualpinball -->
+    <id>vpinball</id>
     <!-- version should match as closely as possible with the underlying software -->
     <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
     <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
-    <version>__REPLACE__</version>
-    <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>
-    <!-- owners basically means you. -->
-    <owners>__REPLACE_YOUR_NAME__</owners>
+    <version>10.7.3</version>
+    <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/vpinball/</packageSourceUrl>
+    <owners>vpinball</owners>
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <!-- This section is about the software itself -->
-    <!-- If the software is also distributed as a portable program, the software title here should end with ' (Install)' -->
-    <title>vpinball (Install)</title>
-    <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
-    <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
+    <title>vpinball</title>
+    <authors>Randy Davis,Visual Pinball,vpforums community</authors>
+    <projectUrl>https://www.vpforums.org</projectUrl>
     <!-- There are a number of CDN Services that can be used for hosting the icon. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
     <!--<iconUrl>https://rawcdn.githack.com/__REPLACE_YOUR_NAME__/__REPLACE_YOUR_REPO__/main/icons/vpinball.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
-    <licenseUrl>Software License Location</licenseUrl>
+    <copyright>Randy Davis and the Visual Pinball team</copyright>
+    <licenseUrl>https://github.com/vpinball/vpinball/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <projectSourceUrl>Software Source Code Location</projectSourceUrl>
-    <docsUrl>At what url are the software docs located?</docsUrl>
-    <!--<mailingListUrl></mailingListUrl>-->
-    <bugTrackerUrl>https://_Software_Bug_Tracker_Location_REPLACE_</bugTrackerUrl>
-    <tags>vpinball SPACE_SEPARATED</tags>
-    <summary>__REPLACE__</summary>
-    <description>__REPLACE__MarkDown_Okay  The default installation directory is `%ChocolateyInstall%\lib\vpinball`. </description>
-    <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
+    <projectSourceUrl>https://github.com/vpinball/vpinball</projectSourceUrl>
+    <docsUrl>https://www.vpforums.org/Tutorials/VP_9.1.1_Documentation_and_Help_v1.0.pdf</docsUrl>
+    <bugTrackerUrl>https://www.vpforums.org/index.php?app=tracker</bugTrackerUrl>
+    <tags>vpinball pinball video-game game emulator table-editor virtual-pinball pachinko arcade vr-game opensource free-software visual-pinmame pinmame vpm pinball-emulator emulation pinball-simulator simulator pinball-simulation virtual-reality vr vr-video-game crowdsourcing visual-pinball vpx vpx-vr 
+    </tags>
+    <summary>Pinball simulation and table editor</summary>
+    <description>**Visual pinball** gives an authentic pinball gaming experience through software emulation. It contains an editor that allows you to make your own pinball tables, or you can play other people's creations.
+
+Visual Pinball comes with Visual PinMAME, an emulator that can play rom images from real pinball machines.
+
+### Features
+* Simulates pinball table physics and renders the table with DirectX or OpenGL
+* Simple editor to (re-)create any kind of pinball table
+* Live editing in the rendered viewport
+* Table logic (and game rules) can be controlled via Visual Basic Script
+* Over 1050 real/unique pinball machines from ~100 manufacturers, plus over 550 original creations were rebuilt/designed using the Visual * Pinball X editor (over 3000 if one counts all released tables, incl. MODs and different variants), and even more when including its * predecessor versions (Visual Pinball 9.X)
+* Emulation of real pinball machines via Visual PinMAME is possible via Visual Basic Script
+* Supports configurable camera views (e.g. to allow for correct display in virtual pinball cabinets)
+* Support for Tablet/Touch input or specialized pinball controllers
+* Support for Stereo3D output
+* Support for Head tracking via BAM
+* Support for VR HMD rendering (including PUP, B2S backglass and DMD output support)
+
+### Installation
+
+The default installation directory is `C:\Visual Pinball`. </description>
+    <releaseNotes>#### FIXES
+
+* fix missing render updates when debugging/changing parameters in pause mode (10.7.0 regression)
+* show bulb in UI/viewport
+* fix primitive animations getting stuck
+* fix primitive animation speed being dependent on the framerate
+* fix material list combobox not updating
+* fix missing decal UI updates (e.g. width,height)
+* fix loading of greyscale/8bit JPEGs (10.7.2 regression)
+* fix crash when bumper skirt is not visible
+* do not fail to load a table if only the hash/checksum fails, but instead just output a warning
+* do not attempt to play "" reel sound (which otherwise polluted the debug outputs)
+* update BASS library to 2.4.17
+      </releaseNotes>
     <!-- =============================== -->
 
-    <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
-    <!--<dependencies>
-      <dependency id="" version="__MINIMUM_VERSION__" />
-      <dependency id="" version="[__EXACT_VERSION__]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)" />
-      <dependency id="" />
-      <dependency id="chocolatey-core.extension" version="1.1.0" />
-    </dependencies>-->
-    <!-- chocolatey-core.extension - https://community.chocolatey.org/packages/chocolatey-core.extension -->
-
-    <!--<provides>NOT YET IMPLEMENTED</provides>-->
-    <!--<conflicts>NOT YET IMPLEMENTED</conflicts>-->
-    <!--<replaces>NOT YET IMPLEMENTED</replaces>-->
+    <dependencies>
+      <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" />
+    </dependencies>
   </metadata>
   <files>
     <!-- Contents -->

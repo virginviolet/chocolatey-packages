@@ -2,10 +2,25 @@
 
 # Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors
-# $shortcutName = "$($packageName)"
-# $addDesktopShortcut = $true
-# $addStartMenuShortcut = $true
-# $logShortcuts = $true
+$patchInstallDirPath = "C:\Visual Pinball"
+
+# Prevent force install or upgrade if the program is running (so that no progress is lost)
+# This cannot be moved to chocolateybeforemodify.ps1 unless the feature suggested in the following issue is added:
+# https://github.com/chocolatey/choco/issues/1731
+Start-CheckandThrow "VPinball8" > $null
+Start-CheckandThrow "VPinball99_PhysMod5_Updated" > $null
+Start-CheckandThrow "VPinball921" > $null
+Start-CheckandThrow "VPinball995" > $null
+Start-CheckandThrow "VPinballX" > $null
+Start-CheckandThrow "PinMAME" > $null
+Start-CheckandThrow "PinMAME32" > $null
+Start-CheckandThrow "UltraDMD" > $null
+
+# Prevent force install or upgrade if the FlexDMD install tool is running
+Start-CheckandThrow "FlexDMDUI" > $null
+
+# Stop VPinMame Test
+Start-CheckandStop "VPinMameTest" > $null
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
@@ -18,41 +33,26 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
 # Install-ChocolateyVsixPackage @packageArgs
 
-## Extract archive
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-## Paths
-## In Chocolatey scripts, ALWAYS use absolute paths
-# $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-# $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'example.zip'
-# # Arguments
-# $unzipArgs = @{
-#   PackageName  = "$($packageName)"
-#   FileFullPath = "$zipArchivePath"
-#   Destination  = "$toolsDirPath"
-# }
-## Unzip file to the specified location - auto overwrites existing content
-# Get-ChocolateyUnzip @unzipArgs
-
 # Run EXE installer
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
-# In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$ExeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
+$ExeInstallerPath = Join-Path $toolsDirPath 'Main.Download.Installer.-.VPX72setup.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
   file           = $ExeInstallerPath
-  softwareName   = 'vpinball*' # Part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique.
+  softwareName   = 'Visual Pinball*' # The display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
-  checksum       = 'INSERT_CHECKSUM'
+  checksum       = '9661673BD65D3B5E201F8FC7DD6215643BB07D70599B4C232465B6E915505475'
   checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
-  checksum64     = 'INSERT_CHECKSUM'
-  checksumType64 = 'sha256' # Default is checksumType
+  # There is only a 64-bit developer build currently
+  # checksum64     = 'INSERT_CHECKSUM'
+  # checksumType64 = 'sha256' # Default is checksumType
   # Silent arguments
   # Uncomment matching installer type (sorted by most to least common)
-  # silentArgs   = '/S'           # NSIS
+  silentArgs   = '/S'           # NSIS
   # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # silentArgs   = '/s'           # InstallShield
   # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
@@ -63,11 +63,26 @@ $packageArgs = @{
   # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
   # silentArgs   = ''             # None; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
-  # validExitCodes = @(0) # Inno Setup
-  validExitCodes = @(0) # Insert other valid exit codes here
+  # Exit codes indicating success
+  validExitCodes = @(0) # NSIS
 }
 # Installer, will assert administrative rights
 Install-ChocolateyInstallPackage @packageArgs
+
+# Extract archive
+# - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
+Write-Host "Installing patch for $($packageName)..."
+# Paths
+$zipArchivePath = Join-Path $toolsDirPath -ChildPath 'VPinballX73_Minimal.zip'
+# Arguments
+$unzipArgs = @{
+  PackageName  = "$($packageName)"
+  FileFullPath = "$zipArchivePath"
+  Destination  = "$patchInstallDirPath"
+}
+# Unzip file to the specified location - auto overwrites existing content
+Get-ChocolateyUnzip @unzipArgs
+Write-Host "$($packageName) has been patched."
 
 ## Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
 ## - https://docs.chocolatey.org/en-us/create/functions/start-chocolateyprocessasadmin
@@ -102,52 +117,3 @@ Install-ChocolateyInstallPackage @packageArgs
 ## - https://docs.chocolatey.org/en-us/create/functions
 ## There may also be functions available in extension packages
 ## - https://community.chocolatey.org/packages?q=id%3A.extension for examples and availability.
-
-## Add shortcuts
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
-# if ($addDesktopShortcut -or $addStartMenuShortcut) {
-#   # Paths
-#   $executableDirPath = $toolsDirPath
-#   $executablePath = Join-Path $executableDirPath "$($packageName).exe"
-#   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
-#   $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk"
-#   $iconPath = Join-Path "$installerDirPath" -ChildPath "$($packageName).ico"
-#   if ($logShortcuts) {
-#     $packagePath = $env:ChocolateyPackageFolder
-#     $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
-#   }
-# }
-## Add desktop shortcut
-# if ($addDesktopShortcut) {
-#   # Arguments
-#   $desktopShortcutArgs = @{
-#     shortcutFilePath = "$desktopShortcutPath"
-#     targetPath       = "$executablePath"
-#     workingDirectory = "$installerDirPath"
-#     arguments        = "C:\test.txt"
-#     iconLocation     = "$iconPath"
-#     description      = "This is the description."
-#   }
-#   Install-ChocolateyShortcut @desktopShortcutArgs
-#   # Log
-#   if ($logShortcuts) {
-#     "$desktopShortcutPath" | Out-File "$shortcutsLog" -Append
-#   }
-# }
-## Add start menu shortcut
-# if ($addStartMenuShortcut) {
-#   # Arguments
-#   $startMenuShortcutArgs = @{
-#     shortcutFilePath = "$startMenuShortcutPath"
-#     targetPath       = "$executablePath"
-#     workingDirectory = "$installerDirPath"
-#     arguments        = "C:\test.txt"
-#     iconLocation     = "$iconPath"
-#     description      = "This is the description."
-#   }
-#   Install-ChocolateyShortcut @startMenuShortcutArgs
-#   # Log
-#   if ($logShortcuts) {
-#     "$startMenuShortcutPath" | Out-File "$shortcutsLog" -Append
-#   }
-# }
