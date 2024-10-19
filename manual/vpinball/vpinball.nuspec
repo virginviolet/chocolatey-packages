@@ -24,8 +24,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <title>vpinball</title>
     <authors>Randy Davis,Visual Pinball,vpforums community</authors>
     <projectUrl>https://www.vpforums.org</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the icon. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!--<iconUrl>https://rawcdn.githack.com/__REPLACE_YOUR_NAME__/__REPLACE_YOUR_REPO__/main/icons/vpinball.png</iconUrl>-->
+    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/vpinball/icon/vpinball.ico-96px.png</iconUrl>
     <copyright>Randy Davis and the Visual Pinball team</copyright>
     <licenseUrl>https://github.com/vpinball/vpinball/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
