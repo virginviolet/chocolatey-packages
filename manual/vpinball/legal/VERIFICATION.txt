@@ -25,6 +25,6 @@ and can be verified like this:
   checksum64: 9661673BD65D3B5E201F8FC7DD6215643BB07D70599B4C232465B6E915505475
 
 6. If the hashes match for both files, you have successfully verified this package.
-7. You can also have a look at the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1' <CHECK WHICH FILES ARE INCLUDED>. Open a file in a text editor or IDE and see if it looks clean. If you want to learn more about this, check out the Chocolatey docs on creating packages <https://docs.chocolatey.org/en-us/create/create-packages/>.
+7. You can also have a look at the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1'. Open a file in a text editor or IDE and see if it looks clean. If you want to learn more about this, check out the Chocolatey docs on creating packages <https://docs.chocolatey.org/en-us/create/create-packages/>.
 
 The license in 'LICENSE.txt' is obtained from <VPinballX73_Minimal.zip\license.txt>.
