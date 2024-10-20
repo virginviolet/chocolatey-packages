@@ -5,7 +5,7 @@
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
     <id>pysolfc</id> <!-- https://repology.org/projects/?search=pysol -->
-    <version>3.0.0</version>
+    <version>3.1.0</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/pysolfc/</packageSourceUrl>
     <owners>virginviolet</owners>
     <!-- ============================== -->
@@ -32,12 +32,10 @@ Its features include a modern look and feel (uses the TTk widget set), multiple 
 ### Installation
 
 The default installation directory is `C:\Program Files (x86)\PySol Fan Club edition`. </description> 
-    <releaseNotes>* 120 new games.
-* Support for several new types of games/decks, including tile puzzles, Ishido-type tile matching games, joker deck games, and more.
-* New game and cardset categories.
-* Ability to change the style of virtually any of the graphics in PySol.
-* Some UI/Quality of Life improvements.
-* Bugfixes.
+    <releaseNotes>* Ten new games.
+* Cleanup of duplicate images to reduce package size.
+* Some extra cardset/table tile filter options.
+* Many enhancements, bugfixes, etc.
   </releaseNotes>
     <!-- =============================== -->
 

@@ -5,7 +5,7 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 
 # Run EXE installer
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$ExeInstallerPath = Join-Path $toolsDirPath 'PySolFC_3.0.0_setup.exe'
+$ExeInstallerPath = Join-Path $toolsDirPath 'PySolFC_3.1.0_setup.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
