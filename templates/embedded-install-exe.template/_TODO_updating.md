@@ -2,21 +2,21 @@
 
 # To do
 
-- [ ] `Tools/`: Move old binaries to `archive/`.
-- [ ] `pysolfc/`: Move old nupkg to `archive/`.
-- [ ] `Tools/`: Move new binaries to `tools/`.
-- [ ] `Nuspec`: Update `version`.
-- [ ] `Nuspec`: Update `releaseNotes`.
-- [ ] `legal/LICENSE.txt`: Verify license.
-- [ ] `legal/VERIFICATION.txt`: Update download URLs.
-- [ ] `legal/VERIFICATION.txt`: Update filenames in every place.
-- [ ] `legal/VERIFICATION.txt`: Update checksum32.
-- [ ] `legal/VERIFICATION.txt`: Update checksum64.
-- [ ] `legal/VERIFICATION.txt`: Verify license URL.
-- [ ] `chocolateyInstall.ps1`: Update `$exeInstallerPath`.
-- [ ] `chocolateyInstall.ps1`: Update `checksum`.
-- [ ] `chocolateyInstall.ps1`: Update `checksum64`.
-- [ ] Test the package to ensure install works appropriately.
+1. [ ] `Tools/`: Move old binaries to `archive/`.
+2. [ ] `pysolfc/`: Move old nupkg to `archive/`.
+3. [ ] `Tools/`: Move new binaries to `tools/`.
+4. [ ] `Nuspec`: Update `version`.
+5. [ ] `Nuspec`: Update `releaseNotes`.
+6. [ ] `legal/LICENSE.txt`: Verify license.
+7. [ ] `legal/VERIFICATION.txt`: Update download URLs.
+8. [ ] `legal/VERIFICATION.txt`: Update filenames in every place.
+9. [ ] `legal/VERIFICATION.txt`: Update checksum32.
+10. [ ] `legal/VERIFICATION.txt`: Update checksum64.
+11. [ ] `legal/VERIFICATION.txt`: Verify license URL.
+12. [ ] `chocolateyInstall.ps1`: Update `$exeInstallerPath`.
+13. [ ] `chocolateyInstall.ps1`: Update `checksum`.
+14. [ ] `chocolateyInstall.ps1`: Update `checksum64`.
+15. [ ] Test the package to ensure install works appropriately.
     `choco pack; choco upgrade [[PackageName]] --source .`
-- [ ] Push package.
+16. [ ] Push package to Chocolatey Community Repository.
     `choco push`
