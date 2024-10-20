@@ -14,11 +14,11 @@
 6. [ ] Remove one of the verification files in `legal/`.
 7. [ ] Rename the remaining verification file to `VERIFICATION.txt`.
 8. [ ] Fill out `legal\VERIFICATION.txt`.
-9. [ ] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
+9.  [ ] Fill out nuspec.
 10. [ ] Fill out `tools\chocolateyInstall.ps1`.
 11. [ ] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 12. [ ] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
-13. [ ] Fill out nuspec.
+13. [ ] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
 14. [ ] Test the package to ensure install/uninstall work appropriately.
 15. [ ] Commit.
 16. [ ] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.

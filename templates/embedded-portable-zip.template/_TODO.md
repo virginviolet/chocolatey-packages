@@ -19,10 +19,11 @@ Portable packages should be possible to install without administrative rights.
 6. [ ] Remove one of the verification files in `legal/`.
 7. [ ] Rename the remaining verification file to `VERIFICATION.txt`.
 8. [ ] Fill out `legal\VERIFICATION.txt`.
-9. [ ] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
+9.  [ ] Fill out nuspec.
 10. [ ] Fill out `tools\chocolateyInstall.ps1`.
 11. [ ] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
-12. [ ] Fill out nuspec.
+12. [ ] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
+12. [ ] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
 13. [ ] If there is a GUI executable, create an empty file next to the exe named `name.exe.gui`.
 14. [ ] If you want to ignore an executable, create an empty file next to the exe named `name.exe.ignore`.
 15. [ ] Test the package to ensure install/uninstall work appropriately.
