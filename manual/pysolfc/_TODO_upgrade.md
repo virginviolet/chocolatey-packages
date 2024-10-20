@@ -1,3 +1,5 @@
+# TODO on updating the package for a new version of the software
+
 - [ ] `Tools/`: Move binary to `archive/`.
 - [ ] `pysolfc/`: Move nupkg to `archive/`.
 - [ ] `Tools/`: Move new binary to `tools/`.
