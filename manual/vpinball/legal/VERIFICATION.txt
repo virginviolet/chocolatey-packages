@@ -15,7 +15,7 @@ and can be verified like this:
   checksum type: sha256
   checksum64: 30CCBE74F2D59BF758760D9067BC2180E754D0E4043AEA85BE82ACADF7CF47F3
 
-3. Obtain the checksum of the zip archive you downloaded in step 1, and of the zip archive that came with this package (in the 'tools' folder). If they have the same hash, you have successfully verified the file.
+3. Obtain the checksum of the EXE file you downloaded in step 1, and of the EXE file that came with this package (in the 'tools' folder). If they have the same hash, you have successfully verified the file.
 4. Download 'VPinballX73_Minimal.zip' from this page:
 <https://github.com/vpinball/vpinball/releases/tag/10.7.3>
 5. Verify it in the same manner as the previous file.
@@ -24,7 +24,7 @@ and can be verified like this:
   checksum type: sha256
   checksum64: 9661673BD65D3B5E201F8FC7DD6215643BB07D70599B4C232465B6E915505475
 
-6. If the hashes match for both files, you have successfully verified this package.
+6. If the hashes match in both cases, you have successfully verified this package.
 7. You can also have a look at the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1'. Open a file in a text editor or IDE and see if it looks clean. If you want to learn more about this, check out the Chocolatey docs on creating packages <https://docs.chocolatey.org/en-us/create/create-packages/>.
 
 The license in 'LICENSE.txt' is obtained from <VPinballX73_Minimal.zip\license.txt>.
