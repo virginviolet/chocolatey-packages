@@ -19,7 +19,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
     <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
     <version>[[PackageVersion]]</version>
-    <packageSourceUrl>Where is this Chocolatey package located (think GitHub)?</packageSourceUrl>
+    <packageSourceUrl>https://github.com/[[MaintainerName]]/chocolatey-packages/tree/main/manual/png-to-ico.install/</packageSourceUrl>
     <!-- owners basically means you. -->
     <owners>[[MaintainerName]]</owners>
     <!-- ============================== -->
@@ -30,7 +30,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
     <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
     <!-- There are a number of CDN Services that can be used for hosting the icon. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!--<iconUrl>https://rawcdn.githack.com/[[MaintainerName]]/__REPLACE_YOUR_REPO__/main/manual/[[PackageName]]/[[PackageName]]_icon.png</iconUrl>-->
+    <!--<iconUrl>https://rawcdn.githack.com/[[MaintainerName]]/chocolatey-packages/main/manual/[[PackageName]]/[[PackageName]]_icon.png</iconUrl>-->
     <!-- <copyright>Year Software Vendor</copyright> -->
     <licenseUrl>Software License Location</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
