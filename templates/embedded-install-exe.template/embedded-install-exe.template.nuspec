@@ -42,7 +42,13 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <bugTrackerUrl>https://_Software_Bug_Tracker_Location_REPLACE_</bugTrackerUrl>
     <tags>[[PackageNameLower]] SPACE_SEPARATED</tags>
     <summary>__REPLACE__</summary>
-    <description>__REPLACE__MarkDown_Okay  The default installation directory is `C:\Program Files (x86)\[[PackageName]]`. [[AutomaticPackageNotesNuspec]]</description>
+    <description>__REPLACE__MarkDown_Okay  [[AutomaticPackageNotesNuspec]]
+
+### Installation
+
+This is an installing package (not portable).
+
+The default installation directory is `C:\Program Files (x86)\[[PackageName]]`.</description>
     <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
     <!-- =============================== -->
 
