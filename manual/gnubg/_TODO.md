@@ -11,7 +11,7 @@
 3. [x] Commit.
 4. [x] Add installer EXE to the tools directory.
 5. [x] Fill out legal\LICENSE.txt
-6. [ ] Fill out legal\VERIFICATION.txt
+6. [x] Fill out legal\VERIFICATION.txt
 7. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 8. [ ] Fill out tools\chocolateyInstall.ps1.
 9.  [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
