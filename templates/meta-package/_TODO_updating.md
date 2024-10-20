@@ -14,6 +14,6 @@
 10. [ ] `chocolateyUninstall.ps1`: Update `ZipFileName`.
 11. [ ] Test the package to ensure install works appropriately.
     `choco pack; choco upgrade [[PackageName]] --source .`
-12. [ ] Push package.
+12. [ ] Push package to Chocolatey Community Repository.
     `choco push`
 13. [ ] Update meta-package if applicable.
