@@ -1,4 +1,4 @@
-﻿# TODO
+﻿# Checklist for package creation
 
 ## Guides
 
@@ -15,7 +15,7 @@
 6. [ ] Test the package to ensure install/uninstall work appropriately.
 7. [ ] Add nupkg to .gitignore.
 8. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
-9.  [ ] Delete this file.
+9. [ ] Delete this file.
 10. [ ] Commit and publish to GitHub.
 11. [ ] Merge branch with main.
 12. [ ] Commit and publish to GitHub.

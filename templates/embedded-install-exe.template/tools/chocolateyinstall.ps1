@@ -37,13 +37,13 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$ExeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
+$exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
-  file           = $ExeInstallerPath
+  file           = $exeInstallerPath
   softwareName   = '[[PackageName]]*' # Display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = 'INSERT_CHECKSUM'
@@ -66,7 +66,7 @@ $packageArgs = @{
   # Exit codes indicating success
   # validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
-  validExitCodes = @(0) # Insert other valid exit codes here
+  validExitCodes = @(0) # Other; insert other valid exit codes here
 }
 # Installer, will assert administrative rights
 Install-ChocolateyInstallPackage @packageArgs

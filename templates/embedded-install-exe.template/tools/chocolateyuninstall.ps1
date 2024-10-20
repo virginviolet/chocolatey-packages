@@ -29,7 +29,7 @@ $packageArgs = @{
   # Exit codes indicating success
   # validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
-  # validExitCodes= @(0) # Insert other valid exit codes here
+  validExitCodes = @(0) # Other; insert other valid exit codes here
 }
 # Get uninstall registry keys that match the softwareName pattern
 [array]$keys = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']

@@ -1,4 +1,4 @@
-﻿# TODO
+﻿# Checklist for package creation
 
 ## Guides
 
@@ -19,7 +19,7 @@ Portable packages should be possible to install without administrative rights.
 6. [ ] Fill out legal\VERIFICATION.txt
 7. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
 8. [ ] Fill out tools\chocolateyInstall.ps1.
-9.  [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
+9. [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 10. [ ] Fill out nuspec.
 11. [ ] If there is a GUI executable, create an empty file next to the exe named 'name.exe.gui'.
 12. [ ] If you want to ignore an executable, create an empty file next to the exe named 'name.exe.ignore'.
@@ -32,6 +32,7 @@ Portable packages should be possible to install without administrative rights.
 19. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
 19. [ ] Inform of default install location in description in nuspec.
 20. [ ] Finish legal\VERIFICATION.txt
+21. [ ] Adjust TODO_updating.md if needed.
 21. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
 22. [ ] Test the package again to ensure install/uninstall work appropriately.
 23. [ ] Commit and publish to GitHub.
@@ -42,6 +43,7 @@ Portable packages should be possible to install without administrative rights.
 28. [ ] Merge branch with main again.
 29. [ ] Commit and publish to GitHub again.
 30. [ ] Pack and push to Chocolatey Community Repository.
+32. [ ] Make a meta-package if applicable.
 
 ## Learn more
 
