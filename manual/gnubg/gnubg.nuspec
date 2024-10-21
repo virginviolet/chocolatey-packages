@@ -63,20 +63,14 @@ The following features can be found in the current release of GNU Backgammon.
 
 This is an installing package (not portable).
 
-The default installation directory is `C:\Program Files (x86)\gnubg`. </description>
+The default installation directory is `%LOCALAPPDATA%\gnubg`. </description>
     <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
     <!-- =============================== -->
 
     <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
-    <!--<dependencies>
-      <dependency id="" version="__MINIMUM_VERSION__" />
-      <dependency id="" version="[__EXACT_VERSION__]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)" />
-      <dependency id="" />
-      <dependency id="chocolatey-core.extension" version="1.1.0" />
-    </dependencies>-->
-    <!-- chocolatey-core.extension - https://community.chocolatey.org/packages/chocolatey-core.extension -->
+    <dependencies>
+      <dependency id="autohotkey" version="1.0" />
+    </dependencies>
   </metadata>
   <files>
     <!-- Contents -->
