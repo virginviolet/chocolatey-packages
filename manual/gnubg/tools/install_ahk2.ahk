@@ -50,16 +50,16 @@ SetWorkingDir A_ScriptDir ; Ensure a consistent starting directory
 ;{-----------------------------------------------
 ;
 
-; Wait up to 12 minutes for the program to start
-NewPID := ProcessWait("gnubg-cli.exe", 720)
-; If not started
-if not NewPID
+; Wait up to 12 minutes for the window to appear
+HWND := WinWait("ahk_exe gnubg-cli.exe", , 720)
+; If not appeared
+if not HWND
     {
-        ; [ ] Test
-        Throw "The 'gnubg-cli' process did not appear within 12 minutes."
+        ; [x] Test
+        Throw "A windown from a 'gnubg-cli.exe' process did not appear within 12 minutes."
     }
 ; Otherwise
-; [ ] Test
+; [x] Test
 ; Hide the window
 WinHide "ahk_exe gnubg-cli.exe"
 ExitApp  ; Exit the script

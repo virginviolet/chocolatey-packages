@@ -63,7 +63,7 @@ The following features can be found in the current release of GNU Backgammon.
 
 This is an installing package (not portable).
 
-The default installation directory is `%LOCALAPPDATA%\gnubg`. </description>
+The default installation directory is ~~`%LOCALAPPDATA%\gnubg`~~ `%ProgramFiles(x86)%\gnubg`. </description>
     <!-- <releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes> -->
     <!-- =============================== -->
 

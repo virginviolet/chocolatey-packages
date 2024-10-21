@@ -51,19 +51,21 @@ SetTitleMatchMode, 1 ; Match window titles from the beginning
 ;{-----------------------------------------------
 ;
 
-; Wait up to 12 minutes for the program starts
-; Process, Wait, gnubg-cli.exe, 720
-Process, Wait, gnubg-cli.exe, 720
-NewPID := ErrorLevel  ; Save the value immediately since ErrorLevel is often changed.
-if not NewPID  ; If Notepad has started
+; Wait up to 12 minutes for the window to appear
+; MsgBox, Looking
+WinWait, ahk_exe gnubg-cli.exe, , 720
+if ErrorLevel
     {
-        ; [ ] Test
-        Throw "The 'gnubg-cli' process did not appear within 12 minutes."
-    }
-; Otherwise
-; [ ] Test
-; Retrieve the window ID of the program
-WinHide, ahk_exe, gnubg-cli.exe
-ExitApp  ; Exit the script
+    ; [x] Test
+    ; MsgBox, "Not found"
+    Throw "The 'gnubg-cli' process did not appear within 12 minutes."
+}
+else {
+    ; [x] Test
+    ; MsgBox, "Found!"
+    WinHide ; Use the window found by WinWait.
+    ; MsgBox, "Hidden."
+    ExitApp  ; Exit the script
+}
 
 ;}
