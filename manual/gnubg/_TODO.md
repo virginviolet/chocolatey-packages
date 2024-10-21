@@ -13,7 +13,7 @@
 5. [x] Fill out legal\LICENSE.txt
 6. [x] Fill out legal\VERIFICATION.txt
 7. [x] Fill out nuspec.
-8. [ ] Fill out tools\chocolateyInstall.ps1.
+8. [x] Fill out tools\chocolateyInstall.ps1.
 9. [ ] Fill out tools\chocolateyUninstall.ps1 - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 10. [ ] Remove tools\.skipAutoUninstall if chocolateyUninstall.ps1 is used and auto-uninstaller is not desired.
 11. [ ] Fill out tools\chocolateyBeforeModify.ps1 - remove if you have no processes or services to shut down before upgrade/uninstall
