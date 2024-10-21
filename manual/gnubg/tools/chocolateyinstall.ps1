@@ -24,17 +24,29 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # Start AutoHotKey script to hide compiler window
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$ahk1InstallPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
-$ahk2InstallPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
-$autoHotKeyPath = $(Get-Command autohotkey).Source
+$ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
+$ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
+# Get AutoHotKey path
+try {
+  # $autoHotKeyPath = $(Get-Command autohotkey).Source
+  $autoHotKeyPath = "C:\Program Files\AutoHotkey\AutoHotkey.exe"
+}
+catch [System.Management.Automation.CommandNotFoundException]  {
+  Write-Error "AutoHotKey not found.`n$_"
+}
+catch {
+  Write-Error "$_"
+}
 # Start-ChocolateyProcessAsAdmin -Statements "" -ExeToRun "$autoHotKeyPath" -validExitCodes 0
 # TODO Try for AutoHotKey
-$ahkVersionMajor = $(Get-Command autohotkey).Version.Major
+$ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
 if ($ahkVersionMajor -ge 2) {
-$ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2InstallPath"""
-Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+  Write-Debug "AutoHotKey >= 2.0"
+  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2ScriptPath"""
+  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
 } else {
-  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1InstallPath"""
+  Write-Debug "AutoHotKey < 2.0"
+  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
   Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
 }
 # throw
@@ -72,6 +84,8 @@ $packageArgs = @{
 
 # Installer, will assert administrative rights
 Install-ChocolateyInstallPackage @packageArgs
+
+# TODO Installation at in LOCALAPPDATA and PFx86??
 
 ## Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
 ## - https://docs.chocolatey.org/en-us/create/functions/start-chocolateyprocessasadmin
