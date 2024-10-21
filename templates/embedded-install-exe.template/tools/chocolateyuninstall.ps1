@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'embedded-install-exe.template*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName = '[[PackageName]]*' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
