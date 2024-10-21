@@ -18,26 +18,15 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
 # Install-ChocolateyVsixPackage @packageArgs
 
-## Extract archive
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-## Paths
-## In Chocolatey scripts, ALWAYS use absolute paths
-# $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-# $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'example.zip'
-# # Arguments
-# $unzipArgs = @{
-#   PackageName  = "$($packageName)"
-#   FileFullPath = "$zipArchivePath"
-#   Destination  = "$toolsDirPath"
-# }
-## Unzip file to the specified location - auto overwrites existing content
-# Get-ChocolateyUnzip @unzipArgs
-
 # Run EXE installer
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
-# In Chocolatey scripts, ALWAYS use absolute paths
+# Start AutoHotKey script to hide compiler window
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$ExeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
+$ahkInstallPath = Join-Path $toolsDirPath -ChildPath 'install.ahk'
+$autoHotKeyPath = $(Get-Command autohotkey).Source
+Start-ChocolateyProcessAsAdmin -Statements "$ahkInstallPath" -ExeToRun "$autoHotKeyPath" -validExitCodes 0
+
+$ExeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
@@ -53,7 +42,7 @@ $packageArgs = @{
   # Silent arguments
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
-  # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # silentArgs   = '/s'           # InstallShield
   # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
   # silentArgs   = '/s'           # Wise InstallMaster
@@ -65,9 +54,10 @@ $packageArgs = @{
   #       https://community.chocolatey.org/packages/autohotkey.portable
   # Exit codes indicating success
   # validExitCodes = @(0) # NSIS
-  # validExitCodes = @(0) # Inno Setup
-  validExitCodes = @(0) # Insert other valid exit codes here
+  validExitCodes = @(0) # Inno Setup
+  # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
+
 # Installer, will assert administrative rights
 Install-ChocolateyInstallPackage @packageArgs
 
