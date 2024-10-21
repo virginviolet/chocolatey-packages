@@ -7,6 +7,8 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # $addStartMenuShortcut = $true
 # $logShortcuts = $true
 
+# TODO Close app
+
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
 
@@ -22,10 +24,20 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # Start AutoHotKey script to hide compiler window
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$ahkInstallPath = Join-Path $toolsDirPath -ChildPath 'install.ahk'
+$ahk1InstallPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
+$ahk2InstallPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
 $autoHotKeyPath = $(Get-Command autohotkey).Source
-Start-ChocolateyProcessAsAdmin -Statements "$ahkInstallPath" -ExeToRun "$autoHotKeyPath" -validExitCodes 0
-
+# Start-ChocolateyProcessAsAdmin -Statements "" -ExeToRun "$autoHotKeyPath" -validExitCodes 0
+# TODO Try for AutoHotKey
+$ahkVersionMajor = $(Get-Command autohotkey).Version.Major
+if ($ahkVersionMajor -ge 2) {
+$ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2InstallPath"""
+Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+} else {
+  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1InstallPath"""
+  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+}
+# throw
 $ExeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
 # Arguments
 $packageArgs = @{
