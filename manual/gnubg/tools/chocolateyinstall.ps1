@@ -7,7 +7,37 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # $addStartMenuShortcut = $true
 # $logShortcuts = $true
 
-# TODO Close app
+# Prevent force install if any of these programs are running
+# (so that no progress is lost)
+# This cannot be moved to chocolateybeforemodify.ps1
+# unless the feature suggested in the following issue is added:
+# https://github.com/chocolatey/choco/issues/1731
+# GUI version of the game
+Start-CheckandThrow "gnubg" > $null
+# Command line version of the game
+Start-CheckandThrow "gnubg-cli" > $null
+# Bundled program for generating bearoff databases
+Start-CheckandThrow "makebearoff" > $null
+# Bundled program for generating databases for Hypergammon
+Start-CheckandThrow "makehyper" > $null
+# Bundled program for generating a GNU Backgammon binary weights file
+Start-CheckandThrow "makeweights" > $null
+
+# Close the following program if it is running
+# Bundled program for dumping a position from the
+# GNU Backgammon bearoff database
+# Check PowerShell version
+# (Start-CheckandStop uses Write-Host, so output can only be suppressed
+# in PowerShell > 5.0)
+if ($PSVersionTable.PSVersion.Major -ge 5) {
+  # Redirect to Success stream before $null,
+  # in case the author ever decides to move away from Write-Host
+  Write-Debug "PowerShell >= 5.0"
+  Start-CheckandStop "bearoffdump" 6>&1 > $null
+} else {
+  Write-Debug "PowerShell < 5.0"
+  Start-CheckandStop "bearoffdump" > $null
+}
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
@@ -28,8 +58,11 @@ $ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
 $ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
 # Get AutoHotKey path
 try {
-  # $autoHotKeyPath = $(Get-Command autohotkey).Source
-  $autoHotKeyPath = "C:\Program Files\AutoHotkey\AutoHotkey.exe"
+  # IMPROVE Move to Preferences section
+  $autoHotKeyPath = $(Get-Command autohotkey).Source
+  # Set custom AutoHotKey path (comment out previous line
+  # and uncomment next line)
+  # $autoHotKeyPath = "C:\Program Files\AutoHotkey\AutoHotkey.exe"
 }
 catch [System.Management.Automation.CommandNotFoundException]  {
   Write-Error "AutoHotKey not found.`n$_"
@@ -37,19 +70,20 @@ catch [System.Management.Automation.CommandNotFoundException]  {
 catch {
   Write-Error "$_"
 }
-# Start-ChocolateyProcessAsAdmin -Statements "" -ExeToRun "$autoHotKeyPath" -validExitCodes 0
 # TODO Try for AutoHotKey
 $ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
 if ($ahkVersionMajor -ge 2) {
   Write-Debug "AutoHotKey >= 2.0"
   $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2ScriptPath"""
+  # I cannot get this working
+  # Start-ChocolateyProcessAsAdmin -Statements "" -ExeToRun "$autoHotKeyPath" -elevated False -validExitCodes 0
+  # Use regular PowerShell instead
   Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
 } else {
   Write-Debug "AutoHotKey < 2.0"
   $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
   Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
 }
-# throw
 $ExeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
 # Arguments
 $packageArgs = @{
@@ -81,7 +115,6 @@ $packageArgs = @{
   validExitCodes = @(0) # Inno Setup
   # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
-
 # Installer, will assert administrative rights
 Install-ChocolateyInstallPackage @packageArgs
 
