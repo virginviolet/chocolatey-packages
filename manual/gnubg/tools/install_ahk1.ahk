@@ -1,71 +1,43 @@
-; install
-; virginviolet
+; Script to make installation of gnubg with Chocolatey silent
 ;
-; <Scipt Short Description>
+; Hide the command prompt window that showing compiler progress
+; as soon as it appears.
 ;
 
-;; INITIALIZATION - ENVIROMENT
+;; INITIALIZATION
 ;{-----------------------------------------------
 ;
-#ErrorStdOut utf-8 ; Send errors to the Error stream rather than displaying as a dialog ; Send errors to the Error stream rather than displaying as a dialogue
+; Send errors to the Error stream rather than displaying as a dialog
+; (this doesn't work for me, but I wish it would)
+#ErrorStdOut utf-8
+; Enforce single instance
 #SingleInstance force
-#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases
-#Warn ; Enable warnings to assist with detecting common errors
-#NoTrayIcon ; Disables tray icon
-SetBatchLines, -1 ; Removing artificial delays between the execution of lines
-SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
-SetTitleMatchMode, 1 ; Match window titles from the beginning
+; Avoid checking empty variables to see if they are environment variables 
+#NoEnv
+; Enable warnings to assist with detecting common errors
+#Warn
+; Disable tray icon
+#NoTrayIcon
+; Remove artificial delays between the execution of lines
+SetBatchLines, -1
+; Match window titles from the beginning
+SetTitleMatchMode, 1
 ;}
 
-;; DEFAULT SETTING - VARIABLES
+;; WAIT AND HIDE
 ;{-----------------------------------------------
 ;
-
-;}
-
-;; INITIALIZATION - VARIABLES
-;{-----------------------------------------------
-;
-
-;}
-
-;; AUTO-EXECUTE
-;{-----------------------------------------------
-;
-
-;}
-
-;; CLASSES & FUNCTIONS
-;{-----------------------------------------------
-;
-
-;}
-
-;; LIBRARIES
-;{-----------------------------------------------
-;
-
-;}
-
-;; INSTALL
-;{-----------------------------------------------
-;
-
 ; Wait up to 12 minutes for the window to appear
-; MsgBox, Looking
 WinWait, ahk_exe gnubg-cli.exe, , 720
 if ErrorLevel
     {
-    ; [x] Test
-    ; MsgBox, "Not found"
+    ; Throw error if the window did not appear within the time limit
     Throw "The 'gnubg-cli' process did not appear within 12 minutes."
 }
 else {
-    ; [x] Test
-    ; MsgBox, "Found!"
-    WinHide ; Use the window found by WinWait.
-    ; MsgBox, "Hidden."
-    ExitApp  ; Exit the script
+    ; Hide the window found by WinWait
+    WinHide
+    ; Exit the script
+    ExitApp
 }
-
 ;}
