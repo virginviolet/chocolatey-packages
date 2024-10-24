@@ -16,16 +16,16 @@ and can be verified like this:
   
   FILENAME.exe:
   checksum type: sha256
-  checksum<32 OR 64>: 68CD01D92A99E6EC4BDB5F544C14ECBFCC7D9119AFB0D2AC189698B309E62D06
+  checksum32: 68CD01D92A99E6EC4BDB5F544C14ECBFCC7D9119AFB0D2AC189698B309E62D06
 
 3. Obtain the checksum of the exe file that came with this package (in the
   'tools' folder). If they have the same hash as the file you downloaded in
   step 1, you have successfully verified the integrity of the exe files.
-4. Open the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1' <CHECK WHICH FILES ARE INCLUDED> in a
+4. Open the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1' in a
 text editor or IDE and see if it looks clean.
   If you want to learn more about this, check out the Chocolatey docs on
   creating packages:
   <https://docs.chocolatey.org/en-us/create/create-packages/>
 
-The license in 'LICENSE.txt' is obtained from <https://git.savannah.gnu.org/cgit/gnubg.git/tree/COPYING>.
-<KEEP EACH LINE 80 CHARACTERS MAX>
+The license in 'LICENSE.txt' is obtained from
+<https://git.savannah.gnu.org/cgit/gnubg.git/tree/COPYING>.
