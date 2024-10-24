@@ -94,10 +94,21 @@ $packageArgs = @{
 }
 # Get uninstall registry keys that match the softwareName pattern
 [array]$keys = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
-# If 1 match was found
-if ($keys.Count -eq 1) {
-  $keys | % {
-    # Adjust arguments
+# Perform action based on the number of matching keys
+# If 0 keys matched
+if ($keys.Count -eq 0) {
+  Write-Warning "$packageName has already been uninstalled by other means."
+  # If more than 1 keys matched
+} elseif ($keys.Count -gt 1) {
+  Write-Warning "$($keys.Count) matches found!"
+  Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
+  Write-Warning "Please alert package maintainer the following keys were matched:"
+  $keys | ForEach-Object { Write-Warning "- $($_.DisplayName)" }
+  # If 1 key matched
+} elseif ($keys.Count -eq 1) {
+  # Uninstall
+  # Adjust arguments
+  $keys | ForEach-Object {
     # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
     # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"
     $packageArgs['file'] = "$($_.UninstallString)" # NOTE: You may need to split this if it contains spaces
@@ -139,13 +150,9 @@ if ($keys.Count -eq 1) {
       Write-Debug "GNU Backgammon preferences directory not found."
       # Pause
     }
-    # Run uninstaller
-    if (-not $shouldRestorePrefsDir) {
-      # [x] Test
-      Write-Debug "Running installer..."
-      # Pause
-      Uninstall-ChocolateyPackage @packageArgs
-    } else {
+    # Run uninstaller and restore '.gnubg\' from '$env:TEMP'
+    if ($shouldRestorePrefsDir) {
+      # If installation fails, restore '.gnubg\' to its original location before stopping the script.
       # [x] Test
       try {
         Write-Debug "Running installer..."
@@ -162,7 +169,7 @@ if ($keys.Count -eq 1) {
         Write-Verbose "Restoring preferences directory..."
         Write-Verbose "Moving '.gnubg/' from '$env:TEMP' to '$env:UserProfile'..."
         # Pause
-        Move-Item $gnuBgPreferencesTempDir -Destination "$env:UserProfile" -Force # Replace silently in edge case where it already exists
+        Move-Item $gnuBgPreferencesTempDir -Destination "$env:UserProfile" -Force
         Write-Verbose "Moved '.gnubg/' from '$env:TEMP' to '$env:UserProfile'."
         Write-Verbose "Preferences directory restored."
       }
@@ -173,18 +180,18 @@ if ($keys.Count -eq 1) {
         + "Manually remove it if you do not wish to keep it.`n" `
         + "GNU Backgammon preferences directory: $gnuBgPreferencesDir"
       Write-Warning $message
-      Start-Sleep -Seconds 5 # time to read
+       # Give the user time to read
+      Start-Sleep -Seconds 5
+    } else {
+      # [x] Test
+      # Uninstall directly
+      # It feels, perhaps unfoundedly, safer to not use try-catch
+      # for Chocolatey package installation, so let's avoid it when possible
+      Write-Debug "Running installer..."
+      # Pause
+      Uninstall-ChocolateyPackage @packageArgs
     }
   }
-  # If 0 matches was found
-} elseif ($keys.Count -eq 0) {
-  Write-Warning "$packageName has already been uninstalled by other means."
-  # If more than 1 matches were found
-} elseif ($keys.Count -gt 1) {
-  Write-Warning "$($keys.Count) matches found!"
-  Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
-  Write-Warning "Please alert package maintainer the following keys were matched:"
-  $keys | % { Write-Warning "- $($_.DisplayName)" }
 }
 
 ## Remove persistent Environment variable
