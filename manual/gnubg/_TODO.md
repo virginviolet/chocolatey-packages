@@ -27,8 +27,8 @@
 17. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
 18. [x] Inform of default install location in description in nuspec.
 19. [x] Finish legal\VERIFICATION.txt
-20. [ ] Delete ReadMe.md file once you have read over and used anything you've needed from here.
-21. [ ] Test the package again to ensure install/uninstall work appropriately.
+20. [x] Delete ReadMe.md file once you have read over and used anything you've needed from here.
+21. [x] Test the package again to ensure install/uninstall work appropriately.
 22. [ ] Commit and publish to GitHub.
 23. [ ] Merge branch with main.
 24. [ ] Add icon key to nuspec.
