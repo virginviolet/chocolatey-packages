@@ -39,6 +39,7 @@ if ($PSVersionTable.PSVersion.Major -ge 5) {
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # Start AutoHotKey script to hide compiler window
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$exeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
 $ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
 $ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
 # Get AutoHotKey path
@@ -48,34 +49,29 @@ try {
   # Set custom AutoHotKey path (comment out previous line
   # and uncomment next line)
   # $autoHotKeyPath = "C:\Program Files\AutoHotkey\AutoHotkey.exe"
-}
-catch [System.Management.Automation.CommandNotFoundException]  {
+} catch [System.Management.Automation.CommandNotFoundException] {
   Write-Error "AutoHotKey not found.`n$_"
-}
-catch {
+} catch {
   Write-Error "$_"
 }
-# TODO Try for AutoHotKey
+# Run AutoHotKey script that a hides window that appears during installation
+# Run the script correct script for the found version of AutoHotKey
 $ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
 if ($ahkVersionMajor -ge 2) {
   Write-Debug "AutoHotKey >= 2.0"
   $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2ScriptPath"""
-  # I cannot get this working
-  # Start-ChocolateyProcessAsAdmin -Statements "" -ExeToRun "$autoHotKeyPath" -elevated False -validExitCodes 0
-  # Use regular PowerShell instead
   Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
 } else {
   Write-Debug "AutoHotKey < 2.0"
   $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
   Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
 }
-$ExeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
-  file           = $ExeInstallerPath
+  file           = $exeInstallerPath
   softwareName   = 'GNU Backgammon*' # Display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = '68CD01D92A99E6EC4BDB5F544C14ECBFCC7D9119AFB0D2AC189698B309E62D06'
@@ -83,7 +79,7 @@ $packageArgs = @{
   # No 64-bit version has yet been made and published
   # checksum64     = 'INSERT_CHECKSUM'
   # checksumType64 = 'sha256' # Default is checksumType
-  silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # Exit codes indicating success
   validExitCodes = @(0) # Inno Setup
 }
