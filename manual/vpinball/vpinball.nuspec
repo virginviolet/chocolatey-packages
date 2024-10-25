@@ -11,9 +11,6 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <!-- == PACKAGE SPECIFIC SECTION == -->
-    <!-- https://repology.org/projects/?search=vpinball -->
-    <!-- https://repology.org/projects/?search=visual-pinball -->
-    <!-- https://repology.org/projects/?search=visualpinball -->
     <id>vpinball</id>
     <version>10.7.3</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/vpinball/</packageSourceUrl>
@@ -24,7 +21,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <title>vpinball</title>
     <authors>Randy Davis,The Visual Pinball team,vpforums community</authors>
     <projectUrl>https://www.vpforums.org</projectUrl>
-    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/vpinball/icon/vpinball.ico-96px.png</iconUrl>
+    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/vpinball/icon/vpinball.ico.png</iconUrl>
     <copyright>Randy Davis and the Visual Pinball team</copyright>
     <licenseUrl>https://github.com/vpinball/vpinball/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
