@@ -15,7 +15,7 @@
 10. [ ] `legal/VERIFICATION.txt`: Verify license URL.
 11. [ ] `chocolateyInstall.ps1`: Update `$exeInstallerPath`.
 12. [ ] `chocolateyInstall.ps1`: Update `checksum`.
-13. [ ] `chocolateyInstall.ps1`: Update `checksum64`.
+13. [ ] `chocolateyInstall.ps1`: Update `checksum62`.
 14. [ ] Test the package to ensure upgrade/uninstall/install works appropriately.
     `choco pack; choco upgrade [[PackageName]] --source .`
     `choco pack; choco uninstall [[PackageName]]; choco install [[PackageName]] --source .`
