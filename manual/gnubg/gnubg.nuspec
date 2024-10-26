@@ -13,7 +13,7 @@
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <title>gnubg</title>
     <authors>Joseph Heled,Oystein Johansen,Jorn Thyssen,Gary Wong</authors>
-    <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
+    <projectUrl>https://www.gnu.org/software/gnubg/</projectUrl>
     <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/gnubg/gnubg-gui.ico-32px-128px.png</iconUrl>
     <licenseUrl>https://git.savannah.gnu.org/cgit/gnubg.git/tree/COPYING</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
