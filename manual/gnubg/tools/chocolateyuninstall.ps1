@@ -26,13 +26,11 @@ Start-CheckandThrow "makeweights"
 # (Start-CheckandStop uses Write-Host, so output can only be suppressed
 # in PowerShell > 5.0)
 if ($PSVersionTable.PSVersion.Major -ge 5) {
-  # Redirect to Success stream before $null,
-  # in case the author ever decides to move away from Write-Host
   Write-Debug "PowerShell >= 5.0"
-  Start-CheckandStop "bearoffdump" 6>&1 > $null
+  Start-CheckandStop "bearoffdump" 6> $null
 } else {
   Write-Debug "PowerShell < 5.0"
-  Start-CheckandStop "bearoffdump" > $null
+  Start-CheckandStop "bearoffdump"
 }
 
 # Remove empty GNUbg preferences folders
