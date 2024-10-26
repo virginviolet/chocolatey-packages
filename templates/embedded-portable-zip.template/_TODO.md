@@ -17,35 +17,35 @@ Portable packages should be possible to install without administrative rights.
 4. [ ] Add zip file(s) to the `tools` directory (32-bit and/or 64-bit).
 5. [ ] Fill out `legal\LICENSE.txt`.
 6. [ ] Remove one of the verification files in `legal/`.
-7. [ ] Rename the remaining verification file to `VERIFICATION.txt`.
-8. [ ] Fill out `legal\VERIFICATION.txt`.
-9.  [ ] Fill out nuspec.
+7. [ ] Fill out `legal\VERIFICATION.txt`.
+8. [ ] Rename the remaining verification file to `VERIFICATION.txt`.
+9. [ ] Fill out nuspec.
 10. [ ] Fill out `tools\chocolateyInstall.ps1`.
 11. [ ] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 12. [ ] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
-12. [ ] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
-13. [ ] If there is a GUI executable, create an empty file next to the exe named `name.exe.gui`.
-14. [ ] If you want to ignore an executable, create an empty file next to the exe named `name.exe.ignore`.
-15. [ ] Test the package to ensure install/uninstall work appropriately.
-16. [ ] Commit.
-17. [ ] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
-18. [ ] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
-19. [ ] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
-20. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-21. [ ] Adjust default installation path in description in nuspec.
-22. [ ] Finish `legal\VERIFICATION.txt`.
-23. [ ] Adjust `TODO_updating.md` if needed.
-24. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
-25. [ ] Test the package again to ensure install/uninstall work appropriately.
-26. [ ] Commit and publish to GitHub.
-27. [ ] Merge branch with main.
-28. [ ] Add icon key to nuspec.
-29. [ ] Test the package yet again to ensure install/uninstall work appropriately.
-30. [ ] Delete this file.
-31. [ ] Merge branch with main again.
-32. [ ] Commit and publish to GitHub again.
-33. [ ] Pack and push to Chocolatey Community Repository.
-34. [ ] Create a meta-package if applicable.
+13. [ ] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
+14. [ ] If there is a GUI executable, create an empty file next to the exe named `name.exe.gui`.
+15. [ ] If you want to ignore an executable, create an empty file next to the exe named `name.exe.ignore`.
+16. [ ] Test the package to ensure install/uninstall work appropriately.
+17. [ ] Commit.
+18. [ ] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
+19. [ ] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
+20. [ ] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
+21. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
+22. [ ] Adjust default installation path in description in nuspec.
+23. [ ] Finish `legal\VERIFICATION.txt`.
+24. [ ] Adjust `TODO_updating.md` if needed.
+25. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
+26. [ ] Test the package again to ensure install/uninstall work appropriately.
+27. [ ] Commit and publish to GitHub.
+28. [ ] Merge branch with main.
+29. [ ] Add icon key to nuspec.
+30. [ ] Test the package yet again to ensure install/uninstall work appropriately.
+31. [ ] Delete this file.
+32. [ ] Merge branch with main again.
+33. [ ] Commit and publish to GitHub again.
+34. [ ] Pack and push to Chocolatey Community Repository.
+35. [ ] Create a meta-package if applicable.
 
 ## Learn more
 
