@@ -14,8 +14,7 @@
     <title>gnubg</title>
     <authors>Joseph Heled,Oystein Johansen,Jorn Thyssen,Gary Wong</authors>
     <projectUrl>https://_Software_Location_REPLACE_OR_REMOVE_</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the icon. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!--<iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/gnubg/gnubg_icon.png</iconUrl>-->
+    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/gnubg/gnubg-gui.ico-32px-128px.png</iconUrl>
     <licenseUrl>https://git.savannah.gnu.org/cgit/gnubg.git/tree/COPYING</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://www.gnu.org/software/gnubg/#TOCdownloading</projectSourceUrl>
