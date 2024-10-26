@@ -12,7 +12,7 @@
 8. [ ] `legal/VERIFICATION.txt`: Verify license URL.
 9. [ ] `chocolateyInstall.ps1`: Update `$zipArchivePath`.
 10. [ ] `chocolateyUninstall.ps1`: Update `ZipFileName`.
-11. [ ] Test the package to ensure install works appropriately.
+11. [ ] Test the package to ensure upgrade works appropriately.
     `choco pack; choco upgrade [[PackageName]] --source .`
 12. [ ] Push package to Chocolatey Community Repository.
     `choco push`

@@ -16,7 +16,9 @@
 12. [ ] `chocolateyInstall.ps1`: Update `$exeInstallerPath`.
 13. [ ] `chocolateyInstall.ps1`: Update `checksum`.
 14. [ ] `chocolateyInstall.ps1`: Update `checksum64`.
-15. [ ] Test the package to ensure install works appropriately.
+15. [ ] Test the package to ensure upgrade/uninstall/install works appropriately.
     `choco pack; choco upgrade [[PackageName]] --source .`
+    `choco pack; choco uninstall [[PackageName]]; choco install [[PackageName]] --source .`
 16. [ ] Push package to Chocolatey Community Repository.
     `choco push`
+17. [ ] Update meta-package if applicable.
