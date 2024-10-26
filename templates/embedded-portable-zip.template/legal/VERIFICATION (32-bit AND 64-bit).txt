@@ -23,7 +23,7 @@ and can be verified like this:
   
   FILENAME-64-bit.zip:
   checksum type: sha256
-  checksum64: PASTE CHECKSUM HERE (UPPER CASE) 
+  checksum64: PASTE CHECKSUM HERE (UPPER CASE)
   
 3. Obtain the checksum of the zip files that came with this package (in the
   'tools' folder). If they have the same hash as the files you downloaded in
