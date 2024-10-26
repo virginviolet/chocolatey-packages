@@ -32,7 +32,7 @@
 21. [x] Test the package again to ensure install/uninstall work appropriately.
 22. [x] Commit and publish to GitHub.
 23. [x] Merge branch with main.
-24. [ ] Add icon key to nuspec.
+24. [x] Add icon key to nuspec.
 25. [ ] Test the package yet again to ensure install/uninstall work appropriately.
 26. [ ] Delete this file.
 27. [ ] Merge branch with main again.
