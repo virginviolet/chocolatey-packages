@@ -12,11 +12,11 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'othello*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName = 'Othello*' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
-  # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # silentArgs   = '/s'           # InstallShield
   # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
   # silentArgs   = '/s'           # Wise InstallMaster
@@ -28,8 +28,8 @@ $packageArgs = @{
   #       https://community.chocolatey.org/packages/autohotkey.portable
   # Exit codes indicating success
   # validExitCodes = @(0) # NSIS
-  # validExitCodes = @(0) # Inno Setup
-  validExitCodes = @(0) # Other; insert other valid exit codes here
+  validExitCodes = @(0) # Inno Setup
+  # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
 # Get uninstall registry keys that match the softwareName pattern
 [array]$keys = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']

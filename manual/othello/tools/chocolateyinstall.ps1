@@ -22,7 +22,7 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
+$exeInstallerPath = Join-Path $toolsDirPath 'Othello_Setup.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
