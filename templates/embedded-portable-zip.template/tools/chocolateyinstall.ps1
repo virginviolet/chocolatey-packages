@@ -8,19 +8,21 @@ $addStartMenuShortcut = $true
 $logShortcuts = $true
 # $installationDirPath = 'C:\Tools\[[PackageName]]'
 
-## Helper functions - these have error handling tucked into them already
-## see https://docs.chocolatey.org/en-us/create/functions
+## Helper functions
+## These have error handling tucked into them already
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
 
 ## Outputs the bitness of the OS (either "32" or "64")
-## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
 # $osBitness = Get-ProcessorBits
 
-## Install Visual Studio Package - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyvsixpackage
+## Install Visual Studio Package
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyvsixpackage
 # Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
 # Install-ChocolateyVsixPackage @packageArgs
 
 # Extract archive
-# - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
+# Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 # Paths
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
@@ -39,29 +41,29 @@ Get-ChocolateyUnzip @unzipArgs
 ## Any executables found in the chocolatey package folder will
 ## already be on the path. This is used in addition to that or
 ## for cases when a native installer doesn't add things to the path.
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
-#Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
+# Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
 
 ## Set persistent Environment variables
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
-#Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
+# Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
 
 ## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
-## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
-## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
+## Guide - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-binfile
 # Install-BinFile
 
 ## Set up file association
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
 # Install-ChocolateyFileAssociation
 
 ## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
-## - https://docs.chocolatey.org/en-us/create/functions
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
 ## There may also be functions available in extension packages
-## - https://community.chocolatey.org/packages?q=id%3A.extension for examples and availability.
+## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
 
 # Add shortcuts
-# - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
+# Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
 if ($addDesktopShortcut -or $addStartMenuShortcut) {
   # Paths
   $executableDirPath = $toolsDirPath

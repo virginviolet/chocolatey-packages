@@ -2,11 +2,17 @@
 
 ## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
 ## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.
-## See https://docs.chocolatey.org/en-us/choco/commands/uninstall
-## and https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
+## References
+## "Uninstall". https://docs.chocolatey.org/en-us/choco/commands/uninstall
+## "Uninstall-ChocolateyPackage". https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
+# $removeShortcuts = $true
+# $installationDirPath = 'C:\Program Files (x86)\[[PackageName]]'
+
+## Helper functions - these have error handling tucked into them already
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
 
 # Uninstall
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
@@ -29,10 +35,21 @@ $packageArgs = @{
   # Exit codes indicating success
   # validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
-  validExitCodes = @(0) # Other; insert other valid exit codes here
+  # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
 # Get uninstall registry keys that match the softwareName pattern
 [array]$keys = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
+# Perform action based on the number of matching keys
+# If 0 keys matched
+if ($keys.Count -eq 0) {
+  Write-Warning "$packageName has already been uninstalled by other means."
+# If more than 1 matches were found
+} elseif ($keys.Count -gt 1) {
+  Write-Warning "$($keys.Count) matches found!"
+  Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
+  Write-Warning "Please alert package maintainer the following keys were matched:"
+  $keys | % { Write-Warning "- $($_.DisplayName)" }
+}
 # If 1 match was found
 if ($keys.Count -eq 1) {
   $keys | % {
@@ -46,15 +63,6 @@ if ($keys.Count -eq 1) {
     # Run uninstaller
     Uninstall-ChocolateyPackage @packageArgs
   }
-# If 0 matches was found
-} elseif ($keys.Count -eq 0) {
-  Write-Warning "$packageName has already been uninstalled by other means."
-# If more than 1 matches were found
-} elseif ($keys.Count -gt 1) {
-  Write-Warning "$($keys.Count) matches found!"
-  Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
-  Write-Warning "Please alert package maintainer the following keys were matched:"
-  $keys | % { Write-Warning "- $($_.DisplayName)" }
 }
 
 ## Remove persistent Environment variable
@@ -62,6 +70,11 @@ if ($keys.Count -eq 1) {
 
 ## Remove shim
 # Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
+
+## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
+## There may also be functions available in extension packages
+## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
 
 ## Remove shortcuts
 ## Look for shortcuts log
@@ -89,5 +102,3 @@ if ($keys.Count -eq 1) {
 #     }
 # }
 
-## OTHER HELPER FUNCTIONS
-## https://docs.chocolatey.org/en-us/create/functions

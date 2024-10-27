@@ -1,25 +1,27 @@
 ﻿# Other steps for installing [[PackageName]] with Chocolatey
 
 # Preferences
-$ErrorActionPreference = 'Stop' # stop on all errors
+$ErrorActionPreference = 'Stop' # Stop on all errors
 # $shortcutName = "$($packageName)"
 # $addDesktopShortcut = $true
 # $addStartMenuShortcut = $true
 # $logShortcuts = $true
+# $installationDirPath = 'C:\Program Files (x86)\[[PackageName]]'
 
 ## Helper functions - these have error handling tucked into them already
-## see https://docs.chocolatey.org/en-us/create/functions
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
 
 ## Outputs the bitness of the OS (either "32" or "64")
-## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
 # $osBitness = Get-ProcessorBits
 
-## Install Visual Studio Package - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyvsixpackage
+## Install Visual Studio Package
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyvsixpackage
 # Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
 # Install-ChocolateyVsixPackage @packageArgs
 
 ## Extract archive
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 ## Paths
 ## In Chocolatey scripts, ALWAYS use absolute paths
 # $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
@@ -34,11 +36,11 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # Get-ChocolateyUnzip @unzipArgs
 
 # Run EXE installer
-# - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
+# Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # Paths
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'
+$exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
@@ -67,13 +69,13 @@ $packageArgs = @{
   # Exit codes indicating success
   # validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
-  validExitCodes = @(0) # Other; insert other valid exit codes here
+  # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
 # Installer, will assert administrative rights
 Install-ChocolateyInstallPackage @packageArgs
 
 ## Runs processes asserting UAC, will assert administrative rights - used by Install-ChocolateyInstallPackage
-## - https://docs.chocolatey.org/en-us/create/functions/start-chocolateyprocessasadmin
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/start-chocolateyprocessasadmin
 # Start-ChocolateyProcessAsAdmin 'STATEMENTS_TO_RUN' 'Optional_Application_If_Not_PowerShell' -validExitCodes $validExitCodes
 ## To avoid quoting issues, you can also assemble your -Statements in another variable and pass it in
 # $appPath = "$env:ProgramFiles\appname"
@@ -85,36 +87,36 @@ Install-ChocolateyInstallPackage @packageArgs
 ## Any executables found in the chocolatey package folder will
 ## already be on the path. This is used in addition to that or
 ## for cases when a native installer doesn't add things to the path.
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
 # Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
 
 ## Set persistent Environment variables
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
 # Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
 
 ## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
-## - https://docs.chocolatey.org/en-us/create/functions/install-binfile
-## - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
+## Guide - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-binfile
 # Install-BinFile
 
 ## Set up file association
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
 # Install-ChocolateyFileAssociation
 
 ## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
-## - https://docs.chocolatey.org/en-us/create/functions
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
 ## There may also be functions available in extension packages
-## - https://community.chocolatey.org/packages?q=id%3A.extension for examples and availability.
+## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
 
 ## Add shortcuts
-## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
 # if ($addDesktopShortcut -or $addStartMenuShortcut) {
 #   # Paths
-#   $executableDirPath = $toolsDirPath
+#   $executableDirPath = $installationDirPath
 #   $executablePath = Join-Path $executableDirPath "$($packageName).exe"
 #   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
 #   $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk"
-#   $iconPath = Join-Path "$installerDirPath" -ChildPath "$($packageName).ico"
+#   $iconPath = Join-Path "$executableDirPath" -ChildPath "$($packageName).ico"
 #   if ($logShortcuts) {
 #     $packagePath = $env:ChocolateyPackageFolder
 #     $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
@@ -126,7 +128,7 @@ Install-ChocolateyInstallPackage @packageArgs
 #   $desktopShortcutArgs = @{
 #     shortcutFilePath = "$desktopShortcutPath"
 #     targetPath       = "$executablePath"
-#     workingDirectory = "$installerDirPath"
+#     workingDirectory = "$executableDirPath"
 #     arguments        = "C:\test.txt"
 #     iconLocation     = "$iconPath"
 #     description      = "This is the description."
@@ -143,7 +145,7 @@ Install-ChocolateyInstallPackage @packageArgs
 #   $startMenuShortcutArgs = @{
 #     shortcutFilePath = "$startMenuShortcutPath"
 #     targetPath       = "$executablePath"
-#     workingDirectory = "$installerDirPath"
+#     workingDirectory = "$executableDirPath"
 #     arguments        = "C:\test.txt"
 #     iconLocation     = "$iconPath"
 #     description      = "This is the description."
