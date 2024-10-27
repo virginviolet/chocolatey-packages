@@ -15,10 +15,17 @@ $installationDirPath = 'C:\Tools\[[PackageName]]' # Only necessary if you did no
 ## Helper functions
 ## These have error handling tucked into them already
 ## Documantation - https://docs.chocolatey.org/en-us/create/functions
+## Source code - https://github.com/chocolatey/choco/tree/master/src/chocolatey.resources/helpers/functions
+
+## Outputs the bitness of the OS (either "32" or "64")
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
+# $osBitness = Get-ProcessorBits
 
 # Remove extracted files
 # Only necessary if you did not unpack to package directory
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/UnInstall-ChocolateyZipPackage.ps1
 # Arguments
 $uninstallZipArgs = @{
     Packagename = "$($packageName)"
@@ -73,11 +80,14 @@ elseif ($exists) {
 
 ## Remove persistent Environment variable
 ## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyEnvironmentVariable.ps1
 # Uninstall-ChocolateyEnvironmentVariable
 
 ## Remove shim
+## Only necessary if you used Install-BinFile
 ## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-# Uninstall-BinFile # Only needed if you used Install-BinFile
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-BinFile.ps1
+# Uninstall-BinFile
 
 ## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
 ## Documantation - https://docs.chocolatey.org/en-us/create/functions

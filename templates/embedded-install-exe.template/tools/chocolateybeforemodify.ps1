@@ -10,6 +10,9 @@
 #  the currently installed version, not from the new upgraded package version.
 
 # Terminate process
+# This helper function requires chocolatey-core extension
+# Documentation - https://community.chocolatey.org/packages/chocolatey-core.extension#description
+# Source code - https://github.com/chocolatey-community/chocolatey-extensions/blob/master/src/chocolatey-core.extension/extensions/Remove-Process.ps1
 $terminateArgs = @{
     # RegEx expression of process name, returned by Get-Process function
     NameFilter = "executable"
@@ -20,6 +23,4 @@ $terminateArgs = @{
     ## Close/Kill child processes
     # $WithChildren = $true # Untested
 }
-# This helper function requires chocolatey-core extension
-# - https://community.chocolatey.org/packages/chocolatey-core.extension
 Remove-Process @terminateArgs
