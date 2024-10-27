@@ -18,21 +18,6 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
 # Install-ChocolateyVsixPackage @packageArgs
 
-## Extract archive
-## - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-## Paths
-## In Chocolatey scripts, ALWAYS use absolute paths
-# $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-# $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'example.zip'
-# # Arguments
-# $unzipArgs = @{
-#   PackageName  = "$($packageName)"
-#   FileFullPath = "$zipArchivePath"
-#   Destination  = "$toolsDirPath"
-# }
-## Unzip file to the specified location - auto overwrites existing content
-# Get-ChocolateyUnzip @unzipArgs
-
 # Run EXE installer
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # In Chocolatey scripts, ALWAYS use absolute paths
@@ -44,16 +29,16 @@ $packageArgs = @{
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
   file           = $exeInstallerPath
-  softwareName   = 'othello*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName   = 'Othello*' # Display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = 'INSERT_CHECKSUM'
   checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
-  checksum64     = 'INSERT_CHECKSUM'
+  checksum64     = '1d0ea3fdc4160fd79fd39969ea568bdbdce745fdefef13449aebed07b18105c1'
   checksumType64 = 'sha256' # Default is checksumType
   # Silent arguments
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
-  # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # silentArgs   = '/s'           # InstallShield
   # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
   # silentArgs   = '/s'           # Wise InstallMaster
@@ -65,8 +50,8 @@ $packageArgs = @{
   #       https://community.chocolatey.org/packages/autohotkey.portable
   # Exit codes indicating success
   # validExitCodes = @(0) # NSIS
-  # validExitCodes = @(0) # Inno Setup
-  validExitCodes = @(0) # Other; insert other valid exit codes here
+  validExitCodes = @(0) # Inno Setup
+  # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
 # Installer, will assert administrative rights
 Install-ChocolateyInstallPackage @packageArgs
