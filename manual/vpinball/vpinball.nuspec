@@ -28,7 +28,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <projectSourceUrl>https://github.com/vpinball/vpinball</projectSourceUrl>
     <docsUrl>https://www.vpforums.org/Tutorials/VP_9.1.1_Documentation_and_Help_v1.0.pdf</docsUrl>
     <bugTrackerUrl>https://www.vpforums.org/index.php?app=tracker</bugTrackerUrl>
-    <tags>vpinball pinball video-game game emulator table-editor virtual-pinball pachinko arcade vr-game opensource free-software visual-pinmame pinmame vpm pinball-emulator emulation pinball-simulator simulator pinball-simulation virtual-reality vr vr-video-game crowdsourcing visual-pinball vpx vpx-vr open-source free-software foss foss-games</tags>
+    <tags>vpinball pinball video-game game emulator table-editor virtual-pinball pachinko arcade vr-game visual-pinmame pinmame vpm pinball-emulator emulation pinball-simulator simulator pinball-simulation virtual-reality vr vr-video-game crowdsourcing visual-pinball vpx vpx-vr open-source free-software foss foss-games</tags>
     <summary>Pinball simulation and table editor</summary>
     <description>**Visual pinball** gives an authentic pinball gaming experience through software emulation. It contains an editor that allows you to make your own pinball tables, or you can play other people's creations.
 
