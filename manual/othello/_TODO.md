@@ -6,15 +6,15 @@
 
 ## To do
 
-1. [ ] Search the Community Repository to make sure there isn't a package for this software already: <https://community.chocolatey.org/packages>
-2. [ ] Make sure the total nupkg package will be under 200MB.
-3. [ ] Commit.
-4. [ ] Add EXE installers to the tools directory (32-bit and/or 64-bit).
+1. [x] Search the Community Repository to make sure there isn't a package for this software already: <https://community.chocolatey.org/packages>
+2. [x] Make sure the total nupkg package will be under 200MB.
+3. [x] Commit.
+4. [x] Add EXE installers to the tools directory (32-bit and/or 64-bit).
 5. [ ] Fill out `legal\LICENSE.txt`.
 6. [ ] Remove one of the verification files in `legal/`.
 7. [ ] Fill out `legal\VERIFICATION.txt`.
 8. [ ] Rename the remaining verification file to `VERIFICATION.txt`.
-9. [ ] Fill out nuspec.
+9. [x] Fill out nuspec.
 10. [ ] Fill out `tools\chocolateyInstall.ps1`.
 11. [ ] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 12. [ ] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
