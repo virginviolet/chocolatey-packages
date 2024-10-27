@@ -20,7 +20,7 @@ and can be verified like this:
   checksum<32 OR 64>: PASTE CHECKSUM HERE (UPPER CASE)
   
 3. Obtain the checksum of the exe file that came with this package (in the
-  'tools' folder). If they have the same hash as the file you downloaded in
+  'tools' folder). If it has the same hash as the file you downloaded in
   step 1, you have successfully verified the integrity of the exe files.
 4. Open the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1' <CHECK WHICH FILES ARE INCLUDED> in a
 text editor or IDE and see if it looks clean.
