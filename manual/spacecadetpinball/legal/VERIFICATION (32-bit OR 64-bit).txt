@@ -1,0 +1,32 @@
+﻿VERIFICATION
+Verification is intended to assist the Chocolatey moderators and community
+in verifying that this package's contents are trustworthy.
+
+<IF YOU ARE THE SOFTWARE VENDOR, EXPLAIN THAT HERE>
+
+The zip archive has been downloaded from the official GitHub repository <INSERT DOWNLOAD PAGE URL HERE>
+and can be verified like this:
+
+1. Download 'FILENAME.zip' from this page: <INSERT DOWNLOAD URL HERE>
+2. Obtain the checksum of each file.
+  Here are two means of obtaining the checksums:
+  - Use the PowerShell command 'Get-Filehash'
+  - Use the Chocolatey utility 'checksum.exe'
+  
+  You should get the following result:
+  FILENAME.zip:
+  checksum type: sha256
+  checksum: PASTE CHECKSUM HERE (UPPER CASE)
+  
+3. Obtain the checksum of the zip file that came with this package (in the
+  'tools' folder). If it has the same hash as the file you downloaded in
+  step 1, you have successfully verified the integrity of the zip files.
+4. Open the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1' <CHECK WHICH FILES ARE INCLUDED> in a
+text editor or IDE and see if it looks clean.
+  If you want to learn more about this, check out the Chocolatey docs on
+  creating packages:
+  <https://docs.chocolatey.org/en-us/create/create-packages/>
+
+The license in 'LICENSE.txt' is obtained from <PASTE LICENSE URL HERE>.
+
+<KEEP EACH LINE 80 CHARACTERS MAX>
