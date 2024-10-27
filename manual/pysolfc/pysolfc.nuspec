@@ -21,7 +21,7 @@
     <projectSourceUrl>https://github.com/shlomif/PySolFC</projectSourceUrl>
     <docsUrl>https://pysolfc.sourceforge.io/doc/index.html</docsUrl>
     <bugTrackerUrl>https://pysolfc.sourceforge.io/doc/report_bug.html</bugTrackerUrl>
-    <tags>pysolfc pysol solitaire card-games games game video-game video-games opensource free-software mahjongg hanafuda tarock trumps-only hex-a-deck dashavatara ganjifa-mughal ganjifa-ishido puzzle matching baker's-dozen beleaguered-castle canfield cribbage fan forty-thieves four-deck-game freecell golf gypsy klondike lights-out matrix memory montana napoleon numerica one-deck-game pairing pegged picture-gallery poker raglan samegame shisen-sho spider spider-solitaire tarock terrace three-deck-game tower-of-shanoi two-deck-game yukon pyramid spiderette</tags>
+    <tags>pysolfc pysol solitaire card-games card-game free-software open-source foss foss-games mahjongg hanafuda tarock trumps-only hex-a-deck dashavatara ganjifa-mughal ganjifa-ishido puzzle matching baker's-dozen beleaguered-castle canfield cribbage fan forty-thieves four-deck-game freecell golf gypsy klondike lights-out matrix memory montana napoleon numerica one-deck-game pairing pegged picture-gallery poker raglan samegame shisen-sho spider spider-solitaire tarock terrace three-deck-game tower-of-shanoi two-deck-game yukon pyramid spiderette games game video-game video-games</tags>
     <summary>A solitaire game collection</summary>
     <description>**PySol Fan Club Edition** (**PySolFC**), a fork of PySol Solitaire, is a collection of more than 1200 solitaire card games.
 
