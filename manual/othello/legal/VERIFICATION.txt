@@ -2,12 +2,9 @@
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
-<IF YOU ARE THE SOFTWARE VENDOR, EXPLAIN THAT HERE>
+The EXE installers can be verified like this:
 
-The EXE installer has been downloaded from the official GitHub repository <INSERT DOWNLOAD PAGE URL HERE>
-and can be verified like this:
-
-1. Download 'FILENAME.exe' from this page: <INSERT DOWNLOAD URL HERE>
+1. Download 'Othello_Setup.exe' from this page: <https://github.com/Anders-H/Othello>
 2. Obtain the checksum of each file.
   Here are two means of obtaining the checksums:
   - Use the PowerShell command 'Get-Filehash'
@@ -15,12 +12,12 @@ and can be verified like this:
   
   You should get the following result:
   
-  FILENAME.exe:
+  Othello_Setup.exe:
   checksum type: sha256
-  checksum<32 OR 64>: PASTE CHECKSUM HERE (UPPER CASE)
+  checksum32: 1D0EA3FDC4160FD79FD39969EA568BDBDCE745FDEFEF13449AEBED07B18105C1
   
 3. Obtain the checksum of the exe file that came with this package (in the
-  'tools' folder). If they have the same hash as the file you downloaded in
+  'tools' folder). If it has the same hash as the file you downloaded in
   step 1, you have successfully verified the integrity of the exe files.
 4. Open the scripts, 'chocolateyinstall.ps1' and 'chocolateyuninstall.ps1' <CHECK WHICH FILES ARE INCLUDED> in a
 text editor or IDE and see if it looks clean.

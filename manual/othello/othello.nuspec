@@ -44,7 +44,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
 
 This is an installing package (not portable).
 
-The default installation directory is `C:\Program Files\Othello`. </description>
+The default installation directory is `C:\Program Files (x86)\Othello`. </description>
     <!-- =============================== -->
 
     <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
