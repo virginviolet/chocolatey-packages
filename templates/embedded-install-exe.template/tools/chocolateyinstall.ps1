@@ -40,7 +40,7 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 ## Unzip file to the specified location - auto overwrites existing content
 # Get-ChocolateyUnzip @unzipArgs
 
-# Run EXE installer
+# Install
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 ## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyInstallPackage.ps1
 # Paths
