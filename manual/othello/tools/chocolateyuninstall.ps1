@@ -14,7 +14,7 @@ Start-CheckandThrow "Othello"
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'Othello version *' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName = 'Othello version*' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   validExitCodes = @(0) # Inno Setup
