@@ -1,18 +1,20 @@
 ﻿# Other steps for uninstalling othello with Chocolatey
 
-## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
-## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.
-## See https://docs.chocolatey.org/en-us/choco/commands/uninstall
-## and https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
-
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
+
+# Prevent uninstall if the game is running
+# (in order for the uninstall to succeed and to not lose progress)
+# This cannot be moved to chocolateybeforemodify.ps1
+# unless the feature suggested in the following issue is added:
+# https://github.com/chocolatey/choco/issues/1731
+Start-CheckandThrow "Othello"
 
 # Uninstall
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'Othello version*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName = 'Othello version *' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   validExitCodes = @(0) # Inno Setup

@@ -32,15 +32,9 @@ This is an installing package (not portable).
 The default installation directory is `C:\Program Files (x86)\Othello`. </description>
     <!-- =============================== -->
 
-    <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
-    <!--<dependencies>
-      <dependency id="" version="__MINIMUM_VERSION__" />
-      <dependency id="" version="[__EXACT_VERSION__]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)" />
-      <dependency id="" />
-      <dependency id="chocolatey-core.extension" version="1.1.0" />
-    </dependencies>-->
+    <dependencies>
+      <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" /> <!-- Required for 'Start-CheckandThrow' -->
+    </dependencies>
   </metadata>
   <files>
     <!-- Contents -->
