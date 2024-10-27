@@ -35,6 +35,7 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 
 # Run EXE installer
 # - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
+# Paths
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.EXE'

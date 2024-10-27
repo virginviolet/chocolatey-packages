@@ -7,7 +7,6 @@ $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
 $logShortcuts = $true
 # $installationDirPath = 'C:\Tools\[[PackageName]]'
-$installationDirPath = $toolsDirPath
 
 ## Helper functions - these have error handling tucked into them already
 ## see https://docs.chocolatey.org/en-us/create/functions
@@ -26,6 +25,7 @@ $installationDirPath = $toolsDirPath
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'NAME_OF_EMBEDDED_ZIP_FILE.zip'
+$installationDirPath = $toolsDirPath
 # Arguments
 $unzipArgs = @{
   PackageName  = "$($packageName)"
