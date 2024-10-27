@@ -30,9 +30,9 @@
 22. [x] Adjust `TODO_updating.md` if needed.
 23. [x] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
 24. [x] Test the package again to ensure install/uninstall work appropriately.
-25. [ ] Commit and publish to GitHub.
-26. [ ] Merge branch with main.
-27. [ ] Add icon key to nuspec.
+25. [x] Commit and publish to GitHub.
+26. [x] Merge branch with main.
+27. [x] Add icon key to nuspec.
 28. [ ] Test the package yet again to ensure install/uninstall work appropriately.
 29. [ ] Delete this file.
 30. [ ] Merge branch with main again.

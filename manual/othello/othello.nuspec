@@ -14,14 +14,12 @@
     <title>Othello</title>
     <authors>Anders Hesselbom</authors>
     <projectUrl>https://www.winsoft.se/2020/03/othello/</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the icon. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
-    <!--<iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/othello/icon/othello_icon.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
+    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/othello/icon/circle.ico-128px.png</iconUrl>
     <licenseUrl>https://github.com/Anders-H/Othello/blob/master/gpl-3.0.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/Anders-H/Othello</projectSourceUrl>
     <bugTrackerUrl>https://github.com/Anders-H/Othello/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
-    <tags>othello riversi game board-game strategy-game abstract-game open-source free-software foss foss-game video-game</tags>
+    <tags>othello riversi game board-game strategy-game abstract-game open-source free-software foss foss-game video-game riversi</tags>
     <summary>Simple strategy game</summary>
     <description>**Othello** is a simple implementation of the classic board game Riversi/Othello. It's played on an 8x8 grid, and the goal is to flip the CPU's discs by surrounding them on two sides, which will turn them into your own.
 
