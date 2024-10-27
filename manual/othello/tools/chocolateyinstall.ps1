@@ -31,10 +31,8 @@ $packageArgs = @{
   file           = $exeInstallerPath
   softwareName   = 'Othello*' # Display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
-  checksum       = 'INSERT_CHECKSUM'
+  checksum       = '1D0EA3FDC4160FD79FD39969EA568BDBDCE745FDEFEF13449AEBED07B18105C1'
   checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
-  checksum64     = '1d0ea3fdc4160fd79fd39969ea568bdbdce745fdefef13449aebed07b18105c1'
-  checksumType64 = 'sha256' # Default is checksumType
   # Silent arguments
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
