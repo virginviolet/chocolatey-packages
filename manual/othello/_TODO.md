@@ -20,10 +20,10 @@
 12. [x] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
 13. [x] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
 14. [x] Test the package to ensure install/uninstall work appropriately.
-15. [ ] Commit.
-16. [ ] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
-17. [ ] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
-18. [ ] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
+15. [x] Commit.
+16. [x] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
+17. [x] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
+18. [x] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
 19. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
 20. [ ] Inform of default install location in description in nuspec.
 21. [ ] Finish `legal\VERIFICATION.txt`.
