@@ -24,12 +24,12 @@
 16. [x] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
 17. [x] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
 18. [x] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
-19. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-20. [ ] Inform of default install location in description in nuspec.
-21. [ ] Finish `legal\VERIFICATION.txt`.
-22. [ ] Adjust `TODO_updating.md` if needed.
-23. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
-24. [ ] Test the package again to ensure install/uninstall work appropriately.
+19. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
+20. [x] Inform of default install location in description in nuspec.
+21. [x] Finish `legal\VERIFICATION.txt`.
+22. [x] Adjust `TODO_updating.md` if needed.
+23. [x] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
+24. [x] Test the package again to ensure install/uninstall work appropriately.
 25. [ ] Commit and publish to GitHub.
 26. [ ] Merge branch with main.
 27. [ ] Add icon key to nuspec.
