@@ -45,34 +45,10 @@ $originalGameArgs = @{
 }
 Install-ChocolateyZipPackage @originalGameArgs
 
-# Rename extracted directory
-$extractedDirectory = Join-Path $installationDirPath -ChildPath '3D Pinball x64'
-$installationDirName = Split-Path "$installationDirPath" -Leaf
-Write-Output "Renaming '$extractedDirectory' to '$installationDirName'..."
-Pause
-Rename-Item "$extractedDirectory" -NewName "$installationDirName"
-Write-Debug "Renamed '$extractedDirectory' to '$installationDirName'."
-Pause
-
-# Prevent incorrect shimming
-# by creating a '.ignore' file and a '.gui' file
-$executableDirPath = Join-Path "$installationDirPath" # Also used for shortcuts
-$dotIgnorePath = Join-Path "$executableDirPath" -ChildPath 'PINBALL.exe.ignore'
-$dotGuiPath = Join-Path "$executableDirPath" -ChildPath 'SpaceCadetPinball.exe.gui'
-Write-Verbose "Creating file '$dotIgnorePath'..."
-New-Item -Path "$dotIgnorePath" -ItemType File > $null
-Write-Debug "File '$dotIgnorePath' created."
-Write-Verbose "Creating file '$dotGuiPath'..."
-New-Item -Path $dotGuiPath -ItemType File > $null
-Write-Debug "File '$dotGuiPath' created."
-
-Pause
-
-# Extract archive
+# Extract decompilation archive
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 # Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1
 # Paths
-# In Chocolatey scripts, ALWAYS use absolute paths
 $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx86Win.zip'
 $zipArchive64Path = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx64Win.zip'
 # Arguments
