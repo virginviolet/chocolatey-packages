@@ -5,9 +5,15 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 
 # Preferences
-$installationDirPath = Join-Path "$toolsDirPath" '3D Pinball'
+# Note: If you change installation directory name, the original game directory
+# and decompile directory will not merge.
+$installationDirName = '3D Pinball x64'
+# Note: If you install outside the package directory, the auto-uninstaller will
+# not work; create an uninstallation script.
+$installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
 # $installationDirPath = 'C:\Games\spacecadetpinball'
-$shortcutName = "$($packageName)"
+# This is what I remember the original start menu shortcut name as
+$shortcutName = '3D Pinball'
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
 $logShortcuts = $true
@@ -33,10 +39,11 @@ $logShortcuts = $true
 # Source code - 
 # Path
 $url = 'https://ia902303.us.archive.org/28/items/3d-pinball-x64/3D%20Pinball%20x64.zip'
+$unzipDirPath = Split-Path $installationDirPath
 # Arguments
 $originalGameArgs = @{
   packageName   = $env:ChocolateyPackageName
-  unzipLocation = $installationDirPath
+  unzipLocation = $unzipDirPath
   url           = $url
   checksum      = 'AF6B1B5A3C0B9D13C58DFEFC937982A0357D209962A81003B11C8FA58EF56329'
   checksumType  = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
@@ -52,14 +59,14 @@ Install-ChocolateyZipPackage @originalGameArgs
 $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx86Win.zip'
 $zipArchive64Path = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx64Win.zip'
 # Arguments
-$unzipArgs = @{
+$decompiledArgs = @{
   PackageName    = "$($packageName)"
   FileFullPath   = "$zipArchivePath"
   FileFullPath64 = "$zipArchive64Path"
   Destination    = "$installationDirPath"
 }
 # Unzip file to the specified location - auto overwrites existing content
-Get-ChocolateyUnzip @unzipArgs
+Get-ChocolateyUnzip @decompiledArgs
 
 ## Add specific folders to the path
 ## Any executables found in the chocolatey package folder will
@@ -88,16 +95,16 @@ Get-ChocolateyUnzip @unzipArgs
 ## Documantation - https://docs.chocolatey.org/en-us/create/functions
 ## There may also be functions available in extension packages
 ## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
-<# 
+
 # Add shortcuts
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
 # Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyShortcut.ps1
 if ($addDesktopShortcut -or $addStartMenuShortcut) {
   # Paths
-  $executablePath = Join-Path "$executableDirPath" -ChildPath 'PINBALL.exe.ignore'
+  $executableDirPath = $installationDirPath
+  $executablePath = Join-Path "$installationDirPath" -ChildPath 'SpaceCadetPinball.exe'
   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
   $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk"
-  $iconPath = Join-Path "$executableDirPath" -ChildPath "$($packageName).ico"
   if ($logShortcuts) {
     $packagePath = $env:ChocolateyPackageFolder
     $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
@@ -110,9 +117,7 @@ if ($addDesktopShortcut) {
     shortcutFilePath = "$desktopShortcutPath"
     targetPath       = "$executablePath"
     workingDirectory = "$executableDirPath"
-    arguments        = "C:\test.txt"
-    iconLocation     = "$iconPath"
-    description      = "This is the description."
+    description      = "Decompilation of '3D Pinball for Windows – Space Cadet'."
   }
   Install-ChocolateyShortcut @desktopShortcutArgs
   # Log
@@ -127,9 +132,7 @@ if ($addStartMenuShortcut) {
     shortcutFilePath = "$startMenuShortcutPath"
     targetPath       = "$executablePath"
     workingDirectory = "$executableDirPath"
-    arguments        = "C:\test.txt"
-    iconLocation     = "$iconPath"
-    description      = "This is the description."
+    description      = "Decompilation of '3D Pinball for Windows – Space Cadet'."
   }
   Install-ChocolateyShortcut @startMenuShortcutArgs
   # Log
@@ -137,4 +140,3 @@ if ($addStartMenuShortcut) {
     "$startMenuShortcutPath" | Out-File "$shortcutsLog" -Append
   }
 }
- #>
