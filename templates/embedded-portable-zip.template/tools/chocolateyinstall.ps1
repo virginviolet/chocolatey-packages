@@ -2,7 +2,7 @@
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
-$shortcutName = "$($packageName)"
+$shortcutName = '[[PackageName]]'
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
 $logShortcuts = $true
