@@ -15,6 +15,7 @@ $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
 $shortcutName = 'Pinball'
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
+$addGameDirShortcut = $true
 $logShortcuts = $true
 
 ## Helper functions
@@ -104,6 +105,7 @@ if ($addDesktopShortcut -or $addStartMenuShortcut) {
   $executablePath = Join-Path "$installationDirPath" -ChildPath 'SpaceCadetPinball.exe'
   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
   $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Games\$shortcutName.lnk"
+  $gameDirShortcutPath = Join-Path "$installationDirPath" -ChildPath "Launch $shortuctName.lnk"
   if ($logShortcuts) {
     $packagePath = $env:ChocolateyPackageFolder
     $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
@@ -138,4 +140,19 @@ if ($addStartMenuShortcut) {
   if ($logShortcuts) {
     "$startMenuShortcutPath" | Out-File "$shortcutsLog" -Append
   }
+}
+  # Add game directory shortcut
+  if ($addGameDirShortcut) {
+    # Arguments
+    $gameDirShortcutArgs = @{
+      shortcutFilePath = "$gameDirShortcutPath"
+      targetPath       = "$executablePath"
+      workingDirectory = "$executableDirPath"
+      description      = "Begins a game of 3-D Pinball."
+    }
+    Install-ChocolateyShortcut @gameDirShortcutArgs
+    # Log
+    if ($logShortcuts) {
+      "$gameDirShortcutPath" | Out-File "$shortcutsLog" -Append
+    }
 }
