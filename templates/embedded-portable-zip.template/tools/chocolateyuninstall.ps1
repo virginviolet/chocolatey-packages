@@ -52,6 +52,22 @@ else {
     Write-Debug "Installation directory removed."
 }
 
+## Remove persistent Environment variable
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyEnvironmentVariable.ps1
+# Uninstall-ChocolateyEnvironmentVariable
+
+## Remove shim
+## Only necessary if you used Install-BinFile
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-BinFile.ps1
+# Uninstall-BinFile
+
+## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
+## There may also be functions available in extension packages
+## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
+
 # Remove shortcuts
 # Look for shortcuts log
 $packagePath = $env:ChocolateyPackageFolder
@@ -77,46 +93,3 @@ elseif ($exists) {
         }
     }
 }
-
-## Remove persistent Environment variable
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyEnvironmentVariable.ps1
-# Uninstall-ChocolateyEnvironmentVariable
-
-## Remove shim
-## Only necessary if you used Install-BinFile
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-BinFile.ps1
-# Uninstall-BinFile
-
-## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
-## Documantation - https://docs.chocolatey.org/en-us/create/functions
-## There may also be functions available in extension packages
-## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
-
-## Remove shortcuts
-## Look for shortcuts log
-# $packagePath = $env:ChocolateyPackageFolder
-# $shortcutsLogPath = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
-# $exists = Test-Path -Path "$shortcutsLogPath" -PathType Leaf
-# if ($removeShortcuts -and -not $exists) {
-#     Write-Warning "Cannot uninstall shortcuts.`nShortcuts log not found."
-# }
-# elseif ($exists) {
-#     Write-Debug "Shortcuts log found."
-#     # Read log line-per-line and remove files
-#     $shortcutsLog = Get-Content "$shortcutsLogPath"
-#     foreach ($fileInLog in $shortcutsLog) {
-#         if ($null -ne $fileInLog -and '' -ne $fileInLog.Trim()) {
-#             try {
-#                 Write-Debug "Removing shortcut '$fileInLog'."
-#                 Remove-Item -Path "$fileInLog" -Force
-#                 Write-Debug "Removed shortcut '$fileInLog'."
-#             }
-#             catch {
-#                 Write-Warning "Could not remove shortcut '$fileInLog'.`n$_"
-#             }
-#         }
-#     }
-# }
-
