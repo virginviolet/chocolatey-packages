@@ -12,8 +12,7 @@ $installationDirName = '3D Pinball x64'
 # not work; create an uninstallation script.
 $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
 # $installationDirPath = 'C:\Games\spacecadetpinball'
-# This is what I remember the original start menu shortcut name as
-$shortcutName = '3D Pinball'
+$shortcutName = 'Pinball'
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
 $logShortcuts = $true
@@ -104,7 +103,7 @@ if ($addDesktopShortcut -or $addStartMenuShortcut) {
   $executableDirPath = $installationDirPath
   $executablePath = Join-Path "$installationDirPath" -ChildPath 'SpaceCadetPinball.exe'
   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
-  $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk"
+  $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Games\$shortcutName.lnk"
   if ($logShortcuts) {
     $packagePath = $env:ChocolateyPackageFolder
     $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
@@ -117,7 +116,7 @@ if ($addDesktopShortcut) {
     shortcutFilePath = "$desktopShortcutPath"
     targetPath       = "$executablePath"
     workingDirectory = "$executableDirPath"
-    description      = "Decompilation of '3D Pinball for Windows – Space Cadet'."
+    description      = "Begins a game of 3-D Pinball."
   }
   Install-ChocolateyShortcut @desktopShortcutArgs
   # Log
@@ -132,7 +131,7 @@ if ($addStartMenuShortcut) {
     shortcutFilePath = "$startMenuShortcutPath"
     targetPath       = "$executablePath"
     workingDirectory = "$executableDirPath"
-    description      = "Decompilation of '3D Pinball for Windows – Space Cadet'."
+    description      = "Begins a game of 3-D Pinball."
   }
   Install-ChocolateyShortcut @startMenuShortcutArgs
   # Log
