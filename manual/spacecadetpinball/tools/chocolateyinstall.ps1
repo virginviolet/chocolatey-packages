@@ -11,7 +11,7 @@ $installationDirName = '3D Pinball x64'
 # Note: If you install outside the package directory, the auto-uninstaller will
 # not work; create an uninstallation script.
 $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
-# $installationDirPath = 'C:\Games\spacecadetpinball'
+# $installationDirPath = 'C:\Games\SpaceCadetPinball'
 $shortcutName = 'Pinball'
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
@@ -52,17 +52,41 @@ $originalGameArgs = @{
 }
 Install-ChocolateyZipPackage @originalGameArgs
 
-# Extract decompilation archive
+# Extract decompilation release archive
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 # Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1
 # Paths
-$zipArchivePath = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx86Win.zip'
-$zipArchive64Path = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx64Win.zip'
+$zipArchiveX64Path = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx64Win.zip'
+$zipArchiveX86Path = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx86Win.zip'
+$zipArchiveX86XpPath = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx86WinXP.zip'
+# Select which of x86 archives to use
+$userOs = $([System.Environment]::OSVersion).Platform
+# Windows NT (or Win32NT) is Windows XP up to Windows 11 (as of typing)
+$windowsNt = [PlatformID]::Win32NT
+$userOsVersionMajor = $([System.Environment]::OSVersion).Version.Major
+$userOsVersionMinor = $([System.Environment]::OSVersion).Version.Minor
+$userOsIs2000 = $userOs -eq $windowsNt -and $userOsVersionMajor -eq 5 -and $userOsVersionMinor -eq 0
+$userOsIsXp = $userOs -eq $windowsNt -and $userOsVersionMajor -eq 5 -and $userOsVersionMinor -eq 1
+if ($userOsIsXp) {
+  # Use the Zip meant for XP
+  Write-Debug "Windows XP (32-bit) detected."
+  $zipArchiveX86CorrectPath = $zipArchiveX86XpPath
+} elseif ($userOsIs2000) {
+  # Untested
+  # Use the Zip meant for XP
+  Write-Debug "Windows 2000 detected."
+  $zipArchiveX86CorrectPath = $zipArchiveX86XpPath
+} else {
+  # [x] Test
+  # Don't use the zip meant for XP
+  Write-Debug "Will not use the Windows XP version."
+  $zipArchiveX86CorrectPath = $zipArchiveX86Path
+}
 # Arguments
 $decompiledArgs = @{
   PackageName    = "$($packageName)"
-  FileFullPath   = "$zipArchivePath"
-  FileFullPath64 = "$zipArchive64Path"
+  FileFullPath   = "$zipArchiveX86CorrectPath"
+  FileFullPath64 = "$zipArchiveX64Path"
   Destination    = "$installationDirPath"
 }
 # Unzip file to the specified location - auto overwrites existing content
@@ -141,18 +165,19 @@ if ($addStartMenuShortcut) {
     "$startMenuShortcutPath" | Out-File "$shortcutsLog" -Append
   }
 }
-  # Add game directory shortcut
-  if ($addGameDirShortcut) {
-    # Arguments
-    $gameDirShortcutArgs = @{
-      shortcutFilePath = "$gameDirShortcutPath"
-      targetPath       = "$executablePath"
-      workingDirectory = "$executableDirPath"
-      description      = "Begins a game of 3-D Pinball."
-    }
-    Install-ChocolateyShortcut @gameDirShortcutArgs
-    # Log
-    if ($logShortcuts) {
-      "$gameDirShortcutPath" | Out-File "$shortcutsLog" -Append
-    }
+# Add game directory shortcut
+# [ ] Test
+if ($addGameDirShortcut) {
+  # Arguments
+  $gameDirShortcutArgs = @{
+    shortcutFilePath = "$gameDirShortcutPath"
+    targetPath       = "$executablePath"
+    workingDirectory = "$executableDirPath"
+    description      = "Begins a game of 3-D Pinball."
+  }
+  Install-ChocolateyShortcut @gameDirShortcutArgs
+  # Log
+  if ($logShortcuts) {
+    "$gameDirShortcutPath" | Out-File "$shortcutsLog" -Append
+  }
 }
