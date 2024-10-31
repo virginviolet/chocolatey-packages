@@ -15,7 +15,7 @@
     <title>SpaceCadetPinball</title>
     <authors>Kevin Gliner,Mike Sandige,David Stafford,Dave Plummer,Raymond Chen,Cinematronics,Microsoft,Muzychenko Andrey</authors>
     <projectUrl>https://github.com/k4zmu2a/SpaceCadetPinball</projectUrl>
-    <!--<iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/spacecadetpinball/icon/spacecadetpinball_icon.png</iconUrl>-->
+    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/spacecadetpinball/icon/Icon_128x128.png</iconUrl>
     <copyright>2020-2021 SpaceCadetPinball Andrey Muzychenko</copyright>
     <licenseUrl>https://github.com/k4zmu2a/SpaceCadetPinball/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

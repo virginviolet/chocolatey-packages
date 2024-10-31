@@ -36,10 +36,10 @@ Portable packages should be possible to install without administrative rights.
 23. [x] Finish `legal\VERIFICATION.txt`.
 24. [x] Adjust `TODO_updating.md` if needed.
 25. [x] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
-26. [ ] Test the package again to ensure install/uninstall work appropriately.
-27. [ ] Commit and publish to GitHub.
-28. [ ] Merge branch with main.
-29. [ ] Add icon key to nuspec.
+26. [x] Test the package again to ensure install/uninstall work appropriately.
+27. [x] Commit and publish to GitHub.
+28. [x] Merge branch with main.
+29. [x] Add icon key to nuspec.
 30. [ ] Test the package yet again to ensure install/uninstall work appropriately.
 31. [ ] Delete this file.
 32. [ ] Merge branch with main again.
