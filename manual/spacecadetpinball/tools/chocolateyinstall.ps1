@@ -16,25 +16,7 @@ $addStartMenuShortcut = $true
 $addGameDirShortcut = $true
 $logShortcuts = $true
 
-## Helper functions
-## These have error handling tucked into them already
-## Documantation - https://docs.chocolatey.org/en-us/create/functions
-## Source code - https://github.com/chocolatey/choco/tree/master/src/chocolatey.resources/helpers/functions
-
-## Outputs the bitness of the OS (either "32" or "64")
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
-# $osBitness = Get-ProcessorBits
-
-## Install Visual Studio Package
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyvsixpackage
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyVsixPackage.ps1
-# Install-ChocolateyVsixPackage $packageName $url [$vsVersion] [-checksum $checksum -checksumType $checksumType]
-# Install-ChocolateyVsixPackage @packageArgs
-
 # Download and unpack a zip file
-# Documentation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyzippackage
-# Source code - 
 # Path
 $url = 'https://ia902303.us.archive.org/28/items/3d-pinball-x64/3D%20Pinball%20x64.zip'
 $unzipDirPath = Split-Path $installationDirPath
@@ -51,8 +33,6 @@ $originalGameArgs = @{
 Install-ChocolateyZipPackage @originalGameArgs
 
 # Extract decompilation release archive
-# Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1
 # Paths
 $zipArchiveX64Path = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx64Win.zip'
 $zipArchiveX86Path = Join-Path $toolsDirPath -ChildPath 'SpaceCadetPinballx86Win.zip'
@@ -90,37 +70,7 @@ $decompiledArgs = @{
 # Unzip file to the specified location - auto overwrites existing content
 Get-ChocolateyUnzip @decompiledArgs
 
-## Add specific folders to the path
-## Any executables found in the chocolatey package folder will
-## already be on the path. This is used in addition to that or
-## for cases when a native installer doesn't add things to the path.
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath
-# Install-ChocolateyPath 'LOCATION_TO_ADD_TO_PATH' 'User_OR_Machine' # Machine will assert administrative rights
-
-## Set persistent Environment variables
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyenvironmentvariable
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyEnvironmentVariable.ps1
-# Install-ChocolateyEnvironmentVariable -variableName "SOMEVAR" -variableValue "value" [-variableType = 'Machine' #Defaults to 'User']
-
-## Adding a shim when not automatically found - Chocolatey automatically shims exe files found in package directory.
-## Guide - https://docs.chocolatey.org/en-us/create/create-packages#how-do-i-exclude-executables-from-getting-shims
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-binfile
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-BinFile.ps1
-# Install-BinFile
-
-## Set up file association
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyfileassociation
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyFileAssociation.ps1
-# Install-ChocolateyFileAssociation
-
-## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
-## Documantation - https://docs.chocolatey.org/en-us/create/functions
-## There may also be functions available in extension packages
-## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
-
 # Add shortcuts
-# Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
-# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyShortcut.ps1
 if ($addDesktopShortcut -or $addStartMenuShortcut) {
   # Paths
   $executableDirPath = $installationDirPath
@@ -164,7 +114,6 @@ if ($addStartMenuShortcut) {
   }
 }
 # Add game directory shortcut
-# [ ] Test
 if ($addGameDirShortcut) {
   # Arguments
   $gameDirShortcutArgs = @{

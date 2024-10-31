@@ -2,11 +2,6 @@
 
 # This script is required for Chocolatey to remove the shortcuts
 
-## References
-## "Uninstall". https://docs.chocolatey.org/en-us/choco/commands/uninstall
-## "Uninstall-ChocolateyPackage". https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
-## "Uninstall-ChocolateyZipPackage". https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
-
 # Initialization
 $ErrorActionPreference = 'Stop' # Stop on all errors
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
@@ -15,23 +10,10 @@ $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $removeShortcuts = $true
 $installationDirName = '3D Pinball x64'
 $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
-# $installationDirPath = 'C:\Tools\spacecadetpinball'
-
-## Helper functions
-## These have error handling tucked into them already
-## Documantation - https://docs.chocolatey.org/en-us/create/functions
-## Source code - https://github.com/chocolatey/choco/tree/master/src/chocolatey.resources/helpers/functions
-
-## Outputs the bitness of the OS (either "32" or "64")
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
-# $osBitness = Get-ProcessorBits
+# $installationDirPath = 'C:\Tools\SpaceCadetPinball'
 
 # Remove extracted files
-# Only necessary if you did not unpack to package directory
-# Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/UnInstall-ChocolateyZipPackage.ps1
-
+# (Only necessary if archives were not unpacked to the package directory)
 # Uninstall the decompilation release files
 # Arguments
 $decompiledX64WinArgs = @{
@@ -87,7 +69,6 @@ if ($removeShortcuts -and -not $exists) {
                     # deleted at this point in the script. Not finding that
                     # shortcut should not throw a warning. That's what this
                     # catch block is for.
-                    # [ ] Test
                     $message = "Shortcut '$fileInLog' has already been " + `
                         "removed."
                     Write-Debug $message
@@ -101,7 +82,7 @@ if ($removeShortcuts -and -not $exists) {
     }
 }
 
-# Check whether the installation directory exists and if it is empty
+# Check whether the installation directory exists, and if it is empty
 # (This is stock code in virginviolet's scripts)
 $exists = (Test-Path "$installationDirPath" -PathType Container)
 $empty = -not (Test-Path "$installationDirPath\*")
@@ -124,13 +105,12 @@ if ($exists -and -not $empty) {
     Write-Debug "Installation directory has been removed."
 }
 
-# Check whether the game data directory exists and if it is empty
+# Check whether the game data directory exists, and if it is empty
 $gameDataDirPath = Join-Path $env:APPDATA -ChildPath 'SpaceCadetPinball'
 $exists = (Test-Path "$gameDataDirPath" -PathType Container)
 $empty = -not (Test-Path "$gameDataDirPath\*")
 if ($exists -and -not $empty) {
     # Inform user that the game data directory is not empty
-    # [x] Test
     $message = "Data remains in the game data directory (highscore and " + `
         "settings).`n" + `
         "Manually remove the directory if you do not wish" + `
@@ -141,28 +121,10 @@ if ($exists -and -not $empty) {
 }
 elseif ($exists -and $empty) {
     # Remove the game data directory if it is empty (edge case)
-    # [x] Test
     Write-Debug "Game data directory is empty."
     Write-Debug "Removing Game data directory."
     Remove-Item $gameDataDirPath
     Write-Debug "Game data directory directory removed."
 } elseif (-not $exists) {
-    # [x] Test
     Write-Debug "Game data directory (settings and highscore) not found."
 }
-
-## Remove persistent Environment variable
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyEnvironmentVariable.ps1
-# Uninstall-ChocolateyEnvironmentVariable
-
-## Remove shim
-## Only necessary if you used Install-BinFile
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-BinFile.ps1
-# Uninstall-BinFile
-
-## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
-## Documantation - https://docs.chocolatey.org/en-us/create/functions
-## There may also be functions available in extension packages
-## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension

@@ -12,20 +12,17 @@
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <!-- This section is about the software itself -->
-    <!-- If the software is also distributed as a portable program, the software title here should end with ' (Install)' -->
-    <title>spacecadetpinball (Install)</title>
+    <title>SpaceCadetPinball</title>
     <authors>Kevin Gliner,Mike Sandige,David Stafford,Dave Plummer,Raymond Chen,Cinematronics,Microsoft,Muzychenko Andrey</authors>
     <projectUrl>https://github.com/k4zmu2a/SpaceCadetPinball</projectUrl>
-    <!-- There are a number of CDN Services that can be used for hosting the icon. More information can be found here: https://docs.chocolatey.org/en-us/create/create-packages#package-icon-guidelines -->
     <!--<iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/spacecadetpinball/icon/spacecadetpinball_icon.png</iconUrl>-->
-    <!-- <copyright>Year Software Vendor</copyright> -->
+    <copyright>2020-2021 SpaceCadetPinball Andrey Muzychenko</copyright>
     <licenseUrl>https://github.com/k4zmu2a/SpaceCadetPinball/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/k4zmu2a/SpaceCadetPinball</projectSourceUrl>
-    <!-- <docsUrl>At what url are the software docs located?</docsUrl> -->
+    <docsUrl>https://github.com/k4zmu2a/SpaceCadetPinball</docsUrl>
     <bugTrackerUrl>https://github.com/k4zmu2a/SpaceCadetPinball/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen</bugTrackerUrl>
-    <tags>spacecadetpinball pinball arcade-game decompiled decompilation reimplementation windows-port microsoft-game multiplayer-game hotseat single-systems-multiplayer local-multiplayer single-player-game pre-rendered-3d-graphics 3d-game open-source free-software foss foss-games 3d-pinball spacecadet space-cadet space-cadet-pinball pc-port arcade multiplayer</tags>
+    <tags>spacecadetpinball pinball arcade-game decompiled decompilation reimplementation windows-port microsoft-game multiplayer-game hotseat single-systems-multiplayer local-multiplayer single-player-game pre-rendered-3d-graphics 3d-game open-source free-software foss foss-games 3d-pinball pinball-3d spacecadet space-cadet space-cadet-pinball pc-port arcade multiplayer</tags>
     <summary>Space-themed pinball game</summary>
     <description>**SpaceCadetPinball** is a decompilation of the game that was bundled with Windows XP.
 
