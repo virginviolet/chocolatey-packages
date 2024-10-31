@@ -33,7 +33,11 @@
 
 This is a portable package (not installing).
 
-The default installation directory is `C:\ProgramData\chocolatey\lib\spacecadetpinball`.</description>
+The default installation directory is `C:\ProgramData\chocolatey\lib\spacecadetpinball`.
+
+A start menu shortcut is created in a folder named "Game".
+
+Options and high score are purposefully *not* be removed during uninstalling. These are stored in `%AppData%\SpaceCadetPinball\imgui_pb.ini`. Remove the directory manually if desired.</description>
     <releaseNotes>Feature release focusing on FT compatibility
 
 Main highlights:
