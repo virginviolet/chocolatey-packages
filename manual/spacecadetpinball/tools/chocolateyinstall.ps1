@@ -8,8 +8,6 @@ $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 # Note: If you change installation directory name, the original game directory
 # and decompile directory will not merge.
 $installationDirName = '3D Pinball x64'
-# Note: If you install outside the package directory, the auto-uninstaller will
-# not work; create an uninstallation script.
 $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
 # $installationDirPath = 'C:\Games\SpaceCadetPinball'
 $shortcutName = 'Pinball'
@@ -129,7 +127,7 @@ if ($addDesktopShortcut -or $addStartMenuShortcut) {
   $executablePath = Join-Path "$installationDirPath" -ChildPath 'SpaceCadetPinball.exe'
   $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
   $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Games\$shortcutName.lnk"
-  $gameDirShortcutPath = Join-Path "$installationDirPath" -ChildPath "Launch $shortuctName.lnk"
+  $gameDirShortcutPath = Join-Path "$installationDirPath" -ChildPath "Launch $shortcutName.lnk"
   if ($logShortcuts) {
     $packagePath = $env:ChocolateyPackageFolder
     $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
