@@ -18,15 +18,15 @@ and can be verified like this:
   
   SpaceCadetPinballx86WinXP.zip:
   checksum type: sha256
-  checksum32: 0754A1EDCFA5F3C45EB371E39CA2AEF2CC0E65BDEC7E3B50D1B04720600CAF8B
+  checksum: 0754A1EDCFA5F3C45EB371E39CA2AEF2CC0E65BDEC7E3B50D1B04720600CAF8B
   
   SpaceCadetPinballx86Win.zip:
   checksum type: sha256
-  checksum32: 9896FF9F9BE63EDC69CCDD0AE20D32BADFFD576F77C433E327500112007213C4
+  checksum: 9896FF9F9BE63EDC69CCDD0AE20D32BADFFD576F77C433E327500112007213C4
   
   SpaceCadetPinballx64Win.zip.zip:
   checksum type: sha256
-  checksum64: 407E53143E4699C8416CEA690152F513C324D7DFFE8973C924CA82DF69362F84
+  checksum: 407E53143E4699C8416CEA690152F513C324D7DFFE8973C924CA82DF69362F84
   
 3. Obtain the checksum of the zip files that came with this package (in the
   'tools' folder). If they have the same hash as the files you downloaded in

@@ -35,7 +35,7 @@ Portable packages should be possible to install without administrative rights.
 22. [x] Adjust default installation path in description in nuspec.
 23. [x] Finish `legal\VERIFICATION.txt`.
 24. [x] Adjust `TODO_updating.md` if needed.
-25. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
+25. [x] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
 26. [ ] Test the package again to ensure install/uninstall work appropriately.
 27. [ ] Commit and publish to GitHub.
 28. [ ] Merge branch with main.
