@@ -30,7 +30,9 @@
 
 This is a portable package (not installing).
 
-The default installation directory is `C:\ProgramData\chocolatey\lib\spacecadetpinball\3D Pinball x64\`.
+The default installation directory is `C:\ProgramData\chocolatey\lib\spacecadetpinball\3D Pinball x64\` (regardless of whether the package installs a 32-bit or 64-bit build of SpaceCadetPinball).
+
+The package works by downloading the original game from the Internet Archive, unextract it, then use an embedded zip to apply a SpaceCadetPinball decompiled release over it. The shortcuts created will be to the new decompilation EXE.
 
 A start menu shortcut is created in a folder named "Games".
 
