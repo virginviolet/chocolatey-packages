@@ -115,7 +115,7 @@ if ($exists -and -not $empty) {
         "settings).`n" + `
         "Manually remove the directory if you do not wish" + `
         "to keep the data.`n" + `
-        "Game data directory: '$installationDirPath'"
+        "Game data directory: '$gameDataDirPath'"
     Write-Warning $message
     Start-Sleep -Seconds 5 # Time to read
 }
@@ -123,7 +123,7 @@ elseif ($exists -and $empty) {
     # Remove the game data directory if it is empty (edge case)
     Write-Debug "Game data directory is empty."
     Write-Debug "Removing Game data directory."
-    Remove-Item $gameDataDirPath
+    Remove-Item "$gameDataDirPath"
     Write-Debug "Game data directory directory removed."
 } elseif (-not $exists) {
     Write-Debug "Game data directory (settings and highscore) not found."
