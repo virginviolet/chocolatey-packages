@@ -49,9 +49,6 @@ Main highlights:
 * Bug fixes.</releaseNotes>
     <!-- =============================== -->
 
-    <dependencies>
-      <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" /> <!-- Required for 'Start-CheckandThrow' -->
-    </dependencies>
   </metadata>
   <files>
     <!-- Contents -->
