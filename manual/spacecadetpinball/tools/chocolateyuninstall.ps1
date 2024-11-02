@@ -5,46 +5,15 @@
 # Initialization
 $ErrorActionPreference = 'Stop' # Stop on all errors
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$packagePath = "$(Split-Path -Parent $toolsDirPath)"
 
 # Preferences
 $removeShortcuts = $true
 $installationDirName = '3D Pinball x64'
 $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
-# $installationDirPath = 'C:\Tools\SpaceCadetPinball'
-
-# Remove extracted files
-# (Only necessary if archives were not unpacked to the package directory)
-# Uninstall the decompilation release files
-# Arguments
-$decompiledX64WinArgs = @{
-    Packagename = "$($packageName)"
-    ZipFileName = "SpaceCadetPinballx64Win.zip"
-}
-Uninstall-ChocolateyZipPackage @decompiledX64WinArgs > $null
-# Arguments
-$decompiledX86WinArgs = @{
-    Packagename = "$($packageName)"
-    ZipFileName = "SpaceCadetPinballx86Win.zip"
-}
-Uninstall-ChocolateyZipPackage @decompiledX86WinArgs > $null
-# Arguments
-$decompiledX86WinXpArgs = @{
-    Packagename = "$($packageName)"
-    ZipFileName = "SpaceCadetPinballx86WinXP.zip"
-}
-Uninstall-ChocolateyZipPackage @decompiledX86WinXpArgs > $null
-
-# Uninstall the original game files
-# Arguments
-$originalGameArgs = @{
-    Packagename = "$($packageName)"
-    ZipFileName = "3D Pinball x64.zip"
-}
-Uninstall-ChocolateyZipPackage @originalGameArgs > $null
 
 # Remove shortcuts
 # Look for shortcuts log
-$packagePath = Get-ChocolateyPath -PathType 'PackagePath'
 $shortcutsLogPath = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
 $exists = Test-Path -Path "$shortcutsLogPath" -PathType Leaf
 if ($removeShortcuts -and -not $exists) {
@@ -60,15 +29,10 @@ if ($removeShortcuts -and -not $exists) {
                 Remove-Item -Path "$fileInLog" -Force
                 Write-Debug "Removed shortcut '$fileInLog'."
             } catch [System.Management.Automation.ItemNotFoundException] {
+                # Prevent warning when trying to remove a
+                # shortcut in install directory
                 $shortcutDirPath = $(Split-Path -Path $fileInLog)
                 if ($shortcutDirPath -eq $installationDirPath) {
-                    # As far as I understand, directories created
-                    # through 'Install-ChocolateyZipPackage' get removed
-                    # by 'Uninstall-ChocolateyZipPackage'. Thus, the shortcut
-                    # in the installation directory will already have been
-                    # deleted at this point in the script. Not finding that
-                    # shortcut should not throw a warning. That's what this
-                    # catch block is for.
                     $message = "Shortcut '$fileInLog' has already been " + `
                         "removed."
                     Write-Debug $message
@@ -80,29 +44,6 @@ if ($removeShortcuts -and -not $exists) {
             }
         }
     }
-}
-
-# Check whether the installation directory exists, and if it is empty
-# (This is stock code in virginviolet's scripts)
-$exists = (Test-Path "$installationDirPath" -PathType Container)
-$empty = -not (Test-Path "$installationDirPath\*")
-if ($exists -and -not $empty) {
-    # Inform user that the installation directory is not empty (edge case)
-    $message = "Data remains in the installation directory. `n" + `
-        "Manually remove the directory if you do not" + `
-        "wish to keep the data.`n" + `
-        "Installation directory: '$installationDirPath'"
-    Write-Warning $message
-    Start-Sleep -Seconds 5 # Time to read
-} elseif ($exists -and $empty) {
-    # Remove installation directory if it is empty (edge case;
-    # may be possible if not unpacked to package directory)
-    Write-Debug "Installation directory is empty."
-    Write-Debug "Removing installation directory."
-    Remove-Item $installationDirPath
-    Write-Debug "Installation directory removed."
-} elseif (-not $exists) {
-    Write-Debug "Installation directory has been removed."
 }
 
 # Check whether the game data directory exists, and if it is empty

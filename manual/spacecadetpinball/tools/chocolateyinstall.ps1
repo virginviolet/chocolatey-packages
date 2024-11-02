@@ -5,15 +5,10 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 
 # Preferences
-# Note: If you change installation directory name, the original game directory
-# and decompile directory will not merge.
 $installationDirName = '3D Pinball x64'
 $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
-# $installationDirPath = 'C:\Games\SpaceCadetPinball'
+$packagePath = "$(Split-Path -Parent $toolsDirPath)"
 $shortcutName = 'Pinball'
-$addDesktopShortcut = $true
-$addStartMenuShortcut = $true
-$addGameDirShortcut = $true
 $logShortcuts = $true
 
 # Download and unpack a zip file
@@ -55,7 +50,6 @@ if ($userOsIsXp) {
   Write-Debug "Windows 2000 detected."
   $zipArchiveX86CorrectPath = $zipArchiveX86XpPath
 } else {
-  # [x] Test
   # Don't use the zip meant for XP
   Write-Debug "Will not use the Windows XP version."
   $zipArchiveX86CorrectPath = $zipArchiveX86Path
@@ -71,60 +65,34 @@ $decompiledArgs = @{
 Get-ChocolateyUnzip @decompiledArgs
 
 # Add shortcuts
-if ($addDesktopShortcut -or $addStartMenuShortcut) {
-  # Paths
-  $executableDirPath = $installationDirPath
-  $executablePath = Join-Path "$installationDirPath" -ChildPath 'SpaceCadetPinball.exe'
-  $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
-  $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Games\$shortcutName.lnk"
-  $gameDirShortcutPath = Join-Path "$installationDirPath" -ChildPath "Launch $shortcutName.lnk"
-  if ($logShortcuts) {
-    $packagePath = $env:ChocolateyPackageFolder
-    $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
-  }
+# Paths
+$executableDirPath = $installationDirPath
+$executablePath = Join-Path "$installationDirPath" -ChildPath 'SpaceCadetPinball.exe'
+$desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
+$startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Games\$shortcutName.lnk"
+$gameDirShortcutPath = Join-Path "$installationDirPath" -ChildPath "Launch $shortcutName.lnk"
+$shortcutDescription = "Begins a game of 3-D Pinball."
+if ($logShortcuts) {
+  $shortcutsLogPath = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
 }
 # Add desktop shortcut
-if ($addDesktopShortcut) {
-  # Arguments
-  $desktopShortcutArgs = @{
-    shortcutFilePath = "$desktopShortcutPath"
-    targetPath       = "$executablePath"
-    workingDirectory = "$executableDirPath"
-    description      = "Begins a game of 3-D Pinball."
-  }
-  Install-ChocolateyShortcut @desktopShortcutArgs
-  # Log
-  if ($logShortcuts) {
-    "$desktopShortcutPath" | Out-File "$shortcutsLog" -Append
-  }
+Install-ChocolateyShortcut -shortcutFilePath "$desktopShortcutPath" `
+  -targetPath "$executablePath" `
+  -workingDirectory "$executableDirPath" `
+  -description $shortcutDescription
+if ($logShortcuts) {
+  "$desktopShortcutPath" | Out-File "$shortcutsLogPath" -Append
 }
 # Add start menu shortcut
-if ($addStartMenuShortcut) {
-  # Arguments
-  $startMenuShortcutArgs = @{
-    shortcutFilePath = "$startMenuShortcutPath"
-    targetPath       = "$executablePath"
-    workingDirectory = "$executableDirPath"
-    description      = "Begins a game of 3-D Pinball."
-  }
-  Install-ChocolateyShortcut @startMenuShortcutArgs
-  # Log
-  if ($logShortcuts) {
-    "$startMenuShortcutPath" | Out-File "$shortcutsLog" -Append
-  }
+Install-ChocolateyShortcut -shortcutFilePath "$startMenuShortcutPath" `
+  -targetPath "$executablePath" `
+  -workingDirectory "$executableDirPath" `
+  -description $shortcutDescription
+if ($logShortcuts) {
+  "$startMenuShortcutPath" | Out-File "$shortcutsLogPath" -Append
 }
 # Add game directory shortcut
-if ($addGameDirShortcut) {
-  # Arguments
-  $gameDirShortcutArgs = @{
-    shortcutFilePath = "$gameDirShortcutPath"
-    targetPath       = "$executablePath"
-    workingDirectory = "$executableDirPath"
-    description      = "Begins a game of 3-D Pinball."
-  }
-  Install-ChocolateyShortcut @gameDirShortcutArgs
-  # Log
-  if ($logShortcuts) {
-    "$gameDirShortcutPath" | Out-File "$shortcutsLog" -Append
-  }
+Install-ChocolateyShortcut @gameDirShortcutArgs -shortcutFilePath "$gameDirShortcutPath" -targetPath "$executablePath" -workingDirectory "$executableDirPath" -description $shortcutDescription
+if ($logShortcuts) {
+  "$gameDirShortcutPath" | Out-File "$shortcutsLogPath" -Append
 }
