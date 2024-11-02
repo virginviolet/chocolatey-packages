@@ -22,7 +22,7 @@ $url = 'https://ia902303.us.archive.org/28/items/3d-pinball-x64/3D%20Pinball%20x
 $unzipDirPath = Split-Path $installationDirPath
 # Arguments
 $originalGameArgs = @{
-  packageName   = $env:ChocolateyPackageName
+  packageName   = 'spacecadetpinball'
   unzipLocation = $unzipDirPath
   url           = $url
   checksum      = 'AF6B1B5A3C0B9D13C58DFEFC937982A0357D209962A81003B11C8FA58EF56329'
