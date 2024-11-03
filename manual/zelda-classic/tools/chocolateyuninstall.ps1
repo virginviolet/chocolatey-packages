@@ -55,7 +55,7 @@ if ($questsDirExists -and $empty) {
 }
 
 # Uninstall extracted files
-Uninstall-ChocolateyZipPackage -PackageName $env:ChocolateyPackageName -ZipFileName $zipName
+Uninstall-ChocolateyZipPackage -PackageName $packagePath -ZipFileName $zipName
 
 # Inform user if installation directory is not empty.
 $empty = -not (Test-Path $installationDirPath\*)
@@ -76,7 +76,8 @@ else {
 
 # Remove shortcuts
 # Look for shortcuts log
-$shortcutsLogPath = Join-Path "$env:ChocolateyPackageFolder" -ChildPath 'shortcuts.txt'
+$packagePath = "$(Split-Path -Parent $toolsDirPath)"
+$shortcutsLogPath = Join-Path "$packagePath" -ChildPath 'shortcuts.txt'
 $exists = Test-Path -Path $shortcutsLogPath -PathType Leaf
 if ($exists) {
     Write-Debug "Shortcuts log found."
