@@ -34,7 +34,8 @@ if ($PSVersionTable.PSVersion.Major -ge 5) {
 }
 
 # Remove empty GNUbg preferences folders
-# (This mitigates the installer showing a GUI prompt when GNUbg preferences directory exists)
+# (This mitigates the installer showing a GUI prompt 
+# when GNUbg preferences directory exists)
 # Remove '.gnubg/backup/' directory if it exists and is empty
 $gnuBgPreferencesDir = Join-Path "$env:UserProfile" -ChildPath '.gnubg/'
 $gnuBgPreferencesBackupDir = Join-Path "$gnuBgPreferencesDir" -ChildPath 'backup/'
@@ -58,7 +59,7 @@ if ($exists -and $empty) {
 # Arguments for 'Get-UninstallRegistryKey' and 'Uninstall-ChocolateyPackage'
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
-  softwareName   = 'GNU Backgammon*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName   = 'GNU Backgammon*' # Name used in "Installed apps" or "Programs and Features".
   fileType       = 'EXE'
   silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # Exit codes indicating success
@@ -114,7 +115,8 @@ if ($keys.Count -eq 0) {
     }
     # Run uninstaller and restore '.gnubg\' from TEMP
     if ($shouldRestorePrefsDir) {
-      # If installation fails, restore '.gnubg\' to its original location before stopping the script.
+      # If installation fails, restore '.gnubg\' to its original location
+      # before stopping the script.
       try {
         Write-Debug "Running installer..."
         Uninstall-ChocolateyPackage @packageArgs

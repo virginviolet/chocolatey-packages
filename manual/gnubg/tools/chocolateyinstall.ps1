@@ -34,7 +34,6 @@ if ($PSVersionTable.PSVersion.Major -ge 5) {
 }
 
 # Run EXE installer
-# - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyinstallpackage
 # Start AutoHotKey script to hide compiler window
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $exeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
@@ -70,7 +69,7 @@ $packageArgs = @{
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
   file           = $exeInstallerPath
-  softwareName   = 'GNU Backgammon*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName   = 'GNU Backgammon*' # Name used in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = '68CD01D92A99E6EC4BDB5F544C14ECBFCC7D9119AFB0D2AC189698B309E62D06'
   checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
