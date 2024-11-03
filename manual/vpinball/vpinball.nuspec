@@ -18,7 +18,7 @@ This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Refe
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <title>vpinball</title>
+    <title>Visual Pinball</title>
     <authors>Randy Davis,The Visual Pinball team,vpforums community</authors>
     <projectUrl>https://www.vpforums.org</projectUrl>
     <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/vpinball/icon/vpinball.ico.png</iconUrl>
