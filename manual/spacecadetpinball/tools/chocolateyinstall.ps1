@@ -3,11 +3,11 @@
 # Initialization
 $ErrorActionPreference = 'Stop' # Stop on all errors
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$packagePath = "$(Split-Path -Parent $toolsDirPath)"
 
 # Preferences
 $installationDirName = '3D Pinball x64'
 $installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
-$packagePath = "$(Split-Path -Parent $toolsDirPath)"
 $shortcutName = 'Pinball'
 $logShortcuts = $true
 
