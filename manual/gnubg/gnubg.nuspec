@@ -19,7 +19,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://www.gnu.org/software/gnubg/#TOCdownloading</projectSourceUrl>
     <docsUrl>https://www.gnu.org/software/gnubg/manual/</docsUrl>
-    <mailingListUrl>mailto:bug-gnubg@gnu.org</mailingListUrl>
+    <mailingListUrl>https://www.gnu.org/software/gnubg/#TOCdownloading</mailingListUrl>
     <bugTrackerUrl>https://savannah.gnu.org/bugs/?group=gnubg</bugTrackerUrl>
     <tags>gnubg backgammon game video-game board-game backgammon-analyzer backgammon-tournament gui-game command-line command-line-game command-line-application console-application backgammon-analysis gnu gnu-project gnu-backgammon open-source free-software foss foss-games</tags>
     <summary>Backgammon game and analyser</summary>
