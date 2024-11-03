@@ -11,7 +11,7 @@
     <!-- ============================== -->
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <title>gnubg</title>
+    <title>GNU Backgammon</title>
     <authors>Joseph Heled,Oystein Johansen,Jorn Thyssen,Gary Wong</authors>
     <projectUrl>https://www.gnu.org/software/gnubg/</projectUrl>
     <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/manual/gnubg/gnubg-gui.ico-32px-128px.png</iconUrl>
