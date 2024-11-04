@@ -1,41 +1,78 @@
 ﻿$ErrorActionPreference = 'Stop'
-$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$file = Join-Path $toolsDir 'parallel-launcher_setup_win32.exe'
-$file64 = Join-Path $toolsDir 'parallel-launcher_setup_win64.exe'
-$fileManual = Join-Path $toolsDir 'Manual.pdf'
-$fileManualInstallDir = 'C:\Program Files (x86)\parallel-launcher'
+$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+
+# Extract archive
+# Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
+# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1
+# Paths
+# Outputs the bitness of the OS (either "32" or "64")
+# Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
+# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
+$osBitness = Get-ProcessorBits
+if ($osBitness -eq 32) {
+  $zipArchivePath = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows32'
+} elseif ($osBitness -eq 64) {
+  $zipArchivePath = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows32'
+} else {
+  Write-Error "Get-ProcessorBits returned neither 32 or 64."
+}
+# Arguments
+$unzipArgs = @{
+  PackageName  = "$($packageName)"
+  FileFullPath = "$zipArchivePath"
+  Destination  = "$toolsDirPath"
+}
+# Unzip file to the specified location (auto overwrites existing content)
+Get-ChocolateyUnzip @unzipArgs
+
+$filePath = Join-Path "$toolsDirPath" 'parallel-launcher_setup_win32.exe'
+$file64Path = Join-Path "$toolsDirPath" 'parallel-launcher_setup_win64.exe'
 
 $packageArgs = @{
-  packageName   = $env:ChocolateyPackageName
-  unzipLocation = $toolsDir
-  fileType      = 'EXE'
-  file          = $file
-  file64        = $file64
-
-  softwareName  = 'Parallel Launcher'
-
-  checksum      = '2F3AAE6C3F209DD77F2D084FD73B5C577D9FD53BB9632FDFD0E721089837811A'
-  checksumType  = 'sha256'
-  checksum64    = 'D29D5AF0D3A5726D20F09D0BBA0E4927D4EE4E4EBC50A20BE83584C66749D65C'
-  checksumType64= 'sha256'
-
-  validExitCodes= @(0, 3010, 1641)
-
-silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-'
+  packageName    = $env:ChocolateyPackageName
+  unzipLocation  = $toolsDirPath
+  fileType       = 'EXE'
+  file           = $filePath
+  file64         = $file64Path
+  softwareName   = 'Parallel Launcher'
+  checksum       = '185916205B2C1D2513296D64816F201AD295AB2D3FF40365EF9531EB14310DF0'
+  checksumType   = 'sha256'
+  checksum64     = '0692E3F857D91BA99C068CBE2A993201E41630977D57128F5A20830AB9EC89AE'
+  checksumType64 = 'sha256'
+  silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  validExitCodes = @(0) # Inno Setup
 }
-
-# The installer automatically launches the program, se we should to close the program.
-# Start-WaitandStop "parallel-launcher" # Does not work, for some reason, so instead
-# we use use Stop-Process after the installation.
-
+# The installer automatically launches the program on completion,
+# so we should to close the program.
+# 'Start-WaitandStop' does not work (pull request pending).
+# Start-WaitandStop "parallel-launcher"
+# Instead, we use Stop-Process after the installation.
 Install-ChocolateyInstallPackage @packageArgs
 
-# The installer automatically launches the program, se we should to close the program.
-# (this likely stops the process before the program's window has even appeared).
-Stop-Process -Name "parallel-launcher"
+# The installer automatically launches the program,
+# so we should to close the program.
+Write-Verbose "Terminating 'parallel-launcher' process..."
+try {
+  Stop-Process -Name "parallel-launcher"
+  Write-Debug "Process 'parallel-launcher' terminated."
+} catch {
+  Write-Warning "Could not terminate 'parallel-launcher' process.`n$_"
+}
 
-# Only copy the manual if the program is installed in the expected location.
-$empty = -Not (Test-Path -Path $fileManualInstallDir\* -ea 0)
-if (-Not $empty){
-  Copy-Item $fileManual $fileManualInstallDir
+# Install manual
+$manualPath = Join-Path "$toolsDirPath" 'Manual.pdf'
+$manualInstallDirPath = 'C:\Program Files (x86)\parallel-launcher'
+# Only copy if the program seems to be installed in the expected location.
+$exists = Test-Path $manualInstallDirPath -PathType Container
+$empty = -not (Test-Path $manualInstallDirPath\*)
+if ($exists -and -not $empty) {
+  try {
+    Write-Verbose "Installing manual..."
+    Copy-Item $manualPath $manualInstallDirPath
+    Write-Debug "Manual installed."
+  } catch {
+    Write-Warning "Could not install manual.`n$_"
+  }
+} else {
+  Write-Warning "Could not find installation directory. Manual will not be installed."
 }
