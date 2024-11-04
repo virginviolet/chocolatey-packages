@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>parallel-launcher</id>
-    <version>7.7.0</version>
+    <version>7.8.0</version>
     <packageSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/manual/parallel-launcher</packageSourceUrl>
     <owners>virginviolet</owners>
     <title>Parallel Launcher</title>
@@ -16,17 +16,26 @@
     <projectSourceUrl>https://gitlab.com/parallel-launcher/parallel-launcher</projectSourceUrl>
     <docsUrl>https://gitlab.com/parallel-launcher/parallel-launcher</docsUrl>
     <bugTrackerUrl>https://gitlab.com/parallel-launcher/parallel-launcher/-/boards</bugTrackerUrl>
-    <tags>parallel-launcher paralleln64 mupen64plus-next mupen64plus mupen64 emulator retroarch</tags>
+    <tags>parallel-launcher paralleln64 mupen64plus-next mupen64plus mupen64 emulator retroarch open-source free-software foss</tags>
     <summary>Launcher for ParallelN64 and Mupen64Plus-Next.</summary>
-    <description>Launcher for the Nintendo 64 emulatorsParallelN64 and Mupen64Plus-Next.
+    <description>**Parallel Launcher** is a launcher for the Nintendo 64 emulators ParallelN64 and Mupen64Plus-Next.
 
-The default installation directory is C:/Program Files (x86)/parallel-launcher (both the 32-bit version and the 64-bit version).</description>
-    <releaseNotes>- Enabled error logging in RetroArch
-- When RetroArch crashes shortly after starting, the error logs can now be viewed in the error dialog
-- Worked around a Windows bug that prevented SD card mounting from working if file compression is enabled
-- Fixed the incorrect error code being logged when an SD card fails to mount on Windows</releaseNotes>
+### Installation
+
+The default installation directory is `C:/Program Files (x86)/parallel-launcher` (both the 32-bit version and the 64-bit version).
+
+The default save files directory is `%LocalAppData%\parallel-launcher\data\retro-data\saves`.
+The default save state directory is `%LocalAppData%\parallel-launcher\data\retro-data\states`.
+The default save state directory is `%LocalAppData%\parallel-launcher\data\retro-data\states`.
+The configuration files directory is `%LocalAppData%\parallel-launcher\config`.
+
+Upgrade will safetly fail if a process named `retroarch` is running (Parallel-Launcher uses RetroArch).</description>
+    <releaseNotes>* Added Japanese translations (thanks to Rulu for the translations)
+* Fixed RetroArch failing to be unzipped on certain RPM based Linux distros
+* Fixed RetroArch not updating to versions newer than 1.17.0
+* Fixed star icons being cut off in certain star layouts</releaseNotes>
     <dependencies>
-      <!-- Extension for Start-CheckandStop and Start-CheckandThrow commands. -->
+      <!-- Extension for 'Start-CheckandStop' and 'Start-WaitandStop' commands. -->
       <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" />
     </dependencies>
   </metadata>
