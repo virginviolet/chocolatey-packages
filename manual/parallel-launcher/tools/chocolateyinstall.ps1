@@ -1,5 +1,9 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿# Initialization
+$ErrorActionPreference = 'Stop'
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+
+# Preferences
+$pdfManualInstallDirPath = 'C:\Program Files (x86)\parallel-launcher'
 
 # Extract archive
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
@@ -60,15 +64,14 @@ try {
 }
 
 # Install manual
-$manualPath = Join-Path "$toolsDirPath" 'Manual.pdf'
-$manualInstallDirPath = 'C:\Program Files (x86)\parallel-launcher'
+$pdfManualPath = Join-Path "$toolsDirPath" -ChildPath 'Manual.pdf'
 # Only copy if the program seems to be installed in the expected location.
-$exists = Test-Path $manualInstallDirPath -PathType Container
-$empty = -not (Test-Path $manualInstallDirPath\*)
+$exists = Test-Path $pdfManualInstallDirPath -PathType Container
+$empty = -not (Test-Path $pdfManualInstallDirPath\*)
 if ($exists -and -not $empty) {
   try {
     Write-Verbose "Installing manual..."
-    Copy-Item $manualPath $manualInstallDirPath
+    Copy-Item $pdfManualPath $pdfManualInstallDirPath
     Write-Debug "Manual installed."
   } catch {
     Write-Warning "Could not install manual.`n$_"

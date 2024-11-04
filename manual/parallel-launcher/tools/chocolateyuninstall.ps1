@@ -1,7 +1,9 @@
-# Preferences
+# Initialization
 $ErrorActionPreference = 'Stop'
-$fileManualDir = 'C:\Program Files (x86)\parallel-launcher'
-$fileManual = Join-Path $fileManualDir 'Manual.pdf'
+
+# Preferences
+$installationDirPath = 'C:\Program Files (x86)\parallel-launcher'
+$pdfManualInstallPath = Join-Path $installationDirPath -ChildPath 'Manual.pdf'
 
 # Prevent uninstall if retroarch (which Parallel Launcher uses) is running, to ensure
 # no progress is lost
@@ -46,13 +48,38 @@ if ($keys.Count -eq 1) {
   }
 }
 
-$exists = Test-Path -Path $fileManual -ea 0
-if ($exists) {
-  Remove-Item $fileManual
+# Uninstall manual
+$manualExists = Test-Path $pdfManualInstallPath -PathType Leaf
+if ($manualExists) {
+  try {
+    Write-Verbose "Uninstalling manual..."
+    Remove-Item "$pdfManualInstallPath"
+    Write-Debug "Manual uninstalled."
+  } catch {
+    Write-Warning "Could not uninstall manual.`n$_"
+  }
+} else {
+  $message = "Manual could not be found. " + `
+    "It may have been uninstalled by other means."
+  Write-Warning $message
 }
 
-# Delete empty installation folder.
-$empty = -Not (Test-Path -Path $fileManualDir\* -ea 0)
-if ($empty) {
-  Remove-Item $fileManualDir
+# Remove installation directory
+# Inform user if installation directory is not empty (edge case?)
+$exists = Test-Path $installationDirPath -PathType Container
+$empty = -not (Test-Path $installationDirPath\*)
+if ($exists -and -not $empty) {
+  $message = "Data remains in the installation directory. `n" + `
+    "Manually remove the installation directory " + `
+    "if you do not wish to keep the data.`n" + `
+    "Installation directory: '$installationDirPath'"
+  Write-Warning $message
+  Start-Sleep -Seconds 5 # Time to read
+}
+else {
+  # Remove installation directory if it is empty
+  Write-Debug "Installation directory is empty."
+  Write-Debug "Removing installation directory."
+  Remove-Item $installationDirPath
+  Write-Debug "Installation directory removed."
 }
