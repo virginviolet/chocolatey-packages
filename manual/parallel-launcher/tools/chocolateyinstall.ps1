@@ -5,25 +5,27 @@ $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 # Preferences
 $pdfManualInstallDirPath = 'C:\Program Files (x86)\parallel-launcher'
 
-# Extract archive
+# Extract archive for 32-bit 
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
 # Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1
 # Paths
 # Outputs the bitness of the OS (either "32" or "64")
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
 # Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
-$osBitness = Get-ProcessorBits
-if ($osBitness -eq 32) {
-  $zipArchivePath = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows32'
-} elseif ($osBitness -eq 64) {
-  $zipArchivePath = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows32'
-} else {
-  Write-Error "Get-ProcessorBits returned neither 32 or 64."
-}
+$zipArchive32Path = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows32'
 # Arguments
-$unzipArgs = @{
+$unzip32Args = @{
   PackageName  = "$($packageName)"
-  FileFullPath = "$zipArchivePath"
+  FileFullPath = "$zipArchive32Path"
+  Destination  = "$toolsDirPath"
+}
+# Unzip file to the specified location (auto overwrites existing content)
+Get-ChocolateyUnzip @unzip32Args
+$zipArchive64Path = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows64'
+# Arguments
+$unzip32Args = @{
+  PackageName  = "$($packageName)"
+  FileFullPath = "$zipArchive64Path"
   Destination  = "$toolsDirPath"
 }
 # Unzip file to the specified location (auto overwrites existing content)
