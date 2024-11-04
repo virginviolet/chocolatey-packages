@@ -6,9 +6,9 @@ The installer has been downloaded from the official website <https://parallel-la
 and can be verified like this:
 
 1. Download the following archives:
-  64-Bit: <https://parallel-launcher.ca/windows-releases/parallel-launcher-v7.8.0-windows64.zip>
   32-Bit: <https://parallel-launcher.ca/windows-releases/parallel-launcher-v7.8.0-windows32.zip>
-2. Obtain the checksum of each file.
+  64-Bit: <https://parallel-launcher.ca/windows-releases/parallel-launcher-v7.8.0-windows64.zip>
+2. Obtain the checksum of the zip files.
   Here are two means of obtaining the checksums:
   
   - Use the PowerShell command 'Get-Filehash'
@@ -18,19 +18,43 @@ and can be verified like this:
   
   parallel-launcher-v7.8.0-windows32.zip
   checksum type: sha256
-  checksum: 7CF636E4B98A653B90F36499F7F72C10D90602CEE4FDA7C1607B43697205DBB6
+  checksum: C425F77EB16F328BB5AB34ABE07CF33CAABBF3743921C97657404C0482CC0328
   
   parallel-launcher-v7.8.0-windows64.zip
   checksum type: sha256
-  checksum: D29D5AF0D3A5726D20F09D0BBA0E4927D4EE4E4EBC50A20BE83584C66749D65C
+  checksum: 7CF636E4B98A653B90F36499F7F72C10D90602CEE4FDA7C1607B43697205DBB6
+
+2. If the hashes match, use a tool like 7zip or WinRAR to extract the
+  installers from the archives, as well as the manual from either of the two
+  archives.
+3. Obtain the checksums of the files from the zip archives
+  You should get the following results:
   
-3. Obtain the checksum of the zip files that came with this package (in the
-  'tools' folder). If they have the same hash as the files you downloaded in
-  step 1, you have successfully verified the integrity of the zip files.
-4. Open the scripts, 'chocolateyinstall.ps1', 'chocolateybeforemodify.ps1',
-  and 'chocolateyuninstall.ps1' in a text editor or IDE and see if it looks
+  parallel-launcher_setup_win32.exe
+  checksum type: sha256
+  checksum: 185916205B2C1D2513296D64816F201AD295AB2D3FF40365EF9531EB14310DF0
+
+  parallel-launcher_setup_win64.exe
+  checksum type: sha256
+  checksum64: 0692E3F857D91BA99C068CBE2A993201E41630977D57128F5A20830AB9EC89AE
+
+  Manual.pdf (from 'parallel-launcher-v7.8.0-windows32.zip')
+  checksum type: sha256
+  checksum: DF5F47D1A2EE98D700F43F93E1CCBCA25B8CFF5D2B2B44C4FFF96EBD638FED6F
+
+  Manual.pdf (from 'parallel-launcher-v7.8.0-windows64.zip')
+  checksum type: sha256
+  checksum: DF5F47D1A2EE98D700F43F93E1CCBCA25B8CFF5D2B2B44C4FFF96EBD638FED6F
+  
+4. Obtain the checksum of the exe files and the pdf manual that came with this
+  package (in the 'tools' folder). If they have the same hash as the files you
+  downloaded in step 1, you have successfully verified the integrity of the
+  files.
+5. Open the scripts, 'chocolateyinstall.ps1', 'chocolateybeforemodify.ps1',
+  and 'chocolateyuninstall.ps1', in a text editor or IDE and see if they look
   clean.
   If you want to learn more about this, check out the Chocolatey docs on
   creating packages:
   <https://docs.chocolatey.org/en-us/create/create-packages/>
+
 The license in 'LICENSE.txt' is obtained from <https://gitlab.com/parallel-launcher/parallel-launcher/-/blob/master/LICENSE>

@@ -5,35 +5,9 @@ $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 # Preferences
 $pdfManualInstallDirPath = 'C:\Program Files (x86)\parallel-launcher'
 
-# Extract archive for 32-bit 
-# Documantation - https://docs.chocolatey.org/en-us/create/functions/get-chocolateyunzip
-# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1
-# Paths
-# Outputs the bitness of the OS (either "32" or "64")
-# Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
-$zipArchive32Path = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows32'
-# Arguments
-$unzip32Args = @{
-  PackageName  = "$($packageName)"
-  FileFullPath = "$zipArchive32Path"
-  Destination  = "$toolsDirPath"
-}
-# Unzip file to the specified location (auto overwrites existing content)
-Get-ChocolateyUnzip @unzip32Args
-$zipArchive64Path = Join-Path "$toolsDirPath" -ChildPath 'parallel-launcher-v7.8.0-windows64'
-# Arguments
-$unzip32Args = @{
-  PackageName  = "$($packageName)"
-  FileFullPath = "$zipArchive64Path"
-  Destination  = "$toolsDirPath"
-}
-# Unzip file to the specified location (auto overwrites existing content)
-Get-ChocolateyUnzip @unzipArgs
-
+# Install program
 $filePath = Join-Path "$toolsDirPath" 'parallel-launcher_setup_win32.exe'
 $file64Path = Join-Path "$toolsDirPath" 'parallel-launcher_setup_win64.exe'
-
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
   unzipLocation  = $toolsDirPath
@@ -53,6 +27,7 @@ $packageArgs = @{
 # 'Start-WaitandStop' does not work (pull request pending).
 # Start-WaitandStop "parallel-launcher"
 # Instead, we use Stop-Process after the installation.
+# Run installer
 Install-ChocolateyInstallPackage @packageArgs
 
 # The installer automatically launches the program,
