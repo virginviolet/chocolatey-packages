@@ -34,3 +34,7 @@ manual/pysolfc/archive/PySolFC_3.0.0_setup.exe
 manual/pysolfc/archive/3.0.0/PySolFC_3.0.0_setup.exe
 manual/pysolfc/tools/PySolFC_3.1.0_setup.exe
 manual/pysolfc/pysolfc.3.1.0.nupkg
+manual/parallel-launcher/archive/7.7.0/parallel-launcher_setup_win32.exe
+manual/parallel-launcher/archive/7.7.0/parallel-launcher_setup_win64.exe
+manual/parallel-launcher/archive/7.7.0/parallel-launcher.7.7.0.nupkg
+manual/parallel-launcher/parallel-launcher.7.8.0.nupkg
