@@ -6,23 +6,31 @@ The installer has been downloaded from the official website <https://parallel-la
 and can be verified like this:
 
 1. Download the following archives:
-  64-Bit: <https://parallel-launcher.ca/windows-releases/parallel-launcher-v7.7.0-windows64.zip>
-  32-Bit: <https://parallel-launcher.ca/windows-releases/parallel-launcher-v7.7.0-windows32.zip>
-2. Use a tool like 7zip or WinRAR to extract the installers from the archives.
-3. You can use one of the following methods to obtain the checksum
-  - Use powershell function 'Get-Filehash'
-  - Use chocolatey utility 'checksum.exe'
+  64-Bit: <https://parallel-launcher.ca/windows-releases/parallel-launcher-v7.8.0-windows64.zip>
+  32-Bit: <https://parallel-launcher.ca/windows-releases/parallel-launcher-v7.8.0-windows32.zip>
+2. Obtain the checksum of each file.
+  Here are two means of obtaining the checksums:
   
-  64-bit
-  checksum type: sha256
-  checksum64: D29D5AF0D3A5726D20F09D0BBA0E4927D4EE4E4EBC50A20BE83584C66749D65C
+  - Use the PowerShell command 'Get-Filehash'
+  - Use the Chocolatey utility 'checksum.exe'
   
-  32-bit
-  checksum type: sha256
-  checksum64: 2F3AAE6C3F209DD77F2D084FD73B5C577D9FD53BB9632FDFD0E721089837811A
+  You should get the following results:
   
-  Manual
+  parallel-launcher-v7.8.0-windows32.zip
   checksum type: sha256
-  checksum64: DF5F47D1A2EE98D700F43F93E1CCBCA25B8CFF5D2B2B44C4FFF96EBD638FED6F
-
+  checksum: 7CF636E4B98A653B90F36499F7F72C10D90602CEE4FDA7C1607B43697205DBB6
+  
+  parallel-launcher-v7.8.0-windows64.zip
+  checksum type: sha256
+  checksum: D29D5AF0D3A5726D20F09D0BBA0E4927D4EE4E4EBC50A20BE83584C66749D65C
+  
+3. Obtain the checksum of the zip files that came with this package (in the
+  'tools' folder). If they have the same hash as the files you downloaded in
+  step 1, you have successfully verified the integrity of the zip files.
+4. Open the scripts, 'chocolateyinstall.ps1', 'chocolateybeforemodify.ps1',
+  and 'chocolateyuninstall.ps1' in a text editor or IDE and see if it looks
+  clean.
+  If you want to learn more about this, check out the Chocolatey docs on
+  creating packages:
+  <https://docs.chocolatey.org/en-us/create/create-packages/>
 The license in 'LICENSE.txt' is obtained from <https://gitlab.com/parallel-launcher/parallel-launcher/-/blob/master/LICENSE>
