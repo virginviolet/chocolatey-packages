@@ -56,10 +56,10 @@ Begin {
         $empty_line | Out-String
         Write-Warning "'$Output' doesn't seem to be a valid path name."
         $empty_line | Out-String
-        Write-Verbose "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -verbose
+        Write-Debug "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -verbose
         $empty_line | Out-String
         $skip_text = "Couldn't find -Output folder '$Output'..."
-        Write-Output $skip_text
+        Write-Warning $skip_text
         $empty_line | Out-String
         Exit
         Return
@@ -219,7 +219,7 @@ End {
                                 } Else {
                                     $stats_text = "Total $($total_number_of_folders) $item_text processed."
                                 } # Else (If $unique_folders.Count)
-                        Write-Output $stats_text
+                        Write-Verbose $stats_text
                         $empty_line | Out-String
                     } Else {
 
@@ -245,7 +245,7 @@ End {
                                         $stats_text = "Total $($total_number_of_folders) $item_text processed. One path name was skipped."
                                     } # Else (If $unique_folders.Count)
                                 } # Else (If $num_invalid_paths)
-                        Write-Output $stats_text
+                        Write-Verbose $stats_text
                         $empty_line | Out-String
                     } # Else (If $skipped_path_names.Count)
 
@@ -271,7 +271,7 @@ End {
                                                         If ($WhatIf) {
                                                             $empty_line | Out-String
                                                             $notify_text = "Found $($unique_empty_folders.Count) empty $folder_text." 
-                                                            Write-Output $notify_text
+                                                            Write-Verbose $notify_text
                                                             $empty_line | Out-String
                                                             "Exit Code 1: A simulation run (the -WhatIf parameter was used), didn't touch any folders."
                                                             Return $empty_line
@@ -286,9 +286,9 @@ End {
                 # Write the deleted directory paths in console
                 $notify_text = "Deleted $($unique_empty_folders.Count) empty $folder_text."     
                 $deleted_folders.PSObject.TypeNames.Insert(0,"Deleted Empty Folders")
-                Write-Output $deleted_folders
+                Write-Verbose $deleted_folders
                 $empty_line | Out-String
-                Write-Output $notify_text
+                Write-Verbose $notify_text
 
 
                         # Write the deleted directory paths to a text file (located at the current temp-folder or the location is defined with the -Output parameter)
@@ -312,7 +312,7 @@ End {
     } Else {
         If ($total_number_of_folders -ge 1) {
             $exit_text = "Didn't find any empty folders."
-            Write-Output $exit_text
+            Write-Verbose $exit_text
             $empty_line | Out-String
         } Else {
             $continue = $true
