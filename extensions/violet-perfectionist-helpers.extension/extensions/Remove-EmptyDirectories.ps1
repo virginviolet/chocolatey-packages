@@ -19,7 +19,7 @@ function Remove-EmptyDirectories {
                 If ($_ -match '^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\"";|/]+$') {
                     $True
                 } Else {
-                    Throw "$_ is either not a valid filename or it is not recommended. If the filename includes space characters, please enclose the filename in quotation marks."
+                    Throw "'$_' is either not a valid filename or it is not recommended. If the filename includes space characters, please enclose the filename in quotation marks."
                 }
             })]
         [Alias("File")]
@@ -215,9 +215,9 @@ function Remove-EmptyDirectories {
         If ($skipped_path_names.Count -eq 0) {
             $enumeration_went_succesfully = $true
             If ($unique_directories.Count -le 4) {
-                $stats_text = "Total $($total_number_of_directories) $item_text processed at $($unique_directories -join ', ')."
+                $stats_text = "$($total_number_of_directories) $item_text in total processed at '$($unique_directories -join ', ')'."
             } Else {
-                $stats_text = "Total $($total_number_of_directories) $item_text processed."
+                $stats_text = "$($total_number_of_directories) $item_text in total processed."
             } # Else (If $unique_directories.Count)
             Write-Verbose $stats_text
             $empty_line | Out-String
@@ -232,17 +232,17 @@ function Remove-EmptyDirectories {
                 If ($unique_directories.Count -eq 0) {
                     $stats_text = "There were $num_invalid_paths skipped paths. Didn't process any directories."
                 } ElseIf ($unique_directories.Count -le 4) {
-                    $stats_text = "Total $($total_number_of_directories) $item_text processed at $($unique_directories -join ', '). There were $num_invalid_paths skipped paths."
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed at $($unique_directories -join ', '). There were $num_invalid_paths skipped paths."
                 } Else {
-                    $stats_text = "Total $($total_number_of_directories) $item_text processed. There were $num_invalid_paths skipped paths."
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed. There were $num_invalid_paths skipped paths."
                 } # Else (If $unique_directories.Count)
             } Else {
                 If ($unique_directories.Count -eq 0) {
                     $stats_text = "One path name was skipped. Didn't process any directories."
                 } ElseIf ($unique_directories.Count -le 4) {
-                    $stats_text = "Total $($total_number_of_directories) $item_text processed at $($unique_directories -join ', '). One path name was skipped."
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed at $($unique_directories -join ', '). One path name was skipped."
                 } Else {
-                    $stats_text = "Total $($total_number_of_directories) $item_text processed. One path name was skipped."
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed. One path name was skipped."
                 } # Else (If $unique_directories.Count)
             } # Else (If $num_invalid_paths)
             Write-Verbose $stats_text
@@ -251,21 +251,21 @@ function Remove-EmptyDirectories {
 
 
         If ($empty_directories.Count -ge 1) {
-
+            
             $unique_empty_directories = $empty_directories | Select-Object -ExpandProperty FullName -Unique
             If ($unique_empty_directories.Count -gt 1) { $directory_text = "directories" } Else { $directory_text = "directory" }
             ForEach ($directory in $unique_empty_directories) {
-
+                
                 # Create a list of the empty directories
                 $deleted_directories += $obj_deleted = New-Object -TypeName PSCustomObject -Property @{
-                    'Deleted Empty Directories' = $directory
+                    'Empty directories' = $directory
                 } # New-Object
-
+                
                 # Delete the empty directories
                 Remove-Item "$directory" -Force -WhatIf:$WhatIf
-
+                
             } # ForEach $directory
-
+            
             # Test if the directories were removed
             If ((Test-Path $unique_empty_directories) -eq $true) {
                 If ($WhatIf) {
@@ -284,9 +284,9 @@ function Remove-EmptyDirectories {
             } # Else (Test-Path $empty_directories)
 
             # Write the deleted directory paths in console
-            $notify_text = "Deleted $($unique_empty_directories.Count) empty $directory_text."     
-            $deleted_directories.PSObject.TypeNames.Insert(0, "Deleted Empty Directories")
-            Write-Verbose $deleted_directories
+            $notify_text = "$($unique_empty_directories.Count) empty $directory_text deleted."
+            $deleted_directories | ForEach-Object { $path = $_.'Empty Directories'; `
+                    Write-Verbose "Empty directory deleted: '$path'" }
             $empty_line | Out-String
             Write-Verbose $notify_text
 
@@ -297,7 +297,7 @@ function Remove-EmptyDirectories {
                 Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
             } Else {
                 $pre_existing_content = Get-Content $txt_file
-                                ($pre_existing_content + $empty_line + $separator + $empty_line + ($deleted_directories | Select-Object -ExpandProperty 'Deleted Empty Directories') + $empty_line) | Out-File "$txt_file" -Encoding UTF8 -Force
+                                ($pre_existing_content + $empty_line + $separator + $empty_line + ($deleted_directories | Select-Object -ExpandProperty 'Empty Directories') + $empty_line) | Out-File "$txt_file" -Encoding UTF8 -Force
                 Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
             } # Else (If Test-Path txt_file)
 
