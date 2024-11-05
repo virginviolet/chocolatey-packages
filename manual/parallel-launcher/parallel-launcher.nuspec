@@ -37,6 +37,8 @@ Upgrade will safetly fail if a process named `retroarch` is running (Parallel-La
     <dependencies>
       <!-- Extension for 'Start-CheckandStop' and 'Start-WaitandStop' commands. -->
       <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" />
+      <!-- Extension for 'Remove-Process' commands. -->
+      <dependency id="chocolatey-core.extension" version="1.3.4" />
     </dependencies>
   </metadata>
   <files>
