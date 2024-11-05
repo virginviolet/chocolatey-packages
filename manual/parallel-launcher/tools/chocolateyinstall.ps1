@@ -26,7 +26,7 @@ $packageArgs = @{
 # so we should to close the program.
 # 'Start-WaitandStop' does not work (pull request pending).
 # Start-WaitandStop "parallel-launcher"
-# Instead, we use Stop-Process after the installation.
+# Instead, we use Remove-Process after the installation.
 # Run installer
 Install-ChocolateyInstallPackage @packageArgs
 
@@ -34,7 +34,7 @@ Install-ChocolateyInstallPackage @packageArgs
 # so we should to close the program.
 Write-Verbose "Terminating 'parallel-launcher' process..."
 try {
-  Stop-Process -Name "parallel-launcher"
+  Remove-Process "parallel-launcher" -WaitFor 900 # 15 minutes
   Write-Debug "Process 'parallel-launcher' terminated."
 } catch {
   Write-Warning "Could not terminate 'parallel-launcher' process.`n$_"
