@@ -8,7 +8,7 @@
     <owners>virginviolet</owners>
     <licenseUrl>https://github.com/virginviolet/chocolatey-packages/blob/main/LICENSE</licenseUrl>
     <projectUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/chocolatey-remove-empty-folders</projectUrl>
-    <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/extensions/violet-perfectionist-helpers.extension/icon/violet-perfectionist-helpers_icon.png</iconUrl>
+    <!--<iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/extensions/violet-perfectionist-helpers.extension/icon/violet-perfectionist-helpers_icon.png</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>**Violet Perfectionist Helpers** currently one has two helpers, the main one being Invoke-EmptyDirectoryRemoval. The other one, Remove-EmptyDirectories, is meant to be used by the main one, but can be used alone.
 
@@ -34,7 +34,7 @@ Manually remove the &gt;name&lt; directory if you do not wish to keep the data.
 
 ```powershell
 Invoke-EmptyDirectoryRemoval
-    [-Path] &gt;String[]&lt; [-Name &gt;String[]&lt;]
+    [-Path] &gt;String&lt; [-Name &gt;String&lt;]
 ```
 
 ##### Examples

@@ -31,7 +31,7 @@ Remove-EmptyDirectories
 
 #>
     param(
-        [parameter(Mandatory = $true, Position = 0)][string[]] $Path,
+        [parameter(Mandatory = $true, Position = 0)][string] $Path,
         [parameter(Mandatory = $false, Position = 1)][string] $Name
     )
 
