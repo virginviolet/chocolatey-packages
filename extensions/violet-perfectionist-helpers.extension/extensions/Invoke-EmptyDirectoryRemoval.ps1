@@ -66,7 +66,7 @@ Remove-EmptyDirectories
         } else {
             # Remove directory if it is empty
             Write-Debug "$nameDirStringUp is empty."
-            Write-Debug "Removing $nameDirString..."
+            Write-Verbose "Removing $nameDirString..."
             Remove-Item "$Path"
             Write-Debug "$nameDirStringUp removed."
         }
