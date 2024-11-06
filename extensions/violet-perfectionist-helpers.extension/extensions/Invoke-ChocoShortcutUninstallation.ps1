@@ -1,9 +1,3 @@
-enum VioletUsers {
-  Auto
-  All
-  Current
-}
-
 function Invoke-ChocoShortcutUninstallation {
   <#
 .SYNOPSIS
