@@ -54,8 +54,8 @@ Remove-EmptyDirectories
         Write-Debug "$nameDirStringUp found."
         Remove-EmptyDirectories "$Path" -Recurse
         # See if the directory is empty
-        $installDirEmpty = -not (Test-Path "$Path\*")
-        if (-not $installDirEmpty) {
+        $dirEmpty = -not (Test-Path "$Path\*")
+        if (-not $dirEmpty) {
             # Inform user if directory is not empty
             $message = "Data remains in the $nameDirString. `n" + `
                 "Manually remove the $nameDirString " + `
