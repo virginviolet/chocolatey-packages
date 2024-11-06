@@ -21,45 +21,45 @@ It allows for all the same parameters as Install-ChocolateyShortcut.
 
 ```powershell
 Install-ChocolateyShortcut
-    [-ShortcutFilePath] &gt;String&lt;
-    [-TargetPath] &gt;String&lt;
-    [-WorkingDirectory] &gt;String&lt;
-    [-Arguments] &gt;String&lt;
-    [-IconLocation] &gt;String&lt;
-    [-Description] &gt;String&lt;
-    [-WindowStyle] &gt;String&lt;
-    [-RunAsAdmin] &gt;Switch&lt;
-    [-PinToTaskbar] &gt;Switch&lt;
-    [-LogPath] &gt;String&lt;
+    [-ShortcutFilePath] <String>;
+    [-TargetPath] <String>;
+    [-WorkingDirectory] <String>;
+    [-Arguments] <String>;
+    [-IconLocation] <String>;
+    [-Description] <String>;
+    [-WindowStyle] <String>;
+    [-RunAsAdmin] <Switch>;
+    [-PinToTaskbar] <Switch>;
+    [-LogPath] <String>;
 ```
 
 ```powershell
 Install-ChocolateyShortcut
-    [-Desktop] &gt;String&lt;
-    [-TargetPath] &gt;String&lt;
-    [-WorkingDirectory] &gt;String&lt;
-    [-Arguments] &gt;String&lt;
-    [-IconLocation] &gt;String&lt;
-    [-Description] &gt;String&lt;
-    [-WindowStyle] &gt;String&lt;
-    [-RunAsAdmin] &gt;Switch&lt;
-    [-PinToTaskbar] &gt;Switch&lt;
-    [-LogPath] &gt;String&lt;
+    [-Desktop] <String>;
+    [-TargetPath] <String>;
+    [-WorkingDirectory] <String>;
+    [-Arguments] <String>;
+    [-IconLocation] <String>;
+    [-Description] <String>;
+    [-WindowStyle] <String>;
+    [-RunAsAdmin] <Switch>;
+    [-PinToTaskbar] <Switch>;
+    [-LogPath] <String>;
 ```
 
 ```powershell
 Install-ChocolateyShortcut
-    [-StartMenu] &gt;String&lt;
-    [-TargetPath] &gt;String&lt;
-    [-WorkingDirectory] &gt;String&lt;
-    [-Arguments] &gt;String&lt;
-    [-IconLocation] &gt;String&lt;
-    [-Description] &gt;String&lt;
-    [-WindowStyle] &gt;String&lt;
-    [-RunAsAdmin] &gt;Switch&lt;
-    [-PinToTaskbar] &gt;Switch&lt;
-    [-LogPath] &gt;String&lt;
-    [-Users] &gt;String&lt;
+    [-StartMenu] <String>;
+    [-TargetPath] <String>;
+    [-WorkingDirectory] <String>;
+    [-Arguments] <String>;
+    [-IconLocation] <String>;
+    [-Description] <String>;
+    [-WindowStyle] <String>;
+    [-RunAsAdmin] <Switch>;
+    [-PinToTaskbar] <Switch>;
+    [-LogPath] <String>;
+    [-Users] <String>;
 ```
 
 ##### Examples
@@ -325,7 +325,7 @@ Removes shortcut listed in a log created by Invoke-ChocoShortcutUninstallation.
 
 ```powershell
 Invoke-EmptyDirectoryRemoval
-    [-Path] &gt;String&lt;
+    [-Path] <String>;
 ```
 
 ##### Examples
@@ -362,7 +362,7 @@ Specifies the path log is located. Only necessary if you set a custom path in In
 ```
 Specifies what the directory will be referred to in output messages.
 
-If left out, the messages will simply say `directory`, rather than `&gt;name&lt; directory`.
+If left out, the messages will simply say `directory`, rather than `<name>; directory`.
 
 | Type:                      | String  |
 | Position                   | 1       |
@@ -380,9 +380,9 @@ This helper deletes empty directories recursively in the specified directory, an
 If the directory is not empty, the following warning will be shown:
 
 ```text
-Data remains in the &gt;name&lt; directory.
-Manually delete the &gt;name&lt; directory if you do not wish to keep the data.
-&gt;Name&lt; directory: '&gt;Path&lt;'"
+Data remains in the <name>; directory.
+Manually delete the <name>; directory if you do not wish to keep the data.
+<Name>; directory: '<Path>;'"
 ```
 
 Remove-EmptyDirectories is adapted from auberginehill's [remove-empty-folders](https://github.com/auberginehill/remove-empty-folders) script.
@@ -391,7 +391,7 @@ Remove-EmptyDirectories is adapted from auberginehill's [remove-empty-folders](h
 
 ```powershell
 Invoke-EmptyDirectoryRemoval
-    [-Path] &gt;String&lt; [-Name &gt;String&lt;]
+    [-Path] <String>; [-Name <String>;]
 ```
 
 ##### Examples
@@ -434,7 +434,7 @@ Specifies the directory to process.
 ```
 Specifies what the directory will be referred to in output messages.
 
-If left out, the messages will simply say `directory`, rather than `&gt;name&lt; directory`.
+If left out, the messages will simply say `directory`, rather than `<name>; directory`.
 
 | Type:                      | String  |
 | Position                   | 1       |
