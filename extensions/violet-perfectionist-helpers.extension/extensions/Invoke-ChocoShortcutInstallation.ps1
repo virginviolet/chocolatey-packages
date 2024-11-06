@@ -154,3 +154,5 @@ Install-ChocolateyShortcut
     # Log
     "$ShortcutFilePath" | Out-File "$LogPath" -Append
   }
+
+New-Alias -Name Invoke-ChocoShortcutInstall -Value Invoke-ChocoShortcutInstallation
