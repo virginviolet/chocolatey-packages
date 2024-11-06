@@ -25,7 +25,7 @@ See the docs (the readme) for full documentation.
 
 #### Invoke-ChocoShortcutInstallation
 
-This helper Installs a shortcut with Install-ChocolateyShortcut and logs the shortcut path to a file (by default in the package directory). Every subsequent shortcut created (within the same chocolateyInstall script) will be appended to the same log file. That log file can then be used by [Invoke-ChocoShortcutUninstallation](https://community.chocolatey.org/packages/violet-perfectionist-helpers.extension/#Invoke-ChocoShortcutUninstallation) to uninstall all shortcuts for that package.
+This helper Installs a shortcut with Install-ChocolateyShortcut and logs the shortcut path to a file (by default in the package directory). Every subsequent shortcut created (within the same chocolateyInstall script) will be appended to the same log file. That log file can then be used by Invoke-ChocoShortcutUninstallation to uninstall all shortcuts for that package.
 
 It allows for all the same parameters as Install-ChocolateyShortcut. It has an additional trick, though.
 
