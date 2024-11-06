@@ -34,7 +34,7 @@ Install-ChocolateyInstallPackage @packageArgs
 # so we should to close the program.
 Write-Verbose "Terminating 'parallel-launcher' process..."
 try {
-  Remove-Process "parallel-launcher" -WaitFor 900 # 15 minutes
+  Remove-Process "parallel-launcher" -WaitFor 900 > $null # 15 minutes
   Write-Debug "Process 'parallel-launcher' terminated."
 } catch {
   Write-Warning "Could not terminate 'parallel-launcher' process.`n$_"

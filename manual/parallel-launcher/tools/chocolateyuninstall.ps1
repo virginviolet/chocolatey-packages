@@ -2,8 +2,8 @@
 $ErrorActionPreference = 'Stop'
 
 # Preferences
-$installationDirPath = 'C:\Program Files (x86)\parallel-launcher'
-$pdfManualInstallPath = Join-Path "$installationDirPath" -ChildPath 'Manual.pdf'
+$installDirPath = 'C:\Program Files (x86)\parallel-launcher'
+$pdfManualInstallPath = Join-Path "$installDirPath" -ChildPath 'Manual.pdf'
 
 # Prevent uninstall if retroarch (which Parallel Launcher uses) is running, to ensure
 # no progress is lost
@@ -63,64 +63,14 @@ if ($exists) {
   Write-Warning $message
 }
 
-# See if installation directory exists
-$installDirExists = Test-Path "$installationDirPath" -PathType Container
-if ($installDirExists) {
-  # Remove empty directories inside the installation directory
-  Write-Debug "Installation directory found."
-  $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-  $RemoveEmptyFolders = Join-Path $toolsDirPath -ChildPath 'Remove-EmptyFolders'
-  . $RemoveEmptyFolders
-  Remove-EmptyDirectories "C:\Program Files (x86)\parallel-launcher" -Recurse
-  # See if the installation directory is empty
-  $installDirEmpty = -not (Test-Path "$installationDirPath\*")
-  if (-not $installDirEmpty) {
-    # Inform user if directory is not empty (edge case)
-    $message = "Data remains in the installation directory. `n" + `
-      "Manually remove the installation directory " + `
-      "if you do not wish to keep the data.`n" + `
-      "Installation directory: '$installationDirPath'"
-    Write-Warning $message
-    Start-Sleep -Seconds 5 # Time to read
-  } else {
-    # Remove directory if it is empty
-    Write-Debug "Installation directory is empty."
-    Write-Debug "Removing installation directory..."
-    Remove-Item "$installationDirPath"
-    Write-Debug "Installation directory removed."
-  }
-} else {
-  # Only write a debug message (edge case)
-  Write-Debug "Installation directory not found."
-}
-
-# See if the application's data directory exists
+# Remove empty directories
+$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$RemoveEmptyFolders = Join-Path "$toolsDirPath" -ChildPath 'Remove-EmptyDirectories'
+. $RemoveEmptyFolders
+$InvokeEmptyDirectoryRemoval = Join-Path "$toolsDirPath" -ChildPath 'Invoke-EmptyDirectoryRemoval'
+. $InvokeEmptyDirectoryRemoval;
+Write-Debug "Invoke-EmptyDirectoryRemoval"
+Invoke-EmptyDirectoryRemoval "$installDirPath" "installation"
 $dataDirPath = Join-Path "$Env:LOCALAPPDATA" -ChildPath 'parallel-launcher'
-$dataDirExists = Test-Path "$dataDirPath" -PathType Container
-if ($dataDirExists) {
-  Write-Debug "Data directory found."
-  # Remove empty directories inside the application's data directory
-  $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-  $RemoveEmptyFolders = Join-Path "$toolsDirPath" -ChildPath 'Remove-EmptyFolders.ps1'
-  . $RemoveEmptyFolders "$dataDirPath" -Recurse
-  # See if the application's data directory is empty
-  $dataDirEmpty = -not (Test-Path "$dataDirPath\*")
-  if (-not $dataDirEmpty) {
-    # Inform user if directory is not empty
-    $message = "Data remains in the application's data directory. `n" + `
-      "Manually remove the application's data directory " + `
-      "if you do not wish to keep the data.`n" + `
-      "Data directory: '$dataDirPath'"
-    Write-Warning $message
-    Start-Sleep -Seconds 5 # Time to read
-  } else {
-    # Remove directory if it is empty
-    Write-Debug "Data directory is empty."
-    Write-Debug "Removing data directory..."
-    Remove-Item $dataDirPath
-    Write-Debug "Data directory removed."
-  }
-} else {
-  # Only write a debug message if the directory is not found (edge case)
-  Write-Debug "Data directory not found."
-}
+Write-Debug "Invoke-EmptyDirectoryRemoval"
+Invoke-EmptyDirectoryRemoval "$dataDirPath" "application data"
