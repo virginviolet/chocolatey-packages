@@ -50,13 +50,13 @@ Remove-EmptyDirectories
     # See if directory exists
     $dirExists = Test-Path "$Path" -PathType Container
     if ($dirExists) {
-        # Remove empty directories inside the installation directory
+        # Remove empty directories inside the directory directory
         Write-Debug "$nameDirStringUp found."
         Remove-EmptyDirectories "$Path" -Recurse
-        # See if the installation directory is empty
+        # See if the directory is empty
         $installDirEmpty = -not (Test-Path "$Path\*")
         if (-not $installDirEmpty) {
-            # Inform user if directory is not empty (edge case)
+            # Inform user if directory is not empty
             $message = "Data remains in the $nameDirString. `n" + `
                 "Manually remove the $nameDirString " + `
                 "if you do not wish to keep the data.`n" + `
@@ -71,7 +71,7 @@ Remove-EmptyDirectories
             Write-Debug "$nameDirStringUp removed."
         }
     } else {
-        # Only write a debug message (edge case)
+        # Only write a debug message
         Write-Debug "$nameDirStringUp not found."
     }
 }
