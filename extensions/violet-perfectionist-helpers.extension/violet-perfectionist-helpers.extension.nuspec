@@ -55,7 +55,7 @@ Install-ChocolateyShortcut -StartMenu "Notepad++.lnk" "C:\Program Files\Notepad+
 
 #### Invoke-ChocoShortcutUninstallation
 
-Removes shortcut listed in a log created by Invoke-ChocoShortcutUninstallation.
+This helper removes shortcut listed in a log created by Invoke-ChocoShortcutUninstallation.
 
 #### Invoke-EmptyDirectoryRemoval
 
