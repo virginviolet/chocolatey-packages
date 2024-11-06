@@ -280,6 +280,8 @@ Auto = Decide automatically based on elevation (default)
 `All` will place the shortcut in `$Env:AppData\Microsoft\Windows\Start Menu\Programs\`.
 `Current` will place the shortcut in `$Env:AppData\Microsoft\Windows\Start Menu\Programs\`.
 
+`User` is an alias for `Users`.
+
 | Type:                      | String  |
 | Position                   | 8       |
 | Default value              | Auto    |
