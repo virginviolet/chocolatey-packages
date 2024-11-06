@@ -70,7 +70,8 @@ if ($installDirExists) {
   Write-Debug "Installation directory found."
   $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
   $RemoveEmptyFolders = Join-Path $toolsDirPath -ChildPath 'Remove-EmptyFolders'
-  . $RemoveEmptyFolders "C:\Program Files (x86)\parallel-launcher" -Recurse
+  . $RemoveEmptyFolders
+  Remove-EmptyDirectories "C:\Program Files (x86)\parallel-launcher" -Recurse
   # See if the installation directory is empty
   $installDirEmpty = -not (Test-Path "$installationDirPath\*")
   if (-not $installDirEmpty) {
