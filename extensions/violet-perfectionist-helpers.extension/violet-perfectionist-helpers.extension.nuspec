@@ -41,11 +41,7 @@ If you want to place the shortcut in a (new or existing) folder on the desktop, 
 Install-ChocolateyShortcut -Desktop "Text Editors\Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe"
 ```
 
-```powershell
-Install-ChocolateyShortcut -Desktop "Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe"
-```
-
-And start menu shortcuts like this:
+And you can add start menu shortcuts like this:
 
 ```powershell
 Install-ChocolateyShortcut -StartMenu "Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe"
