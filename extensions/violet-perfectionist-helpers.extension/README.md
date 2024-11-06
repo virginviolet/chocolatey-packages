@@ -28,8 +28,8 @@ Install-ChocolateyShortcut
     [-IconLocation] <String>;
     [-Description] <String>;
     [-WindowStyle] <String>;
-    [-RunAsAdmin] <Switch>;
-    [-PinToTaskbar] <Switch>;
+    [-RunAsAdmin] <SwitchParameter>;
+    [-PinToTaskbar] <SwitchParameter>;
     [-LogPath] <String>;
 ```
 
@@ -42,8 +42,8 @@ Install-ChocolateyShortcut
     [-IconLocation] <String>;
     [-Description] <String>;
     [-WindowStyle] <String>;
-    [-RunAsAdmin] <Switch>;
-    [-PinToTaskbar] <Switch>;
+    [-RunAsAdmin] <SwitchParameter>;
+    [-PinToTaskbar] <SwitchParameter>;
     [-LogPath] <String>;
 ```
 
@@ -56,8 +56,8 @@ Install-ChocolateyShortcut
     [-IconLocation] <String>;
     [-Description] <String>;
     [-WindowStyle] <String>;
-    [-RunAsAdmin] <Switch>;
-    [-PinToTaskbar] <Switch>;
+    [-RunAsAdmin] <SwitchParameter>;
+    [-PinToTaskbar] <SwitchParameter>;
     [-LogPath] <String>;
     [-Users] <String>;
 ```
@@ -319,14 +319,14 @@ Auto = Decide automatically based on elevation (default)
 
 Specifies that the shortcut should run as administrator.
 
-| Property                   | Value   |
-| -------------------------- | ------- |
-| Type:                      | Switch  |
-| Position                   | -       |
-| Default value              | None    |
-| Required                   | False   |
-| Accept pipeline input      | Unknown |
-| Accept wildcard characters | Unknown |
+| Property                   | Value            |
+| -------------------------- | ---------------- |
+| Type:                      | SwitchParameter  |
+| Position                   | Named            |
+| Default value              | None             |
+| Required                   | False            |
+| Accept pipeline input      | Unknown          |
+| Accept wildcard characters | Unknown          |
 
 ```powershell
 -PinToTaskbar
@@ -334,14 +334,15 @@ Specifies that the shortcut should run as administrator.
 
 Pins the shortcut to the taskbar.
 
-| Property                   | Value   |
-| -------------------------- | ------- |
-| Type:                      | Switch  |
-| Position                   | -       |
-| Default value              | None    |
-| Required                   | False   |
-| Accept pipeline input      | Unknown |
-| Accept wildcard characters | Unknown |
+
+| Property                   | Value            |
+| -------------------------- | ---------------- |
+| Type:                      | SwitchParameter  |
+| Position                   | Named            |
+| Default value              | None             |
+| Required                   | False            |
+| Accept pipeline input      | Unknown          |
+| Accept wildcard characters | Unknown          |
 
 #### Invoke-ChocoShortcutUninstallation
 
