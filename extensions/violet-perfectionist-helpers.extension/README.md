@@ -122,6 +122,8 @@ Install-ChocolateyShortcut -ShortcutFilePath "C:\Program Files\Notepad++\notepad
 
 Specifies the path where the shortcut will be saved.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 0       |
 | Default value              | None    |
@@ -135,6 +137,8 @@ Specifies the path where the shortcut will be saved.
 
 (Alternative to ShortcutFilePath) Specifies the path relative to the desktop where the shortcut will be saved.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 0       |
 | Default value              | None    |
@@ -148,6 +152,8 @@ Specifies the path where the shortcut will be saved.
 
 (Alternative to ShortcutFilePath) Specifies the path relative to the Start Menu where the shortcut will be saved.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 0       |
 | Default value              | None    |
@@ -161,6 +167,8 @@ Specifies the path where the shortcut will be saved.
 
 (Alternative to ShortcutFilePath) Specifies the path relative to the Start Menu where the shortcut will be saved.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 0       |
 | Default value              | None    |
@@ -174,6 +182,8 @@ Specifies the path where the shortcut will be saved.
 
 Specifies the file that the shortcut will point to.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 1       |
 | Default value              | None    |
@@ -187,6 +197,8 @@ Specifies the file that the shortcut will point to.
 
 Sets the shortcut's working directory.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 2       |
 | Default value              | None    |
@@ -200,6 +212,8 @@ Sets the shortcut's working directory.
 
 Sets arguments to the target program that will be used when using the shortcut.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 3       |
 | Default value              | None    |
@@ -213,6 +227,8 @@ Sets arguments to the target program that will be used when using the shortcut.
 
 Sets the path to a custom icon that the shortcut will use.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 4       |
 | Default value              | None    |
@@ -226,6 +242,8 @@ Sets the path to a custom icon that the shortcut will use.
 
 Sets a description for the shortcut that appears when hovering over the shortcut.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 5       |
 | Default value              | None    |
@@ -243,6 +261,8 @@ Sets the window type for the target application.
 
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | Int     |
 | Position                   | 6       |
 | Default value              | None    |
@@ -256,12 +276,14 @@ Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.a
 
 Specifies the path to where the shortcut log will be created or appended to.
 
-| Type:                      | String                                       |
-| Position                   | 7                                            |
-| Default value              | "$Env:chocolateyPackageFolder\shortcuts.txt" |
-| Required                   | False                                        |
-| Accept pipeline input      | Unknown                                      |
-| Accept wildcard characters | Unknown                                      |
+| Property                   | Value   |
+| -------------------------- | ---------------------------------------------- |
+| Type:                      | String                                         |
+| Position                   | 7                                              |
+| Default value              | `"$Env:chocolateyPackageFolder\shortcuts.txt"` |
+| Required                   | False                                          |
+| Accept pipeline input      | Unknown                                        |
+| Accept wildcard characters | Unknown                                        |
 
 ```powershell
 -Users
@@ -282,6 +304,8 @@ Auto = Decide automatically based on elevation (default)
 
 `User` is an alias for `Users`.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 8       |
 | Default value              | Auto    |
@@ -295,6 +319,8 @@ Auto = Decide automatically based on elevation (default)
 
 Specifies that the shortcut should run as administrator.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | Switch  |
 | Position                   | -       |
 | Default value              | None    |
@@ -308,6 +334,8 @@ Specifies that the shortcut should run as administrator.
 
 Pins the shortcut to the taskbar.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | Switch  |
 | Position                   | -       |
 | Default value              | None    |
@@ -350,6 +378,8 @@ Invoke-ChocoShortcutUninstallation "C:\logs\Notepad++\shortcuts.txt"
 
 Specifies the path log is located. Only necessary if you set a custom path in Invoke-ChocoShortcutInstallation.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 0       |
 | Default value              | None    |
@@ -364,6 +394,8 @@ Specifies what the directory will be referred to in output messages.
 
 If left out, the messages will simply say `directory`, rather than `<name>; directory`.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 1       |
 | Default value              | None    |
@@ -422,6 +454,8 @@ Invoke-EmptyDirectoryRemoval "$Env:AppData\example_program" "application data"
 
 Specifies the directory to process.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 0       |
 | Default value              | None    |
@@ -436,6 +470,8 @@ Specifies what the directory will be referred to in output messages.
 
 If left out, the messages will simply say `directory`, rather than `<name>; directory`.
 
+| Property                   | Value   |
+| -------------------------- | ------- |
 | Type:                      | String  |
 | Position                   | 1       |
 | Default value              | None    |
