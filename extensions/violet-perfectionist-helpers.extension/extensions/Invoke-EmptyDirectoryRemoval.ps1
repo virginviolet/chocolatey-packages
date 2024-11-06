@@ -18,7 +18,7 @@ None
 Specifies the directory to process.
 
 .PARAMETER Name
-Specifies what to the directory will be referred to in output messages.
+Specifies what the directory will be referred to in output messages.
 
 .EXAMPLE
 `Invoke-EmptyDirectoryRemoval "C:\Program Files (x86)\Example Program" "installation"`
@@ -58,7 +58,7 @@ Remove-EmptyDirectories
         if (-not $dirEmpty) {
             # Inform user if directory is not empty
             $message = "Data remains in the $nameDirString. `n" + `
-                "Manually remove the $nameDirString " + `
+                "Manually delete the $nameDirString " + `
                 "if you do not wish to keep the data.`n" + `
                 "$nameDirStringUp" + ": '$Path'"
             Write-Warning $message
@@ -66,9 +66,9 @@ Remove-EmptyDirectories
         } else {
             # Remove directory if it is empty
             Write-Debug "$nameDirStringUp is empty."
-            Write-Verbose "Removing $nameDirString..."
+            Write-Verbose "Deleting $nameDirString '$Path'..."
             Remove-Item "$Path"
-            Write-Debug "$nameDirStringUp removed."
+            Write-Debug "$nameDirStringUp '$Path' deleted."
         }
     } else {
         # Only write a debug message

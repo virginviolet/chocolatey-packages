@@ -20,13 +20,13 @@ Helpers for installing and uninstalling shortcuts might soon be added.
 
 ##### Description
 
-This helper removes empty directories recursively in the specified directory, and then removes the directory itself if it is empty.
+This helper deletes empty directories recursively in the specified directory, and then deletes the directory itself if it is empty.
 
 If the directory is not empty, the following warning will be shown:
 
 ```text
 Data remains in the &gt;name&lt; directory.
-Manually remove the &gt;name&lt; directory if you do not wish to keep the data.
+Manually delete the &gt;name&lt; directory if you do not wish to keep the data.
 &gt;Name&lt; directory: '&gt;Path&lt;'"
 ```
 
@@ -39,7 +39,7 @@ Invoke-EmptyDirectoryRemoval
 
 ##### Examples
 
-###### Example 1: Remove installation directory if it has no files
+###### Example 1: Delete installation directory if it has no files
 
 `Invoke-EmptyDirectoryRemoval "C:\Program Files (x86)\Example Program" "installation"`
 
@@ -47,11 +47,11 @@ The `Name` parameter is only used for output messages. For example, the above co
 
 ```text
 Data remains in the installation directory.
-Manually remove the installation directory if you do not wish to keep the data.
+Manually delete the installation directory if you do not wish to keep the data.
 Installation directory: 'C:\Program Files (x86)\Example Program'"
 ```
 
-###### Example 2: Remove application data directory if it has no files
+###### Example 2: Delete application data directory if it has no files
 
 ```powershell
 Invoke-EmptyDirectoryRemoval "$Env:AppData\example_program" "application data"
@@ -75,7 +75,7 @@ Specifies the directory to process.
 ```powershell
 -Name
 ```
-Specifies what to the directory will be referred to in output messages.
+Specifies what the directory will be referred to in output messages.
 
 If left out, the messages will simply say `directory`, rather than `&gt;name&lt; directory`.
 
@@ -88,7 +88,7 @@ If left out, the messages will simply say `directory`, rather than `&gt;name&lt;
 
 </description>
     <summary>Extension for making nice packages</summary>
-    <tags>violet perfectionist helpers unofficial choco misc extension helper-functions Invoke-EmptyDirectoryRemoval Remove-EmptyDirectories perfectionist-helpers violet-helpers perfectionists perfectionist's helper helper-function</tags>
+    <tags>violet perfectionist helpers unofficial choco misc extension helper-functions Invoke-EmptyDirectoryRemoval Remove-EmptyDirectories Remove-EmptyFolders perfectionist-helpers violet-helpers perfectionists perfectionist's helper helper-function</tags>
     <projectSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/chocolatey-remove-empty-folders</projectSourceUrl>
     <docsUrl>https://github.com/chocolatey-community/chocolatey-extensions/blob/master/src/chocolatey-core.extension/README.md</docsUrl>
     <bugTrackerUrl>https://github.com/virginviolet/chocolatey-packages/issues</bugTrackerUrl>

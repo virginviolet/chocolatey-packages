@@ -53,14 +53,14 @@ function Remove-EmptyDirectories {
             $invalid_output_path_was_found = $true
 
             # Display an error message in console
-            $empty_line | Out-String
+            # $empty_line | Out-String
             Write-Warning "'$Output' doesn't seem to be a valid path name."
-            $empty_line | Out-String
+            # $empty_line | Out-String
             Write-Debug "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
-            $empty_line | Out-String
+            # $empty_line | Out-String
             $skip_text = "Couldn't find -Output directory '$Output'..."
             Write-Warning $skip_text
-            $empty_line | Out-String
+            # $empty_line | Out-String
             Exit
             Return
 
@@ -86,13 +86,13 @@ function Remove-EmptyDirectories {
                     $num_invalid_paths++
 
                     # Display an error message in console
-                    $empty_line | Out-String
+                    # $empty_line | Out-String
                     Write-Warning "'$path_candidate' doesn't seem to be a valid path name."
-                    $empty_line | Out-String
+                    # $empty_line | Out-String
                     Write-Verbose "Please consider checking that the '-Path' variable value of '$path_candidate' was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
-                    $empty_line | Out-String
+                    # $empty_line | Out-String
                     $skip_text = "Skipping '$path_candidate' from the directories to be processed."
-                    Write-Output $skip_text
+                    Write-Verbose $skip_text
 
                     # Add the invalid path as an object (with properties) to a collection of skipped paths
                     $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
@@ -209,7 +209,7 @@ function Remove-EmptyDirectories {
 
         # Do the background work for natural language
         If ($total_number_of_directories -gt 1) { $item_text = "directories" } Else { $item_text = "directory" }
-        $empty_line | Out-String
+        # $empty_line | Out-String
 
         # Write the operational stats in console
         If ($skipped_path_names.Count -eq 0) {
@@ -219,8 +219,8 @@ function Remove-EmptyDirectories {
             } Else {
                 $stats_text = "$($total_number_of_directories) $item_text in total processed."
             } # Else (If $unique_directories.Count)
-            Write-Verbose $stats_text
-            $empty_line | Out-String
+            Write-Debug $stats_text
+            # $empty_line | Out-String
         } Else {
 
             # Display the skipped path names and write the operational stats in console
@@ -245,8 +245,8 @@ function Remove-EmptyDirectories {
                     $stats_text = "$($total_number_of_directories) $item_text in total processed. One path name was skipped."
                 } # Else (If $unique_directories.Count)
             } # Else (If $num_invalid_paths)
-            Write-Verbose $stats_text
-            $empty_line | Out-String
+            Write-Debug $stats_text
+            # $empty_line | Out-String
         } # Else (If $skipped_path_names.Count)
 
 
@@ -262,34 +262,28 @@ function Remove-EmptyDirectories {
                 } # New-Object
                 
                 # Delete the empty directories
+                Write-Verbose "Deleting empty directory '$directory'..."
                 Remove-Item "$directory" -Force -WhatIf:$WhatIf
+                Write-Debug "Empty directory '$directory' deleted."
                 
             } # ForEach $directory
             
             # Test if the directories were removed
             If ((Test-Path $unique_empty_directories) -eq $true) {
                 If ($WhatIf) {
-                    $empty_line | Out-String
-                    $notify_text = "Found $($unique_empty_directories.Count) empty $directory_text." 
+                    # $empty_line | Out-String
+                    $notify_text = "$($unique_empty_directories.Count) empty $directory_text found." 
                     Write-Verbose $notify_text
-                    $empty_line | Out-String
+                    # $empty_line | Out-String
                     "Exit Code 1: A simulation run (the -WhatIf parameter was used), didn't touch any directories."
-                    Return $empty_line
+                    # Return $empty_line
                 } Else {
                     "Exit Code 2: Something went wrong with the deletion procedure."
-                    Return $empty_line
+                    # Return $empty_line
                 } # Else (If $WhatIf)
             } Else {
                 $continue = $true
             } # Else (Test-Path $empty_directories)
-
-            # Write the deleted directory paths in console
-            $notify_text = "$($unique_empty_directories.Count) empty $directory_text deleted."
-            $deleted_directories | ForEach-Object { $path = $_.'Empty Directories'; `
-                    Write-Verbose "Empty directory deleted: '$path'" }
-            $empty_line | Out-String
-            Write-Verbose $notify_text
-
 
             # Write the deleted directory paths to a text file (located at the current temp-directory or the location is defined with the -Output parameter)
             If ((Test-Path "$txt_file") -eq $false) {
@@ -313,7 +307,7 @@ function Remove-EmptyDirectories {
             If ($total_number_of_directories -ge 1) {
                 $exit_text = "Didn't find any empty directories."
                 Write-Verbose $exit_text
-                $empty_line | Out-String
+                # $empty_line | Out-String
             } Else {
                 $continue = $true
             } # Else (If $total_number_of_directories)
