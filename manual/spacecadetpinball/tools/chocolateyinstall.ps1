@@ -92,7 +92,7 @@ if ($logShortcuts) {
   "$startMenuShortcutPath" | Out-File "$shortcutsLogPath" -Append
 }
 # Add game directory shortcut
-Install-ChocolateyShortcut @gameDirShortcutArgs -shortcutFilePath "$gameDirShortcutPath" -targetPath "$executablePath" -workingDirectory "$executableDirPath" -description $shortcutDescription
+Install-ChocolateyShortcut -shortcutFilePath "$gameDirShortcutPath" -targetPath "$executablePath" -workingDirectory "$executableDirPath" -description $shortcutDescription
 if ($logShortcuts) {
   "$gameDirShortcutPath" | Out-File "$shortcutsLogPath" -Append
 }
