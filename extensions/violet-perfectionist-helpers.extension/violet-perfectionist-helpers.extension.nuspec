@@ -7,7 +7,7 @@
     <authors>virginviolet</authors>
     <owners>virginviolet</owners>
     <licenseUrl>https://github.com/virginviolet/chocolatey-packages/blob/main/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/chocolatey-remove-empty-folders</projectUrl>
+    <projectUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/violet-perfectionist-helpers.extension</projectUrl>
     <iconUrl>https://rawcdn.githack.com/virginviolet/chocolatey-packages/main/extensions/violet-perfectionist-helpers.extension/icon/violet-perfectionist-helpers_icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>**Violet Perfectionist Helpers** is a Chocolatey extension that adds a few helper functions.
