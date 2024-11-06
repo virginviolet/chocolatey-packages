@@ -71,8 +71,8 @@ Manually delete the &gt;name&lt; directory if you do not wish to keep the data.
 </description>
     <summary>Extension for making nice packages</summary>
     <tags>violet perfectionist helpers unofficial choco misc extension helper-functions Invoke-EmptyDirectoryRemoval Remove-EmptyDirectories Remove-EmptyFolders perfectionist-helpers violet-helpers perfectionists perfectionist's helper helper-function</tags>
-    <projectSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/chocolatey-remove-empty-folders</projectSourceUrl>
-    <docsUrl>https://github.com/chocolatey-community/chocolatey-extensions/blob/master/src/chocolatey-core.extension/README.md</docsUrl>
+    <projectSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/violet-perfectionist-helpers.extension</projectSourceUrl>
+    <docsUrl>https://github.com/virginviolet/chocolatey-packages/blob/main/extensions/violet-perfectionist-helpers.extension/README.md</docsUrl>
     <bugTrackerUrl>https://github.com/virginviolet/chocolatey-packages/issues</bugTrackerUrl>
   </metadata>
 </package>
