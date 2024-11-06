@@ -27,12 +27,22 @@ See the docs (the readme) for full documentation.
 
 This helper Installs a shortcut with Install-ChocolateyShortcut and logs the shortcut path to a file (by default in the package directory). Every subsequent shortcut created (within the same chocolateyInstall script) will be appended to the same log file. That log file can then be used by Invoke-ChocoShortcutUninstallation to uninstall all shortcuts for that package.
 
-It allows for all the same parameters as Install-ChocolateyShortcut. It has an additional trick, though.
+It allows for all the same parameters as Install-ChocolateyShortcut. It has a few additional tricks, though.
 
 You can add desktop shortcuts like this:
 
 ```powershell
+Install-ChocolateyShortcut -Desktop "Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe"
+```
+
+If you want to place the shortcut in a (new or existing) folder on the desktop, you can add it to the first parameter:
+
+```powershell
 Install-ChocolateyShortcut -Desktop "Text Editors\Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe"
+```
+
+```powershell
+Install-ChocolateyShortcut -Desktop "Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe"
 ```
 
 And start menu shortcuts like this:
