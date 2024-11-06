@@ -7,7 +7,7 @@ enum VioletUsers {
 function Invoke-ChocoShortcutInstallation {
   <#
 .SYNOPSIS
-Creates shortcuts for Chocolatey and (optionally) logs it for easy removal with Invoke-ChocoShortcutUninstallation. 
+Create shortcut and log it for easy removal with Invoke-ChocoShortcutUninstallation. 
 
 .NOTES
 None
@@ -109,7 +109,6 @@ Install-ChocolateyShortcut
     [parameter(Mandatory = $false, Position = 6)][int] $WindowStyle,
     [parameter(Mandatory = $false)][switch] $RunAsAdmin,
     [parameter(Mandatory = $false)][switch] $PinToTaskbar,
-    # [parameter(Mandatory = $false, Position = 7)][string] $LogPath = $(Join-Path "$Env:chocolateyPackageFolder" -ChildPath "shortcuts.txt"),
     [parameter(Mandatory = $false, Position = 7)][string] $LogPath = $(Join-Path "$Env:chocolateyPackageFolder" -ChildPath "shortcuts.txt"),
     [Alias("User")][parameter(Mandatory = $false, Position = 8)][VioletUsers] $Users = [VioletUsers]::Auto,
     [parameter(ValueFromRemainingArguments = $true)][Object[]]$IgnoredArguments
@@ -152,7 +151,9 @@ Install-ChocolateyShortcut
     }
     Install-ChocolateyShortcut @desktopShortcutArgs
     # Log
+    Write-Verbose "Logging shortcut path..."
     "$ShortcutFilePath" | Out-File "$LogPath" -Append
+    Write-Debug "Shortcut path logged."
   }
 
 New-Alias -Name Invoke-ChocoShortcutInstall -Value Invoke-ChocoShortcutInstallation
