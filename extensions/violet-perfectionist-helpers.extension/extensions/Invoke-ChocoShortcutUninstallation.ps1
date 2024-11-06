@@ -37,23 +37,25 @@ Invoke-ChocoShortcutUninstallation "C:\logs\Notepad++\shortcuts.txt"
   )
   
   # Delete shortcuts
+  
   # Look for shortcuts log
-  # TODO Remove duplicate entries
   $logExists = Test-Path "$Path" -PathType Leaf
   if (-not $logExists) {
     Write-Warning "Cannot uninstall shortcuts.`nShortcuts log not found."
   } else {
     Write-Debug "Shortcuts log found."
+    # Hash set for skipping duplicate entries in the log
+    $uniqueLines = New-Object System.Collections.Generic.HashSet[string]
     # Read log line-per-line and delete files
     $shortcutsLog = Get-Content "$Path"
-    foreach ($fileInLog in $shortcutsLog) {
-      if ($null -ne $fileInLog -and '' -ne $fileInLog.Trim()) {
+    foreach ($line in $shortcutsLog) {
+      if ($null -ne $line -and '' -ne $line.Trim() -and $uniqueLines.Add($line)) {
         try {
-          Write-Verbose "Deleted shortcut '$fileInLog'."
-          Remove-Item -Path "$fileInLog" -Force
-          Write-Debug "Shortcut '$fileInLog' deleted."
+          Write-Verbose "Deleted shortcut '$line'."
+          Remove-Item -Path "$line" -Force
+          Write-Debug "Shortcut '$line' deleted."
         } catch {
-          Write-Warning "Could not delete shortcut '$fileInLog'.`n$_"
+          Write-Warning "Could not delete shortcut '$line'.`n$_"
         }
       }
     }
