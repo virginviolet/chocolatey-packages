@@ -49,6 +49,15 @@ OPTIONAL - Sets the window type for the target application.
 
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
 
+.PARAMETER RunAsAdmin
+OPTIONAL - Specifies that the shortcut should run as administrator.
+
+.PARAMETER PinToTaskbar
+OPTIONAL - Pins the shortcut to the taskbar.
+
+.PARAMETER LogPath
+OPTIONAL - Specifies the path to where the shortcut log will be created or appended to.
+
 .PARAMETER Users
 OPTIONAL - When the StartMenu parameter is used, the Users parameter specifies whether to
   a. install the shortcut for all users,
@@ -60,15 +69,6 @@ All = All users
 Current = Current user
 Auto = Decide automatically based on elevation (default)
 
-.PARAMETER RunAsAdmin
-OPTIONAL - Specifies that the shortcut should run as administrator.
-
-.PARAMETER PinToTaskbar
-OPTIONAL - Pins the shortcut to the taskbar.
-
-.PARAMETER LogPath
-OPTIONAL - Specifies the path to where the shortcut log will be created or appended to.
-
 .PARAMETER IgnoredArguments
 Handles superflous splatted arguments. Do not use directly.
 
@@ -77,6 +77,9 @@ Install-ChocolateyShortcut -Desktop "Notepad++.lnk" "C:\Program Files\Notepad++\
 
 .EXAMPLE
 Install-ChocolateyShortcut -StartMenu "Text Editors\Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe"
+
+.EXAMPLE
+Install-ChocolateyShortcut -StartMenu "Text Editors\Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe" -Users All
 
 .EXAMPLE
 Install-ChocolateyShortcut -StartMenu "Text Editors\Notepad++.lnk" "C:\Program Files\Notepad++\notepad++.exe" -Users All
@@ -107,10 +110,10 @@ Install-ChocolateyShortcut
     [parameter(Mandatory = $false, Position = 4)][string] $IconLocation,
     [parameter(Mandatory = $false, Position = 5)][string] $Description,
     [parameter(Mandatory = $false, Position = 6)][int] $WindowStyle,
-    [parameter(Mandatory = $false)][switch] $RunAsAdmin,
-    [parameter(Mandatory = $false)][switch] $PinToTaskbar,
     [parameter(Mandatory = $false, Position = 7)][string] $LogPath = $(Join-Path "$Env:chocolateyPackageFolder" -ChildPath "shortcuts.txt"),
     [Alias("User")][parameter(Mandatory = $false, Position = 8)][VioletUsers] $Users = [VioletUsers]::Auto,
+    [parameter(Mandatory = $false)][switch] $RunAsAdmin,
+    [parameter(Mandatory = $false)][switch] $PinToTaskbar,
     [parameter(ValueFromRemainingArguments = $true)][Object[]]$IgnoredArguments
   )
   
