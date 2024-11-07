@@ -64,9 +64,9 @@ This helper deletes empty directories recursively in the specified directory, an
 If the directory is not empty, the following warning will be shown:
 
 ```text
-Data remains in the &gt;name&lt; directory.
-Manually delete the &gt;name&lt; directory if you do not wish to keep the data.
-&gt;Name&lt; directory: '&gt;Path&lt;'"
+- Data remains in the [name] directory.
+Manually delete the [name] directory if you do not wish to keep the data.
+[Name] directory: '[Path];'"
 ```
 </description>
     <releaseNotes>First version.
