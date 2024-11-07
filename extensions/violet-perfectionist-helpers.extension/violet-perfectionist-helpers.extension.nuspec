@@ -81,4 +81,9 @@ Manually delete the [name] directory if you do not wish to keep the data.
     <docsUrl>https://github.com/virginviolet/chocolatey-packages/blob/main/extensions/violet-perfectionist-helpers.extension/README.md</docsUrl>
     <bugTrackerUrl>https://github.com/virginviolet/chocolatey-packages/issues</bugTrackerUrl>
   </metadata>
+  <files>
+    <file src="README.md" target="README.md" />
+    <file src="extensions\**" target="extensions" />
+    <file src="legal\**" target="legal" />
+  </files>
 </package>
