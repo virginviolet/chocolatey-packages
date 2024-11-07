@@ -1,5 +1,6 @@
 # Initialization
 $ErrorActionPreference = 'Stop'
+$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 
 # Preferences
 $installDirPath = 'C:\Program Files (x86)\parallel-launcher'
@@ -17,7 +18,7 @@ $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
   softwareName   = 'Parallel Launcher*'
   fileType       = 'EXE'
-  silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
+  # silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   validExitCodes = @(0) # Inno Setup
 }
 # Get uninstall registry keys that match the softwareName pattern
@@ -42,8 +43,24 @@ if ($keys.Count -eq 0) {
     # - Split args from exe in $packageArgs['file'] and pass those args through $packageArgs['silentArgs'] or ignore them
     # - Review the code for auto-uninstaller for all of the fun things it does in sanitizing - https://github.com/chocolatey/choco/blob/bfe351b7d10c798014efe4bfbb100b171db25099/src/chocolatey/infrastructure.app/services/AutomaticUninstallerService.cs#L142-L192
     $packageArgs['silentArgs'] = "$($_.PSChildName) $($packageArgs['silentArgs'])"
+    # Load Wait-ProcessStart function
+    $WaitProcessStartPath = Join-Path "$toolsDirPath" -ChildPath 'Wait-ProcessStart'
+    . $WaitProcessStartPath
     # Run uninstaller
     Uninstall-ChocolateyPackage @packageArgs
+    $process = "unins000"
+    Wait-ProcessStart $process 30
+    try {
+      Write-Verbose "Wating for uninstaller to finish..."
+      Wait-Process $process -Timeout 900 # 15 minutes
+      Write-Debug "Uninstaller seems to have finished."
+    } catch [System.Management.Automation.SessionStateUnauthorizedAccessException] {
+      Write-Output "Waiting for process '$process' timed out.`n$_"
+    } catch [Microsoft.PowerShell.Commands.ProcessCommandException] {
+      Write-Debug "Process '$process' not found.`n$_"
+    } catch {
+      Write-Warning "Could not find process '$process'.`n$_"
+    }
   }
 }
 
@@ -64,13 +81,12 @@ if ($exists) {
 }
 
 # Remove empty directories
-$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
-$RemoveEmptyFolders = Join-Path "$toolsDirPath" -ChildPath 'Remove-EmptyDirectories'
-. $RemoveEmptyFolders
-$InvokeEmptyDirectoryRemoval = Join-Path "$toolsDirPath" -ChildPath 'Invoke-EmptyDirectoryRemoval'
-. $InvokeEmptyDirectoryRemoval;
-Write-Debug "Invoke-EmptyDirectoryRemoval"
+$RemoveEmptyDirectoriesPath = Join-Path "$toolsDirPath" -ChildPath 'Remove-EmptyDirectories'
+. $RemoveEmptyDirectoriesPath
+$InvokeEmptyDirectoryRemovalPath = Join-Path "$toolsDirPath" -ChildPath 'Invoke-EmptyDirectoryRemoval'
+. $InvokeEmptyDirectoryRemovalPath;
+Write-Debug "Running 'Invoke-EmptyDirectoryRemoval ""$installDirPath"" ""installation""'..."
 Invoke-EmptyDirectoryRemoval "$installDirPath" "installation"
 $dataDirPath = Join-Path "$Env:LOCALAPPDATA" -ChildPath 'parallel-launcher'
-Write-Debug "Invoke-EmptyDirectoryRemoval"
+Write-Debug "Running 'Invoke-EmptyDirectoryRemoval ""$dataDirPath"" ""application data""'..."
 Invoke-EmptyDirectoryRemoval "$dataDirPath" "application data"
