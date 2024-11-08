@@ -14,7 +14,7 @@
 6. [x] Remove one of the verification files in `legal/`.
 7. [x] Fill out `legal\VERIFICATION.txt`.
 8. [x] Rename the remaining verification file to `VERIFICATION.txt`.
-9. [ ] Fill out nuspec.
+9. [x] Fill out nuspec.
 10. [ ] Fill out `tools\chocolateyInstall.ps1`.
 11. [ ] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 12. [ ] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
