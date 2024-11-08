@@ -1,6 +1,6 @@
 # Checklist for package creation
 
-## Guides
+## Guide
 
 - "Create Packages". <https://docs.chocolatey.org/en-us/create/create-packages>
 

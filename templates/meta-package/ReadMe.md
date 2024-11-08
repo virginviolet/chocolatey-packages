@@ -5,6 +5,8 @@ How do I create packages? See <https://docs.chocolatey.org/en-us/create/create-p
 Always try to ensure you have read, understood and adhere to the create
 packages wiki link above.
 
+How do I create a Chocolatey meta package? See <https://docs.chocolatey.org/en-us/guides/create/create-meta-package/>
+
 ## Automatic Packaging Updates?
 
 Consider making this package an automatic package, for the best
