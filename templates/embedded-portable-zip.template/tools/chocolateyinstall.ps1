@@ -1,12 +1,15 @@
 # Other steps for installing [[PackageName]] with Chocolatey
 
-# Preferences
+# Initialization
 $ErrorActionPreference = 'Stop' # Stop on all errors
+$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+
+# Preferences
 $shortcutName = '[[PackageName]]'
 $addDesktopShortcut = $true
 $addStartMenuShortcut = $true
 $logShortcuts = $true
-# $installationDirPath = 'C:\Tools\[[PackageName]]'
+$installationDirPath = $toolsDirPath
 
 ## Helper functions
 ## These have error handling tucked into them already
@@ -29,9 +32,7 @@ $logShortcuts = $true
 # Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-ChocolateyUnzip.ps1
 # Paths
 # In Chocolatey scripts, ALWAYS use absolute paths
-$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $zipArchivePath = Join-Path $toolsDirPath -ChildPath 'NAME_OF_EMBEDDED_ZIP_FILE.zip'
-$installationDirPath = $toolsDirPath
 # Arguments
 $unzipArgs = @{
   PackageName  = "$($packageName)"
@@ -73,19 +74,20 @@ Get-ChocolateyUnzip @unzipArgs
 # Documantation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
 # Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyShortcut.ps1
 if ($addDesktopShortcut -or $addStartMenuShortcut) {
-  # Paths
-  $executableDirPath = $toolsDirPath
+  # Shared paths
+  $executableDirPath = $unzipDirPath
   $executablePath = Join-Path $executableDirPath "$($packageName).exe"
-  $desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
-  $startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$shortcutName.lnk"
   $iconPath = Join-Path "$executableDirPath" -ChildPath "$($packageName).ico"
   if ($logShortcuts) {
-    $packagePath = $env:ChocolateyPackageFolder
+    $packagePath = Split-Path -Parent $toolsDirPath
     $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
   }
 }
 # Add desktop shortcut
 if ($addDesktopShortcut) {
+  # Shortcut path
+  $desktopPath = Convert-Path "$env:UserProfile\Desktop\"
+  $desktopShortcutPath = Join-Path "$DesktopPath" -ChildPath "$shortcutName.lnk"
   # Arguments
   $desktopShortcutArgs = @{
     shortcutFilePath = "$desktopShortcutPath"
@@ -103,6 +105,16 @@ if ($addDesktopShortcut) {
 }
 # Add start menu shortcut
 if ($addStartMenuShortcut) {
+  # Shortcut path
+  $isElevated = Test-ProcessAdminRights
+  if ($isElevated) {
+    # Make shortcut available to all users
+    $startMenuPath = Convert-Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\"
+  } else {
+    # Make shortcut available to current user only
+    $startMenuPath = Convert-Path "$Env:AppData\Microsoft\Windows\Start Menu\Programs\"
+  }
+  $startMenuShortcutPath = Join-Path "$startMenuPath" -ChildPath "$shortcutName.lnk"
   # Arguments
   $startMenuShortcutArgs = @{
     shortcutFilePath = "$startMenuShortcutPath"
