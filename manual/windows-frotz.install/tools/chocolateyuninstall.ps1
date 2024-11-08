@@ -9,6 +9,13 @@
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
 
+# Prevent uninstall if the program is running
+# (so that no progress is lost)
+# This cannot be moved to chocolateybeforemodify.ps1
+# unless the feature suggested in the following issue is added:
+# https://github.com/chocolatey/choco/issues/1731
+Start-CheckandThrow "Frotz"
+
 ## Helper functions
 ## These have error handling tucked into them already
 ## Documantation - https://docs.chocolatey.org/en-us/create/functions
@@ -25,11 +32,11 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'windows-frotz.install*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName = 'Windows Frotz' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   # Silent arguments
   # Uncomment matching installer type (sorted by most to least common)
-  # silentArgs   = '/S'           # NSIS
+  silentArgs   = '/S'           # NSIS
   # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # silentArgs   = '/s'           # InstallShield
   # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
@@ -41,7 +48,7 @@ $packageArgs = @{
   # silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
   #       https://community.chocolatey.org/packages/autohotkey.portable
   # Exit codes indicating success
-  # validExitCodes = @(0) # NSIS
+  validExitCodes = @(0) # NSIS
   # validExitCodes = @(0) # Inno Setup
   # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
