@@ -1,4 +1,4 @@
-﻿# Steps to perform before upgrading or uninstalling frotz.install with Chocolatey
+﻿# Steps to perform before upgrading or uninstalling windows-frotz.install with Chocolatey
 
 # This runs before upgrade or uninstall.
 # Use this file to do things like stop services prior to upgrade or uninstall.

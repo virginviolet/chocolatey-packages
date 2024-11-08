@@ -1,4 +1,4 @@
-﻿# Other steps for uninstalling frotz.install with Chocolatey
+﻿# Other steps for uninstalling windows-frotz.install with Chocolatey
 
 ## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
 ## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.
@@ -25,7 +25,7 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
-  softwareName = 'frotz.install*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName = 'windows-frotz.install*' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   # Silent arguments
   # Uncomment matching installer type (sorted by most to least common)

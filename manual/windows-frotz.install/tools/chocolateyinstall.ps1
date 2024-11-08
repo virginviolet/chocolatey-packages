@@ -1,4 +1,4 @@
-﻿# Other steps for installing frotz.install with Chocolatey
+﻿# Other steps for installing windows-frotz.install with Chocolatey
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
@@ -50,7 +50,7 @@ $packageArgs = @{
   fileType       = 'EXE'
   file           = $exeInstallerPath # Will fail on 32-bit systems if missing
   file64         = $exeInstaller64Path
-  softwareName   = 'frotz.install*' # Display name as it appears in "Installed apps" or "Programs and Features".
+  softwareName   = 'windows-frotz.install*' # Display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = 'INSERT_CHECKSUM'
   checksumType   = 'sha256'

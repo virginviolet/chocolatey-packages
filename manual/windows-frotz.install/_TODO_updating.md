@@ -17,8 +17,8 @@
 13. [ ] `chocolateyInstall.ps1`: Update `checksum`.
 14. [ ] `chocolateyInstall.ps1`: Update `checksum64`.
 15. [ ] Test the package to ensure upgrade/uninstall/install works appropriately.
-    `choco pack; choco upgrade frotz.install --source .`
-    `choco pack; choco uninstall frotz.install; choco install frotz.install --source .`
+    `choco pack; choco upgrade windows-frotz.install --source .`
+    `choco pack; choco uninstall windows-frotz.install; choco install windows-frotz.install --source .`
 16. [ ] Push package to Chocolatey Community Repository.
     `choco push`
 17. [ ] Update meta-package if applicable.
