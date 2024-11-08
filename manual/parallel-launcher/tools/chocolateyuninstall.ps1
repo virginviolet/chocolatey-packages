@@ -6,6 +6,23 @@ $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $installDirPath = 'C:\Program Files (x86)\parallel-launcher'
 $pdfManualInstallPath = Join-Path "$installDirPath" -ChildPath 'Manual.pdf'
 
+# Function
+function Get-ProcessNames {
+  param (  
+    [parameter(Mandatory = $true, Position = 0)]
+    [string]
+    $CommandLine
+  )
+  $commandLineEscaped = $CommandLine -replace '\\', '\\' `
+    -replace ':', '\:' -replace '\(', '\(' -replace '\)', '\)'
+  $processNames = Get-WmiObject Win32_Process | Where-Object {
+    $_.CommandLine -match $commandLineEscaped
+  } | ForEach-Object {
+    Write-Output "$($_.Name)"
+  }
+  return $processNames
+}
+
 # Prevent uninstall if retroarch (which Parallel Launcher uses) is running, to ensure
 # no progress is lost
 # This cannot be moved to chocolateybeforemodify.ps1 unless this feature is added:
@@ -48,8 +65,19 @@ if ($keys.Count -eq 0) {
     . $WaitProcessStartPath
     # Run uninstaller
     Uninstall-ChocolateyPackage @packageArgs
-    $process = "unins000"
-    Wait-ProcessStart $process 30
+    # The uninstaller exe ('unins000.exe') generates a new process
+    # with a random name. When original exe stops, Chocolatey thinks the
+    # installation is finished. We have to catch the new process,
+    # so that we can wait until the uninstaller is really finished.
+    $processes = (Get-ProcessNames -CommandLine "$installDirPath")
+    if ($processes -is [string]) {
+      # If one process matched, '$processes' will be a string
+      $process = $processes
+    } else {
+      # If multiple processes matched, use the last match
+      $process = $processes[-1]
+    }
+    Wait-ProcessStart $process -Milliseconds 30000 -Interval 100
     try {
       Write-Verbose "Wating for uninstaller to finish..."
       Wait-Process $process -Timeout 900 # 15 minutes
