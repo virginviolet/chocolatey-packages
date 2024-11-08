@@ -43,5 +43,6 @@ Upgrade will safetly fail if a process named `retroarch` is running (Parallel-La
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
+    <file src="legal\**" target="legal" />
   </files>
 </package>
