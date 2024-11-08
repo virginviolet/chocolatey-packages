@@ -45,7 +45,7 @@ Invoke-ChocoShortcutUninstallation "C:\logs\Notepad++\shortcuts.txt"
     foreach ($line in $shortcutsLog) {
       if ($null -ne $line -and '' -ne $line.Trim() -and $uniqueLines.Add($line)) {
         try {
-          Write-Verbose "Deleted shortcut '$line'."
+          Write-Debug "Deleted shortcut '$line'."
           Remove-Item -Path "$line" -Force
           Write-Debug "Shortcut '$line' deleted."
         } catch {

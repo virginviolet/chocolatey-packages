@@ -154,7 +154,7 @@ Install-ChocolateyShortcut
     }
     Install-ChocolateyShortcut @desktopShortcutArgs
     # Log
-    Write-Verbose "Logging shortcut path..."
+    Write-Debug "Logging shortcut path..."
     "$ShortcutFilePath" | Out-File "$LogPath" -Append
     Write-Debug "Shortcut path logged."
   }
