@@ -9,7 +9,7 @@
     <title>Parallel Launcher</title>
     <authors>Matt Pharoah</authors>
     <projectUrl>https://parallel-launcher.ca</projectUrl>
-    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher/appicon.png</iconUrl>
+    <iconUrl>https://raw.githack.com/virginviolet/chocolatey-packages/main/manual/parallel-launcher/icon/appicon.png</iconUrl>
     <copyright>2020-2024 Matt Pharoah</copyright>
     <licenseUrl>https://gitlab.com/parallel-launcher/parallel-launcher/-/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
