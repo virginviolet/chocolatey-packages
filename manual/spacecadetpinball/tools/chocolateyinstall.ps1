@@ -22,8 +22,6 @@ $originalGameArgs = @{
   url           = $url
   checksum      = 'AF6B1B5A3C0B9D13C58DFEFC937982A0357D209962A81003B11C8FA58EF56329'
   checksumType  = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
-  # checksum64    = 'AF6B1B5A3C0B9D13C58DFEFC937982A0357D209962A81003B11C8FA58EF56329'
-  # checksumType64= 'sha256' # Default is checksumType
 }
 Install-ChocolateyZipPackage @originalGameArgs
 
