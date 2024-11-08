@@ -40,7 +40,7 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 ## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyInstallPackage.ps1
 # Paths
 # In Chocolatey scripts, ALWAYS use absolute paths
-$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe'
 $exeInstaller64Path = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe'
 # Arguments

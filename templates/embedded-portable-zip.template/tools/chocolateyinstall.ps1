@@ -2,7 +2,7 @@
 
 # Initialization
 $ErrorActionPreference = 'Stop' # Stop on all errors
-$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 # Preferences
 $shortcutName = '[[PackageName]]'
