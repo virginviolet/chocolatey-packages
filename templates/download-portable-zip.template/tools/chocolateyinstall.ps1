@@ -25,8 +25,8 @@ $logShortcuts = $true
 
 # Install
 # Download and unpack a zip file
-# Documentation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyzippackage/
-# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/UnInstall-ChocolateyZipPackage.ps1
+# Documentation - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyzippackage
+# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Install-ChocolateyZipPackage.ps1
 # Path
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath   = Split-Path -Parent $MyInvocation.MyCommand.Definition
