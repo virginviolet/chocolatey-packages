@@ -1,78 +1,95 @@
-﻿# IMPORTANT: Before releasing this package, copy/paste the next 2 lines into PowerShell to remove all comments from this file:
-#   $f='c:\path\to\thisFile.ps1'
-#   gc $f | ? {$_ -notmatch "^\s*#"} | % {$_ -replace '(^.*?)\s*?[^``]#.*','$1'} | Out-File $f+".~" -en utf8; mv -fo $f+".~" $f
+﻿# Other steps for uninstalling [[PackageName]] with Chocolatey
 
 ## NOTE: In 80-90% of the cases (95% with licensed versions due to Package Synchronizer and other enhancements),
 ## AutoUninstaller should be able to detect and handle registry uninstalls without a chocolateyUninstall.ps1.
-## See https://docs.chocolatey.org/en-us/choco/commands/uninstall
-## and https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
+## References
+## "Uninstall". https://docs.chocolatey.org/en-us/choco/commands/uninstall
+## "Uninstall-ChocolateyPackage". https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
+## "Uninstall-ChocolateyZipPackage". https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
 
-## If this is an MSI, ensure 'softwareName' is appropriate, then clean up comments and you are done.
-## If this is an exe, change fileType, silentArgs, and validExitCodes
+# Preferences
+$ErrorActionPreference = 'Stop' # Stop on all errors
+$removeShortcuts = $true
+$installationDirPath = 'C:\Tools\[[PackageName]]' # Only necessary if you did not unpack to package directory
 
-$ErrorActionPreference = 'Stop' # stop on all errors
-$packageArgs = @{
-  packageName   = $env:ChocolateyPackageName
-  softwareName  = 'download-portable-zip.template*'  #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
-  fileType      = 'EXE_MSI_OR_MSU' #only one of these: MSI or EXE (ignore MSU for now)
-  # MSI
-  silentArgs    = "/qn /norestart"
-  validExitCodes= @(0, 3010, 1605, 1614, 1641) # https://msdn.microsoft.com/en-us/library/aa376931(v=vs.85).aspx
-  # OTHERS
-  # Uncomment matching EXE type (sorted by most to least common)
-  #silentArgs   = '/S'           # NSIS
-  #silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
-  #silentArgs   = '/s'           # InstallShield
-  #silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
-  #silentArgs   = '/s'           # Wise InstallMaster
-  #silentArgs   = '-s'           # Squirrel
-  #silentArgs   = '-q'           # Install4j
-  #silentArgs   = '-s -u'        # Ghost
-  # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
-  #silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
-                                 #       https://community.chocolatey.org/packages/autohotkey.portable
-  #validExitCodes= @(0) #please insert other valid exit codes here
+## Helper functions
+## These have error handling tucked into them already
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
+## Source code - https://github.com/chocolatey/choco/tree/master/src/chocolatey.resources/helpers/functions
+
+## Outputs the bitness of the OS (either "32" or "64")
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
+# $osBitness = Get-ProcessorBits
+
+# Remove extracted files
+# Only necessary if you did not unpack to package directory
+# Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/UnInstall-ChocolateyZipPackage.ps1
+# Arguments
+$uninstallZipArgs = @{
+    Packagename = "$($packageName)"
+    ZipFileName = "NAME_OF_EMBEDDED_ZIP_FILE.zip"
+}
+Uninstall-ChocolateyZipPackage @uninstallZipArgs
+
+# Remove installation directory
+# Only necessary if you did not unpack to package directory
+# Inform user if installation directory is not empty
+$empty = -not (Test-Path $installationDirPath\*)
+if (-not $empty) {
+    $message = "Data remains in the installation directory. `n" `
+        + "Manually remove the installation directory if you do not wish to keep the data.`n" `
+        + "Installation directory: '$installationDirPath'"
+    Write-Warning $message
+    Start-Sleep -Seconds 5 # Time to read
+}
+# Remove installation directory if it is empty
+else {
+    Write-Debug "Installation directory is empty."
+    Write-Debug "Removing installation directory."
+    Remove-Item $installationDirPath
+    Write-Debug "Installation directory removed."
 }
 
-[array]$key = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
+## Remove persistent Environment variable
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyEnvironmentVariable.ps1
+# Uninstall-ChocolateyEnvironmentVariable
 
-if ($key.Count -eq 1) {
-  $key | % {
-    $packageArgs['file'] = "$($_.UninstallString)" #NOTE: You may need to split this if it contains spaces, see below
+## Remove shim
+## Only necessary if you used Install-BinFile
+## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
+## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-BinFile.ps1
+# Uninstall-BinFile
 
-    if ($packageArgs['fileType'] -eq 'MSI') {
-      # The Product Code GUID is all that should be passed for MSI, and very
-      # FIRST, because it comes directly after /x, which is already set in the
-      # Uninstall-ChocolateyPackage msiargs (facepalm).
-      $packageArgs['silentArgs'] = "$($_.PSChildName) $($packageArgs['silentArgs'])"
+## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
+## Documantation - https://docs.chocolatey.org/en-us/create/functions
+## There may also be functions available in extension packages
+## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
 
-      # Don't pass anything for file, it is ignored for msi (facepalm number 2)
-      # Alternatively if you need to pass a path to an msi, determine that and
-      # use it instead of the above in silentArgs, still very first
-      $packageArgs['file'] = ''
-    } else {
-      # NOTES:
-      # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
-      # - Split args from exe in $packageArgs['file'] and pass those args through $packageArgs['silentArgs'] or ignore them
-      # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"
-      # - Review the code for auto-uninstaller for all of the fun things it does in sanitizing - https://github.com/chocolatey/choco/blob/bfe351b7d10c798014efe4bfbb100b171db25099/src/chocolatey/infrastructure.app/services/AutomaticUninstallerService.cs#L142-L192
+# Remove shortcuts
+# Look for shortcuts log
+$packagePath = $env:ChocolateyPackageFolder
+$shortcutsLogPath = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
+$exists = Test-Path -Path "$shortcutsLogPath" -PathType Leaf
+if ($removeShortcuts -and -not $exists) {
+    Write-Warning "Cannot uninstall shortcuts.`nShortcuts log not found."
+}
+elseif ($exists) {
+    Write-Debug "Shortcuts log found."
+    # Read log line-per-line and remove files
+    $shortcutsLog = Get-Content "$shortcutsLogPath"
+    foreach ($fileInLog in $shortcutsLog) {
+        if ($null -ne $fileInLog -and '' -ne $fileInLog.Trim()) {
+            try {
+                Write-Debug "Removing shortcut '$fileInLog'."
+                Remove-Item -Path "$fileInLog" -Force
+                Write-Debug "Removed shortcut '$fileInLog'."
+            }
+            catch {
+                Write-Warning "Could not remove shortcut '$fileInLog'.`n$_"
+            }
+        }
     }
-
-    Uninstall-ChocolateyPackage @packageArgs
-  }
-} elseif ($key.Count -eq 0) {
-  Write-Warning "$packageName has already been uninstalled by other means."
-} elseif ($key.Count -gt 1) {
-  Write-Warning "$($key.Count) matches found!"
-  Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
-  Write-Warning "Please alert package maintainer the following keys were matched:"
-  $key | % {Write-Warning "- $($_.DisplayName)"}
 }
-
-## OTHER POWERSHELL FUNCTIONS
-## https://docs.chocolatey.org/en-us/create/functions
-#Uninstall-ChocolateyZipPackage $packageName # Only necessary if you did not unpack to package directory - see https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyzippackage
-#Uninstall-ChocolateyEnvironmentVariable - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
-#Uninstall-BinFile # Only needed if you used Install-BinFile - see https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-## Remove any shortcuts you added in the install script.
-
