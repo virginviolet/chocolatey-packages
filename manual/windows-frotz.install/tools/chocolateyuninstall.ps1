@@ -16,41 +16,15 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # https://github.com/chocolatey/choco/issues/1731
 Start-CheckandThrow "Frotz"
 
-## Helper functions
-## These have error handling tucked into them already
-## Documantation - https://docs.chocolatey.org/en-us/create/functions
-## Source code - https://github.com/chocolatey/choco/tree/master/src/chocolatey.resources/helpers/functions
-
-## Outputs the bitness of the OS (either "32" or "64")
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Get-OSArchitectureWidth.ps1
-# $osBitness = Get-ProcessorBits
-
 # Uninstall
-# Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
-# Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyPackage.ps1
-# Arguments for Get-UninstallRegistryKey and Uninstall-ChocolateyPackage
 $packageArgs = @{
   packageName  = $env:ChocolateyPackageName
   softwareName = 'Windows Frotz' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   # Silent arguments
-  # Uncomment matching installer type (sorted by most to least common)
   silentArgs   = '/S'           # NSIS
-  # silentArgs   = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
-  # silentArgs   = '/s'           # InstallShield
-  # silentArgs   = '/s /v"/qn"'   # InstallShield with MSI
-  # silentArgs   = '/s'           # Wise InstallMaster
-  # silentArgs   = '-s'           # Squirrel
-  # silentArgs   = '-q'           # Install4j
-  # silentArgs   = '-s -u'        # Ghost
-  # Note that some installers, in addition to the silentArgs above, may also need assistance of AHK to achieve silence.
-  # silentArgs   = ''             # none; make silent with input macro script like AutoHotKey (AHK)
-  #       https://community.chocolatey.org/packages/autohotkey.portable
   # Exit codes indicating success
   validExitCodes = @(0) # NSIS
-  # validExitCodes = @(0) # Inno Setup
-  # validExitCodes = @(0) # Other; insert other valid exit codes here
 }
 # Get uninstall registry keys that match the softwareName pattern
 [array]$keys = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
@@ -79,19 +53,3 @@ if ($keys.Count -eq 1) {
     Uninstall-ChocolateyPackage @packageArgs
   }
 }
-
-## Remove persistent Environment variable
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateyenvironmentvariable
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-ChocolateyEnvironmentVariable.ps1
-# Uninstall-ChocolateyEnvironmentVariable
-
-## Remove shim
-## Only necessary if you used Install-BinFile
-## Documantation - https://docs.chocolatey.org/en-us/create/functions/uninstall-binfile
-## Source code - https://github.com/chocolatey/choco/blob/master/src/chocolatey.resources/helpers/functions/Uninstall-BinFile.ps1
-# Uninstall-BinFile
-
-## Other needs: use regular PowerShell to do so, or see if it can be accomplished with the helper functions
-## Documantation - https://docs.chocolatey.org/en-us/create/functions
-## There may also be functions available in extension packages
-## See here for examples and availability: https://community.chocolatey.org/packages?q=id%3A.extension
