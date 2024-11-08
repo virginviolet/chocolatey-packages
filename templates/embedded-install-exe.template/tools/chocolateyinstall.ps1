@@ -2,11 +2,6 @@
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
-# $shortcutName = '[[PackageName]]'
-# $addDesktopShortcut = $true
-# $addStartMenuShortcut = $true
-# $logShortcuts = $true
-# $installationDirPath = 'C:\Program Files (x86)\[[PackageName]]'
 
 ## Helper functions
 ## These have error handling tucked into them already
