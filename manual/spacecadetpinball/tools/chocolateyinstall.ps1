@@ -7,7 +7,7 @@ $packagePath = "$(Split-Path -Parent $toolsDirPath)"
 
 # Preferences
 $installationDirName = '3D Pinball x64'
-$installationDirPath = Join-Path "$toolsDirPath" "$installationDirName"
+$installationDirPath = Join-Path "$toolsDirPath" "$installationDirName" # Used for shortcut installation
 $shortcutName = 'Pinball'
 $logShortcuts = $true
 
@@ -52,9 +52,11 @@ if ($userOsIsXp) {
   Write-Debug "Will not use the Windows XP version."
   $zipArchiveX86CorrectPath = $zipArchiveX86Path
 }
+# Package name
+$packageName = Split-Path $packagePath -Leaf
 # Arguments
 $decompiledArgs = @{
-  PackageName    = "$($packageName)"
+  PackageName    = "$packageName"
   FileFullPath   = "$zipArchiveX86CorrectPath"
   FileFullPath64 = "$zipArchiveX64Path"
   Destination    = "$installationDirPath"
