@@ -6,23 +6,6 @@ $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $installDirPath = 'C:\Program Files (x86)\parallel-launcher'
 $pdfManualInstallPath = Join-Path "$installDirPath" -ChildPath 'Manual.pdf'
 
-# Function
-function Get-ProcessNames {
-  param (  
-    [parameter(Mandatory = $true, Position = 0)]
-    [string]
-    $CommandLine
-  )
-  $commandLineEscaped = $CommandLine -replace '\\', '\\' `
-    -replace ':', '\:' -replace '\(', '\(' -replace '\)', '\)'
-  $processNames = Get-WmiObject Win32_Process | Where-Object {
-    $_.CommandLine -match $commandLineEscaped
-  } | ForEach-Object {
-    Write-Output "$($_.Name)"
-  }
-  return $processNames
-}
-
 # Prevent uninstall if retroarch (which Parallel Launcher uses) is running,
 # to ensure that no progress is lost
 # This cannot be moved to chocolateybeforemodify.ps1 unless this feature
@@ -55,18 +38,18 @@ if ($keys.Count -eq 0) {
   # If 1 match was found
   $keys | ForEach-Object {
     # Adjust arguments
-    # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
-    # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"
-    $packageArgs['file'] = "$($_.UninstallString)" # NOTE: You may need to split this if it contains spaces
-    # - Split args from exe in $packageArgs['file'] and pass those args through $packageArgs['silentArgs'] or ignore them
-    # - Review the code for auto-uninstaller for all of the fun things it does in sanitizing - https://github.com/chocolatey/choco/blob/bfe351b7d10c798014efe4bfbb100b171db25099/src/chocolatey/infrastructure.app/services/AutomaticUninstallerService.cs#L142-L192
+    $packageArgs['file'] = "$($_.UninstallString)"
     $packageArgs['silentArgs'] = "$($_.PSChildName) $($packageArgs['silentArgs'])"
-    # Run uninstaller
-    Uninstall-ChocolateyPackage @packageArgs
     # The uninstaller exe ('unins000.exe') generates a new process
     # with a random name. When original exe stops, Chocolatey thinks the
     # installation is finished. We have to catch the new process,
     # so that we can wait until the uninstaller is really finished.
+    # Load Get-ProcessNames
+    $GetProcessNamesPath = Join-Path "$toolsDirPath" -ChildPath 'Get-ProcessNames'
+    . $GetProcessNamesPath
+    # Run uninstaller
+    Uninstall-ChocolateyPackage @packageArgs
+    # Wait until the uninstaller has finished
     $processes = (Get-ProcessNames -CommandLine "$installDirPath")
     if ($processes -is [string]) {
       # If one process matched, '$processes' will be a string
