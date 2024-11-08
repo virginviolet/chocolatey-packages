@@ -66,15 +66,25 @@ Get-ChocolateyUnzip @decompiledArgs
 
 # Add shortcuts
 # Paths
+$desktopPath = Convert-Path "$env:UserProfile\Desktop\"
+$desktopShortcutPath = Join-Path "$desktopPath" -ChildPath "$shortcutName.lnk"
+$isElevated = Test-ProcessAdminRights
+if ($isElevated) {
+  # Make Startu Menu shortcut available to all users
+  $startMenuPath = Convert-Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\Games\"
+} else {
+  # Make Startu Menu shortcut available to current user only
+  $startMenuPath = Convert-Path "$Env:AppData\Microsoft\Windows\Start Menu\Programs\Games\"
+}
+$startMenuShortcutPath = Join-Path "$startMenuPath" -ChildPath "$shortcutName.lnk"
+$gameDirShortcutPath = Join-Path "$installationDirPath" -ChildPath "Launch $shortcutName.lnk"
 $executableDirPath = $installationDirPath
 $executablePath = Join-Path "$installationDirPath" -ChildPath 'SpaceCadetPinball.exe'
-$desktopShortcutPath = "$env:UserProfile\Desktop\$shortcutName.lnk"
-$startMenuShortcutPath = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Games\$shortcutName.lnk"
-$gameDirShortcutPath = Join-Path "$installationDirPath" -ChildPath "Launch $shortcutName.lnk"
-$shortcutDescription = "Begins a game of 3-D Pinball."
 if ($logShortcuts) {
   $shortcutsLogPath = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
 }
+# Description
+$shortcutDescription = "Begins a game of 3-D Pinball."
 # Add desktop shortcut
 Install-ChocolateyShortcut -shortcutFilePath "$desktopShortcutPath" `
   -targetPath "$executablePath" `
