@@ -48,19 +48,19 @@ $packageArgs = @{
 # Get uninstall registry keys that match the softwareName pattern
 [array]$keys = Get-UninstallRegistryKey -SoftwareName $packageArgs['softwareName']
 # Perform action based on the number of matching keys
-# If 0 keys matched
 if ($keys.Count -eq 0) {
+  # If 0 keys matched
   Write-Warning "$packageName has already been uninstalled by other means."
-# If more than 1 matches were found
 } elseif ($keys.Count -gt 1) {
+  # If more than 1 matches were found
   Write-Warning "$($keys.Count) matches found!"
   Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
   Write-Warning "Please alert package maintainer the following keys were matched:"
-  $keys | % { Write-Warning "- $($_.DisplayName)" }
+  $keys | ForEach-Object { Write-Warning "- $($_.DisplayName)" }
 }
-# If 1 match was found
 if ($keys.Count -eq 1) {
-  $keys | % {
+  # If 1 match was found
+  $keys | ForEach-Object {
     # Adjust arguments
     # - You probably will need to sanitize $packageArgs['file'] as it comes from the registry and could be in a variety of fun but unusable formats
     # - Ensure you don't pass double quotes in $file (aka $packageArgs['file']) - otherwise you will get "Illegal characters in path when you attempt to run this"

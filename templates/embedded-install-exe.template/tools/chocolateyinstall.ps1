@@ -42,18 +42,20 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # In Chocolatey scripts, ALWAYS use absolute paths
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe'
+$exeInstaller64Path = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe'
 # Arguments
 $packageArgs = @{
   packageName    = $env:ChocolateyPackageName
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
-  file           = $exeInstallerPath
+  file           = $exeInstallerPath # Will fail on 32-bit systems if missing
+  file64         = $exeInstaller64Path
   softwareName   = '[[PackageName]]*' # Display name as it appears in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = 'INSERT_CHECKSUM'
-  checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
+  checksumType   = 'sha256'
   checksum64     = 'INSERT_CHECKSUM'
-  checksumType64 = 'sha256' # Default is checksumType
+  checksumType64 = 'sha256'
   # Silent arguments
   # Uncomment matching installer type (sorted by most to least common)
   # silentArgs   = '/S'           # NSIS
