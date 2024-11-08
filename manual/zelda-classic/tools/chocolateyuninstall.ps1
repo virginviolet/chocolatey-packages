@@ -25,14 +25,14 @@ Start-CheckandStop "romview-w" > $null
 # (This isn't important, but it's code that I salvaged from an earlier
 # version of this script that I learned was needlessly complex.)
 # Paths
-$questsDirPath = Join-Path $installationDirPath -ChildPath "Quests"
-$savePath = Join-Path $installationDirPath -ChildPath "zc.sav"
+$questsDirPath = Join-Path "$installationDirPath" -ChildPath "Quests"
+$savePath = Join-Path "$installationDirPath" -ChildPath "zc.sav"
 # Look for save
-$saveExists = Test-Path $savePath -PathType Leaf
+$saveExists = Test-Path "$savePath" -PathType Leaf
 # Look for custom quests
-$questsDirExists = Test-Path $questsDirPath -PathType Container
+$questsDirExists = Test-Path "$questsDirPath" -PathType Container
 # Remove Quests directory if empty
-$empty = -not (Test-Path $questsDirPath\*)
+$empty = -not (Test-Path "$questsDirPath\*")
 # Inform of user data non-removal
 if ($questsDirExists -and $empty) {
     Write-Verbose "Removing empty 'Quests' directory."
@@ -42,7 +42,8 @@ if ($questsDirExists -and $empty) {
     Write-Debug "Save found."
     Write-Debug "Quests dir found."
     Write-Warning "Quests and save data will *not* be removed."
-    # Pause so that the user have time to read, and can abort if desired. Chocolatey stops Pause after 30 seconds by default.
+    # Pause so that the user have time to read.
+    # Chocolatey stops Pause after 30 seconds by default.
     Pause
 } elseif ($saveExists) {
     Write-Debug "Save found."
@@ -55,47 +56,35 @@ if ($questsDirExists -and $empty) {
 }
 
 # Uninstall extracted files
+$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$packagePath = Split-Path -Parent $toolsDirPath
 Uninstall-ChocolateyZipPackage -PackageName $packagePath -ZipFileName $zipName
 
-# Inform user if installation directory is not empty.
-$empty = -not (Test-Path $installationDirPath\*)
-if (-not $empty) {
-    $message = "User data remains in the installation directory. `n" `
-        + "Manually remove the installation directory if you do not wish to keep the data.`n" `
-        + "Installation directory: $installationDirPath"
-    Write-Warning $message
-    Start-Sleep -Seconds 5 # time to read
-}
-# Remove installation directory if empty
-else {
-    Write-Debug "Installation directory is empty."
-    Write-Debug "Removing installation directory."
-    Remove-Item $installationDirPath
-    Write-Debug "Installation directory removed."
-}
-
-# Remove shortcuts
-# Look for shortcuts log
-$packagePath = "$(Split-Path -Parent $toolsDirPath)"
-$shortcutsLogPath = Join-Path "$packagePath" -ChildPath 'shortcuts.txt'
-$exists = Test-Path -Path $shortcutsLogPath -PathType Leaf
-if ($exists) {
-    Write-Debug "Shortcuts log found."
-    # Read log line-per-line and remove files
-    $shortcutsLog = Get-Content $shortcutsLogPath
-    foreach ($fileInLog in $shortcutsLog) {
-        if ($null -ne $fileInLog -and '' -ne $fileInLog.Trim()) {
-            try {
-                Write-Debug "Removing shortcut '$fileInLog'."
-                Remove-Item -Path "$fileInLog" -Force
-                Write-Debug "Removed shortcut '$fileInLog'."
-            }
-            catch {
-                Write-Warning "Could not remove shortcut '$fileInLog'.`n$_"
-            }
-        }
+# See if installation directory exists
+$dirExists = Test-Path "$installationDirPath" -PathType Container
+if ($dirExists) {
+    $empty = -not (Test-Path "$installationDirPath\*")
+    if (-not $empty) {
+        # Inform user if installation directory is not empty.
+        $message = "User data remains in the installation directory. `n" + `
+            "Manually remove the installation directory if you do not" + `
+            "wish to keep the data.`n" + `
+            "Installation directory: '$installationDirPath'"
+        Write-Warning $message
+        Start-Sleep -Seconds 5 # Time to read
+    } else {
+        # Remove installation directory if empty
+        Write-Debug "Installation directory is empty."
+        Write-Debug "Removing installation directory."
+        Remove-Item "$installationDirPath"
+        Write-Debug "Installation directory removed."
     }
 }
-else {
-    Write-Warning "Cannot uninstall shortcuts.`nShortcuts log not found."
-}
+
+# Uninstall shortcuts
+# Load helper
+$helpersDirPath = Join-Path "$toolsDirPath" -ChildPath "helpers"
+$InvokeChocoShortcutUninstallationPath = Join-Path "$helpersDirPath" -ChildPath "Invoke-ChocoShortcutUninstallation"
+. $InvokeChocoShortcutUninstallationPath
+# Remove shortcuts using log created by Invoke-ChocoShortcutInstallation
+Invoke-ChocoShortcutUninstallation

@@ -8,21 +8,11 @@ $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $installationDirPath = "C:\Games\Zelda Classic" # I had issues when installed to package directory
 $installDesktopShortcuts = $true
 $installStartMenuShortcuts = $true
-$logShortcuts = $true
 $shortcutBaseNameGame = "Zelda Classic"
 $shortcutBaseNameLauncher = "Zelda Classic Launcher"
 $shortcutBaseNameZQuest = "ZQuest"
 $StartMenuDirectory = "Zelda Classic\"
 $desktopDirectory = ""
-
-# Function
-function Write-ShortcutLog($Line) {
-  if ($logShortcuts) {
-    $packagePath = "$(Split-Path -Parent $toolsDirPath)"
-    $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
-    "$Line" | Out-File "$shortcutsLog" -Append
-  }
-}
 
 # Prevent force install or upgrade if the game is running (so that no progress is lost)
 # This cannot be moved to chocolateybeforemodify.ps1 unless the feature suggested in the following issue is added:
@@ -53,6 +43,11 @@ Get-ChocolateyUnzip @unzipArgs
 ## Add shortcuts
 # Paths
 if ($installDesktopShortcuts -or $installStartMenuShortcuts) {
+  # Load helper
+  $helpersDirPath = Join-Path "$toolsDirPath" -ChildPath "helpers"
+  $InvokeChocoShortcutInstallation = Join-Path "$helpersDirPath" -ChildPath "Invoke-ChocoShortcutInstallation"
+  . $InvokeChocoShortcutInstallation
+
   # Targets
   $executableGamePath = Join-Path $installationDirPath -ChildPath "zelda.exe"
   $executableLauncherPath = Join-Path $installationDirPath -ChildPath "zlaunch.exe"
@@ -61,38 +56,40 @@ if ($installDesktopShortcuts -or $installStartMenuShortcuts) {
   $descriptionGame = "A tribute to the greatest video game of all time."
   $descriptionLauncher = "Launcher for Zelda Classic."
   $descriptionZQuest = "Game editor for Zelda Classic."
-  if ($logShortcuts) {
-    $packagePath = "$(Split-Path -Parent $toolsDirPath)"
-    $shortcutsLog = Join-Path "$packagePath" -ChildPath "shortcuts.txt"
-  }
 }
 # Add desktop shortcuts
 if ($installDesktopShortcuts) {
   # Game
-  $shortcutDesktop = "$env:UserProfile\Desktop\$desktopDirectory$shortcutBaseNameGame.lnk"
-  Install-ChocolateyShortcut -shortcutFilePath $shortcutDesktop -targetPath $executableGamePath -workingDirectory $installationDirPath -description $descriptionGame
-  Write-ShortcutLog "$shortcutDesktop"
+  Invoke-ChocoShortcutInstallation -Desktop "$desktopDirectory$shortcutBaseNameGame.lnk" `
+    -TargetPath $executableGamePath `
+    -WorkingDirectory $installationDirPath `
+    -Description $descriptionGame
   # Launcher
-  $shortcutDesktop = "$env:UserProfile\Desktop\$desktopDirectory$shortcutBaseNameLauncher.lnk"
-  Install-ChocolateyShortcut -shortcutFilePath $shortcutDesktop -targetPath $executableLauncherPath -workingDirectory $installationDirPath -description $descriptionLauncher
-  Write-ShortcutLog "$shortcutDesktop"
+  Invoke-ChocoShortcutInstallation -Desktop "$desktopDirectory$shortcutBaseNameLauncher.lnk" `
+    -TargetPath $executableLauncherPath `
+    -WorkingDirectory $installationDirPath `
+    -Description $descriptionLauncher
   # Editor
-  $shortcutDesktop = "$env:UserProfile\Desktop\$desktopDirectory$shortcutBaseNameZQuest.lnk"
-  Install-ChocolateyShortcut -shortcutFilePath $shortcutDesktop -targetPath $executableZQuestPath -workingDirectory $installationDirPath -description $descriptionZQuest
-  Write-ShortcutLog "$shortcutDesktop"
+  Invoke-ChocoShortcutInstallation -Desktop "$desktopDirectory$shortcutBaseNameZQuest.lnk" `
+    -TargetPath $executableZQuestPath `
+    -WorkingDirectory $installationDirPath `
+    -Description $descriptionZQuest
 }
 ## Add start menu shortcuts
 if ($installStartMenuShortcuts) {
   # Game
-  $shortcutStart = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutBaseNameGame.lnk" 
-  Install-ChocolateyShortcut -ShortcutFilePath $shortcutStart -targetPath $executableGamePath -workingDirectory $installationDirPath -description $descriptionGame
-  Write-ShortcutLog "$shortcutStart"
+  Invoke-ChocoShortcutInstallation -StartMenu "$StartMenuDirectory$shortcutBaseNameGame.lnk" `
+    -TargetPath $executableGamePath `
+    -WorkingDirectory $installationDirPath `
+    -Description $descriptionGame
   # Launcher
-  $shortcutStart = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutBaseNameLauncher.lnk"
-  Install-ChocolateyShortcut -ShortcutFilePath $shortcutStart -targetPath $executableLauncherPath -workingDirectory $installationDirPath -description $descriptionLauncher
-  Write-ShortcutLog "$shortcutStart"
+  Invoke-ChocoShortcutInstallation -StartMenu "$StartMenuDirectory$shortcutBaseNameLauncher.lnk" `
+    -TargetPath $executableLauncherPath `
+    -WorkingDirectory $installationDirPath `
+    -Description $descriptionLauncher
   # Editor
-  $shortcutStart = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\$startmenuDirectory$shortcutBaseNameZQuest.lnk"
-  Install-ChocolateyShortcut -ShortcutFilePath $shortcutStart -targetPath $executableZQuestPath -workingDirectory $installationDirPath -description $descriptionZQuest
-  Write-ShortcutLog "$shortcutStart"
+  Invoke-ChocoShortcutInstallation -StartMenu "$StartMenuDirectory$shortcutBaseNameZQuest.lnk" `
+    -TargetPath $executableZQuestPath `
+    -WorkingDirectory $installationDirPath `
+    -Description $descriptionZQuest
 }
