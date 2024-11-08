@@ -13,7 +13,7 @@ Portable packages should be possible to install without administrative rights.
 1. [ ] Search the Community Repository to make sure there isn't a package for this software already: <https://community.chocolatey.org/packages>
 2. [ ] Make sure the total nupkg package will be under 200MB.
 3. [ ] Commit.
-4. [ ] Fill out nuspec.
+4. [ ] Fill out `[[PackageName]].nuspec`.
 5. [ ] Fill out `tools\chocolateyInstall.ps1`.
 6. [ ] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
 7. [ ] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
@@ -25,14 +25,14 @@ Portable packages should be possible to install without administrative rights.
 13. [ ] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
 14. [ ] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
 15. [ ] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
-16. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-17. [ ] Adjust default installation path in description in nuspec.
+16. [ ] Clean out the comments in `[[PackageName]].nuspec`.
+17. [ ] Adjust default installation path in description in ``[[PackageName]].nuspec``.
 18. [ ] Adjust `TODO_updating.md` if needed.
 19. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
 20. [ ] Test the package again to ensure install/uninstall work appropriately.
 21. [ ] Commit and publish to GitHub.
 22. [ ] Merge branch with main.
-23. [ ] Add icon key to nuspec.
+23. [ ] Add icon key to `[[PackageName]].nuspec`.
 24. [ ] Test the package yet again to ensure install/uninstall work appropriately.
 25. [ ] Delete this file.
 26. [ ] Merge branch with main again.

@@ -2,18 +2,19 @@
 
 # To do
 
-1. [ ] `Nuspec`: Update `version`.
-2. [ ] `Nuspec`: Update `releaseNotes`.
-3. [ ] `legal/LICENSE.txt`: Verify license.
-4. [ ] `legal/VERIFICATION.txt`: Update download URLs.
-5. [ ] `legal/VERIFICATION.txt`: Update filenames in every place.
-6. [ ] `legal/VERIFICATION.txt`: Update checksum32.
-7. [ ] `legal/VERIFICATION.txt`: Update checksum64.
-8. [ ] `legal/VERIFICATION.txt`: Verify license URL.
-9. [ ] `chocolateyInstall.ps1`: Update `$zipArchivePath`.
-10. [ ] `chocolateyUninstall.ps1`: Update `ZipFileName`.
-11. [ ] Test the package to ensure upgrade works appropriately.
+1. [ ] `[[PackageName]].nuspec`: Update `version`.
+2. [ ] `[[PackageName]].nuspec`: Update `releaseNotes`.
+3. [ ] `[[PackageName]].nuspec`: Verify URLs.
+4. [ ] `legal/LICENSE.txt`: Verify license.
+5. [ ] `legal/VERIFICATION.txt`: Update download URLs.
+6. [ ] `legal/VERIFICATION.txt`: Update filenames in every place.
+7. [ ] `legal/VERIFICATION.txt`: Update checksum32.
+8. [ ] `legal/VERIFICATION.txt`: Update checksum64.
+9. [ ] `legal/VERIFICATION.txt`: Verify license URL.
+10. [ ] `chocolateyInstall.ps1`: Update `$zipArchivePath`.
+11. [ ] `chocolateyUninstall.ps1`: Update `ZipFileName`.
+12. [ ] Test the package to ensure upgrade works appropriately.
     `choco pack; choco upgrade [[PackageName]] --source .`
-12. [ ] Push package to Chocolatey Community Repository.
+13. [ ] Push package to Chocolatey Community Repository.
     `choco push`
-13. [ ] Update meta-package if applicable.
+14. [ ] Update meta-package if applicable.

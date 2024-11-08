@@ -68,7 +68,6 @@ The default installation directory is `C:\Program Files (x86)\[[PackageName]]`.<
     <!--<replaces>NOT YET IMPLEMENTED</replaces>-->
   </metadata>
   <files>
-    <!-- Contents -->
     <file src="tools\**" target="tools" />
     <file src="legal\**" target="legal" />
   </files>
