@@ -9,7 +9,7 @@ and can be verified like this:
 
 1. Download 'FILENAME-32-bit.exe' and 'FILENAME-64-bit.exe' from this page:
 <INSERT DOWNLOAD URL HERE>
-2. Obtain the checksum of each file.
+2. Obtain the checksum of each exe file.
   Here are two means of obtaining the checksums:
   
   - Use the PowerShell command 'Get-Filehash'
