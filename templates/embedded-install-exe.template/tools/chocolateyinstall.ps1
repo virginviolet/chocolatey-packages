@@ -45,8 +45,7 @@ $exeInstallerPath = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe
 $exeInstaller64Path = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe'
 # Arguments
 $packageArgs = @{
-  packageName    = $env:ChocolateyPackageName
-  unzipLocation  = $toolsDirPath
+  packageName    = "$($packageName)"
   fileType       = 'EXE'
   file           = $exeInstallerPath # Will fail on 32-bit systems if missing
   file64         = $exeInstaller64Path
