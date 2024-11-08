@@ -45,15 +45,10 @@ The maximum supported bit depth of images in Blorb files with an adaptive palett
     <!-- =============================== -->
 
     <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
-    <!--<dependencies>
-      <dependency id="" version="__MINIMUM_VERSION__" />
-      <dependency id="" version="[__EXACT_VERSION__]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]" />
-      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)" />
-      <dependency id="" />
-      <dependency id="chocolatey-core.extension" version="1.1.0" />
-    </dependencies>-->
-    <!-- chocolatey-core.extension - https://community.chocolatey.org/packages/chocolatey-core.extension -->
+    <dependencies>
+      <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" /> <!-- Required for 'Start-CheckandThrow' -->
+      <!-- chocolatey-misc-helpers.extension - https://community.chocolatey.org/packages/chocolatey-misc-helpers.extension -->
+    </dependencies>
 
     <!--<provides>NOT YET IMPLEMENTED</provides>-->
     <!--<conflicts>NOT YET IMPLEMENTED</conflicts>-->
