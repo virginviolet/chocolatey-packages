@@ -57,4 +57,3 @@ function Set-FriendlyAppName {
 
 ## Example
 # Set-FriendlyAppName -Path "C:\Program Files (x86)\parallel-launcher\parallel-launcher.exe.FriendlyAppName" -Name "Parallel Launcher"
-# echo hey

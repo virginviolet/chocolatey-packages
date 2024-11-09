@@ -1,4 +1,4 @@
-function Test-RegKeyValue {
+function Test-RegistryKey {
   param (
     [Alias("KeyPath")]
     [Alias("Key")]
@@ -51,6 +51,8 @@ function Test-RegKeyValue {
     return $false
   }
 }
+
+New-Alias -Name Test-RegKey -Value Test-RegistryKey
 
 ## Example
 # Test-RegKeyValue -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName"
