@@ -8,7 +8,7 @@ function Get-RegKeyValueData {
     
     [Alias("ValueName")]
     [parameter(Mandatory = $true, Position = 1)]
-    $Name
+    [string]$Name
   )
   try {
     # Write-Debug "Testing if registry key '$Path' has the value '$Name'..."
