@@ -159,4 +159,4 @@ Install-ChocolateyShortcut
     Write-Debug "Shortcut path logged."
   }
 
-New-Alias -Name Invoke-ChocoShortcutInstall -Value Invoke-ChocoShortcutInstallation
+New-Alias -Name Invoke-ChocoShortcutInstall -Value Invoke-ChocoShortcutInstallation -Scope Global

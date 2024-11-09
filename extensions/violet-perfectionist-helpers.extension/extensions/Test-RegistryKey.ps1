@@ -52,7 +52,7 @@ function Test-RegistryKey {
   }
 }
 
-New-Alias -Name Test-RegKey -Value Test-RegistryKey
+New-Alias -Name Test-RegKey -Value Test-RegistryKey -Scope Global
 
 ## Example 1: Test if the specified registry key exists
 # Test-RegistryKey -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"

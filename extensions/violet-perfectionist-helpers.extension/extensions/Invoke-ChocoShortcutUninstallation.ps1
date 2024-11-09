@@ -55,3 +55,5 @@ Invoke-ChocoShortcutUninstallation "C:\logs\Notepad++\shortcuts.txt"
     }
   }
 }
+
+New-Alias -Name Invoke-ChocoShortcutUninstall -Value Invoke-ChocoShortcutUninstallation -Scope Global
