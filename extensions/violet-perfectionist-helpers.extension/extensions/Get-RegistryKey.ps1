@@ -49,7 +49,7 @@ function Get-RegistryKey {
   }
 }
 
-New-Alias -Name Get-RegKey -Value Get-RegistryKey
+New-Alias -Name Get-RegKey -Value Get-RegistryKey -Scope Global
 
 ## Example: Get the value data from a registry key value
 # Get-RegistryKey -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName"
