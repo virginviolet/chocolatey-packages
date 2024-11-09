@@ -8,12 +8,26 @@ function Test-RegKeyValue {
     
     [Alias("ValueName")]
     [parameter(Mandatory = $true, Position = 1)]
-    $Name
+    $Name,
+
+    [Alias("ValueData")]
+    [parameter(Mandatory = $false, Position = 2)]
+    $Data
   )
   try {
     # Write-Debug "Testing if registry key '$Path' has the value '$Name'..."
     Get-ItemProperty -Path $Path -Name $Name -ErrorAction Stop > $null
     # Write-Debug "Value found."
+    if ($Data) {
+      # Write-Debug "Testing if the value '$name' has the data '$Data'..."
+      $existingValueData = Get-RegKeyValueData -Path $Path -Name $Name
+      # Write-Debug "Value data matches the input."
+      if ($existingValueData -eq $Data) {
+        return $true
+      } else {
+        return $false
+      }
+    }
     return $true
   } catch [System.Management.Automation.ItemNotFoundException] {
     <# $message = "Could not get registry key value data.`n" + `
