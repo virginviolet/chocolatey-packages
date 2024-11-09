@@ -3,10 +3,24 @@
 # the process's Commard Line property, which is what this function does.
 function Get-ProcessName {
   param (
-    [parameter(Mandatory = $true, Position = 0)]
+    [parameter(Mandatory = $true, Position = 0, ParameterSetName = "Name")]
+    [string[]]
+    $Name,
+    [parameter(Mandatory = $true, Position = 0, ParameterSetName = "Id")]
+    [Int32[]]
+    $Id,
+    [parameter(Mandatory = $true, Position = 0, ParameterSetName = "CommandLine")]
     [string]
     $CommandLine
   )
+  if (-not $CommandLine) {
+    if ($Name) {
+      $processNames = (Get-Process -Name $Name).ProcessName
+    } elseif ($Id) {
+      $processNames = (Get-Process -Id $Id).ProcessName
+    }
+    return $processNames
+  }
   # Escape characters for the path (by no means complete)
   $commandLineEscaped = $CommandLine -replace '\\', '\\' `
     -replace ':', '\:' -replace '\(', '\(' -replace '\)', '\)'
