@@ -15,51 +15,46 @@ function Set-FriendlyAppName {
     [string]
     $Name
   )
-  Write-Debug "Setting frinedly app name..."
-  $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
-  $valueName = "$Path" + ".FriendlyAppName"
   $newValueData = $Name
-  $keyExists = Test-Path -Path "$keyPath" # key exists;
+  Write-Verbose "Setting friendly app name to '$newValueData'..."
+  $keyPath = "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
+  $valueName = $Path + ".FriendlyAppName"
+  $keyExists = Test-Path -Path $keyPath # key exists;
   if (-not $keyExists) {
     # This shouldn't happen. Perhaps in a future version of Windows.
     $message = "MUI cache key not found! `n" + `
       "Path: $keyPath"
     Write-Warning $message
-  } else {
-    $existingValueData = '' # Initialize variable
-    try {
-      $existingValue = Get-ItemProperty -Path $keyPath -Name $valueName -ErrorAction Stop
-      $valueExists = $true
-      $existingValueData = $existingValue.$valueName
-    } catch [System.Management.Automation.PSArgumentException] {
-      $valueExists = $false
-    } catch {
-      Write-Warning $_
-    }
-    # Try to create/set value
-    try {
-      if ($valueExists) {
-        if ($existingValueData -eq $newValueData) {
-          Write-Debug "The friendly app name is already set to '$newValueData'."
-        } else {
-          Write-Debug "Changing the value data of value '$valueName' from '$existingValueData' to '$newValueData' in registry key '$keyPath'...."
-          Set-ItemProperty -Path $keyPath -Name $valueName -Value $newValueData -Type STRING
-          Write-Debug "Value set."
-          Write-Debug "Friendly app name set."
-        }
-      } else {
-        Write-Debug "Creating value '$valueName' with value data '$newValueData' in registry key '$keyPath'..."
-        New-ItemProperty -Path $keyPath -Name $valueName -Value $newValueData -Type STRING
-        Write-Debug "Value created."
-        Write-Debug "Friendly app name set."
+    return
+  }
+  # Try to create/set value
+  try {
+    $valueExists = Test-RegKeyValue -Path $keyPath -Name $valueName
+    if (-not $valueExists) {
+      Write-Debug "Creating value '$valueName' with value data '$newValueData' in registry key '$keyPath'..."
+      New-ItemProperty -Path $keyPath -Name $valueName -Value $newValueData -Type STRING -ErrorAction Stop > $null
+      Write-Debug "Value created."
+      Write-Debug "Friendly app name set."
+      return
+      
+    } else {
+      $existingValueData = Get-RegKeyValueData -Path $keyPath -Name $valueName -ErrorAction Stop
+      if ($existingValueData -eq $newValueData) {
+        Write-Debug "The friendly app name is already set to '$newValueData'."
+        return
       }
-    } catch {
-      Write-Warning "Could not set a friendly app name`n$_"
+      Write-Debug "Changing the value data of value '$valueName' from '$existingValueData' to '$newValueData' in registry key '$keyPath'...."
+      Set-ItemProperty -Path $keyPath -Name $valueName -Value $newValueData -Type STRING -ErrorAction Stop > $null
+      Write-Debug "Value set."
+      Write-Debug "Friendly app name set."
+      return
     }
+  } catch {
+    Write-Warning "Could not set a friendly app name`n$_"
+    return
   }
 }
 
-New-Alias -Name New-FriendlyAppName -Value Set-FriendlyAppName
-
 ## Example
 # Set-FriendlyAppName -Path "C:\Program Files (x86)\parallel-launcher\parallel-launcher.exe.FriendlyAppName" -Name "Parallel Launcher"
+# echo hey
