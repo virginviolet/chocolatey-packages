@@ -32,7 +32,7 @@ function Test-RegistryKey {
     }
     if ($Value) {
       # Write-Debug "Testing if the value '$name' has the data '$Value'..."
-      $existingValueData = Get-RegKeyValueData -Path $Path -Name $Name -ErrorAction Stop
+      $existingValueData = Get-RegistryKey -Path $Path -Name $Name -ErrorAction Stop
       # Write-Debug "Value data matches the input."
       if ($existingValueData -eq $Value) {
         return $true

@@ -38,7 +38,7 @@ function Set-FriendlyAppName {
       return
       
     } else {
-      $existingValueData = Get-RegKeyValueData -Path $keyPath -Name $valueName -ErrorAction Stop
+      $existingValueData = Get-RegistryKey -Path $keyPath -Name $valueName -ErrorAction Stop
       if ($existingValueData -eq $newValueData) {
         Write-Debug "The friendly app name is already set to '$newValueData'."
         return
