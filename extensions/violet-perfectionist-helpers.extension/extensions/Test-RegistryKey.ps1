@@ -13,9 +13,9 @@ function Test-RegistryKey {
     [parameter(Mandatory = $true, Position = 1, ParameterSetName="Data")]
     [string]$Name,
     
-    [Alias("ValueData")]
+    [Alias("ValueData","Data")]
     [parameter(Mandatory = $true, Position = 2, ParameterSetName="Data")]
-    $Data
+    $Value
   )
   try {
     # Write-Debug "Testing if the registry key '$Path' exists..."
@@ -25,11 +25,11 @@ function Test-RegistryKey {
       Get-ItemProperty -Path $Path -Name $Name -ErrorAction Stop > $null
       # Write-Debug "Value found."
     }
-    if ($Data) {
-      # Write-Debug "Testing if the value '$name' has the data '$Data'..."
+    if ($Value) {
+      # Write-Debug "Testing if the value '$name' has the data '$Value'..."
       $existingValueData = Get-RegKeyValueData -Path $Path -Name $Name -ErrorAction Stop
       # Write-Debug "Value data matches the input."
-      if ($existingValueData -eq $Data) {
+      if ($existingValueData -eq $Value) {
         return $true
       } else {
         return $false
@@ -54,5 +54,14 @@ function Test-RegistryKey {
 
 New-Alias -Name Test-RegKey -Value Test-RegistryKey
 
-## Example
-# Test-RegKeyValue -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName"
+## Example 1: Test if the specified registry key exists
+# Test-RegistryKey -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
+
+## Example 2: Test if the specified registry key has the specified value 
+# Test-RegistryKey -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" `
+#   -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName"
+
+## Example 3: Test if the specified registry key value holds the specified value data
+# Test-RegistryKey -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" `
+#   -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName" `
+#   -Data 'Parallel Launcher'
