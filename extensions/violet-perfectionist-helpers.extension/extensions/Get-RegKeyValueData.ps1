@@ -1,4 +1,4 @@
-function Get-RegKeyValueData {
+function Get-RegistryKey {
   param (
     [Alias("KeyPath")]
     [Alias("Key")]
@@ -7,16 +7,32 @@ function Get-RegKeyValueData {
     $Path,
     
     [Alias("ValueName")]
-    [parameter(Mandatory = $true, Position = 1)]
+    [parameter(Mandatory = $false, Position = 1)]
     [string]$Name
   )
   try {
-    # Write-Debug "Testing if registry key '$Path' has the value '$Name'..."
+    if (-not $Name) {
+      # Write-Debug "Getting the registry key '$Path'..."
+      $key = Get-ItemProperty -Path $Path -ErrorAction Stop
+      # Write-Debug "Registry key retrieved"
+      return $key
+    }
+  } catch [System.Management.Automation.ItemNotFoundException] {
+    $message = "Could not get registry key.`n" + `
+      "The key '$Path' does not exist.`n$_"
+    Write-Error $message
+    return
+  } catch {
+    Write-Error "Could not get registry key.`n$_"
+    return
+  }
+  # If 'Name' parameter was supplied:
+  try {
+    # Write-Debug "Getting the value '$Name' from the key '$Path'..."
     $value = Get-ItemProperty -Path $Path -Name $Name -ErrorAction Stop
     # Write-Debug "Value found."
     # Write-Debug "Getting the value data..."
     $valueData = $value.$Name
-    # echo $value
     # Write-Debug "Value data found."
     return $valueData
   } catch [System.Management.Automation.ItemNotFoundException] {
@@ -33,5 +49,7 @@ function Get-RegKeyValueData {
   }
 }
 
-## Example
-# Get-RegKeyValueData -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppNamea"
+New-Alias -Name Get-RegKey -Value Get-RegistryKey
+
+## Example: Get the value data from a registry key value
+# Get-RegistryKey -Path "REGISTRY::HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" -Name "C:\Program Files\Notepad++\notepad++.exe.FriendlyAppName"
