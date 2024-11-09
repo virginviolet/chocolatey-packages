@@ -4,30 +4,36 @@
 function Get-ProcessName {
   param (
     [parameter(Mandatory = $true, Position = 0, ParameterSetName = "Name")]
-    [string[]]
+    [string]
     $Name,
     [parameter(Mandatory = $true, Position = 0, ParameterSetName = "Id")]
-    [Int32[]]
+    [Int32]
     $Id,
     [parameter(Mandatory = $true, Position = 0, ParameterSetName = "CommandLine")]
     [string]
     $CommandLine
   )
-  if (-not $CommandLine) {
-    if ($Name) {
-      $processNames = (Get-Process -Name $Name).ProcessName
-    } elseif ($Id) {
-      $processNames = (Get-Process -Id $Id).ProcessName
+  if ($Name) {
+    $processNames = Get-WmiObject Win32_Process | Where-Object {
+      $_.Name -like $Name
+    } | ForEach-Object {
+      Write-Output "$($_.Name)"
     }
-    return $processNames
-  }
-  # Escape characters for the path (by no means complete)
-  $commandLineEscaped = $CommandLine -replace '\\', '\\' `
-    -replace ':', '\:' -replace '\(', '\(' -replace '\)', '\)'
-  $processNames = Get-WmiObject Win32_Process | Where-Object {
-    $_.CommandLine -match $commandLineEscaped
-  } | ForEach-Object {
-    Write-Output "$($_.Name)"
+  } elseif ($Id) {
+    $processNames = Get-WmiObject Win32_Process | Where-Object {
+      $_.ProcessId -eq $Id
+    } | ForEach-Object {
+      Write-Output "$($_.Name)"
+    }
+  } elseif ($CommandLine) {
+    # Escape characters for the path (by no means complete)
+    $commandLineEscaped = $CommandLine -replace '\\', '\\' `
+      -replace ':', '\:' -replace '\(', '\(' -replace '\)', '\)'
+    $processNames = Get-WmiObject Win32_Process | Where-Object {
+      $_.CommandLine -match $commandLineEscaped
+    } | ForEach-Object {
+      Write-Output "$($_.Name)"
+    }
   }
   # Return an object containing one or many strings
   return $processNames
