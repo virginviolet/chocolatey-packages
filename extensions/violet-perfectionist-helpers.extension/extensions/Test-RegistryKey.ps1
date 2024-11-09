@@ -17,6 +17,11 @@ function Test-RegistryKey {
     [parameter(Mandatory = $true, Position = 2, ParameterSetName="Data")]
     $Value
   )
+  if (-not $Path.StartsWith("REGISTRY::") -and `
+      $Path -ne '' -and `
+      $null -ne $Path) {
+        $Path = $Path.Insert(0,"REGISTRY::")
+  }
   try {
     # Write-Debug "Testing if the registry key '$Path' exists..."
     Get-ItemProperty -Path $Path -ErrorAction Stop > $null

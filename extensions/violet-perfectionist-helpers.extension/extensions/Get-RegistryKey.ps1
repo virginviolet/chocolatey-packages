@@ -10,6 +10,11 @@ function Get-RegistryKey {
     [parameter(Mandatory = $false, Position = 1)]
     [string]$Name
   )
+  if (-not $Path.StartsWith("REGISTRY::") -and `
+      $Path -ne '' -and `
+      $null -ne $Path) {
+        $Path = $Path.Insert(0,"REGISTRY::")
+  }
   try {
     if (-not $Name) {
       # Write-Debug "Getting the registry key '$Path'..."
