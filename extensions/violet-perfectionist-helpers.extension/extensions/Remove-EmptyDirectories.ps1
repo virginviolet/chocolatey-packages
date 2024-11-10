@@ -1,306 +1,4 @@
-function Remove-EmptyDirectories {
-    [CmdletBinding()]
-    Param (
-        [Parameter(ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            Mandatory = $false,
-            HelpMessage = "`r`nWhich directory, directory or path would you like to target? `r`n`r`nPlease enter a valid file system path to a directory (a full path name of a directory (a.k.a. a directory) i.e. directory path such as C:\Windows). `r`n`r`nNotes:`r`n`t- If the path name includes space characters, please enclose the path name in quotation marks (single or double). `r`n`t- To stop entering new values, please press [Enter] at an empty input row (and the script will run). `r`n`t- To exit this script, please press [Ctrl] + C`r`n"
-            )]
-        [ValidateNotNullOrEmpty()]
-        [Alias("Start", "Begin", "Directory", "From")]
-        [string[]]$Path,
-        
-        [Alias("ReportPath")]
-        [string]$Output = "$env:temp",
-        
-        [ValidateScript({
-                # Source: Robbins
-                If ($_ -match '^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\"";|/]+$') {
-                    $True
-                } Else {
-                    Throw "'$_' is either not a valid filename or it is not recommended. If the filename includes space characters, please enclose the filename in quotation marks."
-                }
-            })]
-        [Alias("File")]
-        [string]$FileName = "deleted_directories.txt",
-
-        [switch]$Recurse,
-
-        [switch]$WhatIf,
-        
-        [switch]$Audio
-    )
-
-    Begin {
-        # Establish some common variables.
-        $ErrorActionPreference = "Stop"
-        $computer = $env:COMPUTERNAME
-        $separator = "---------------------"
-        $empty_line = ""
-        $skipped = @()
-        $directories = @()
-        $empty_directories = @()
-        $deleted_directories = @()
-        $skipped_path_names = @()
-        $num_invalid_paths = 0
-
-        # Test if the Output-path ("ReportPath") exists
-        If ((Test-Path "$Output") -eq $false) {
-            # Display an error message in console
-            # $empty_line | Out-String
-            Write-Warning "'$Output' doesn't seem to be a valid path name."
-            # $empty_line | Out-String
-            Write-Debug "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
-            # $empty_line | Out-String
-            $skip_text = "Couldn't find -Output directory '$Output'..."
-            Write-Warning $skip_text
-            # $empty_line | Out-String
-            Exit
-            Return
-        } Else {
-            # Resolve the Output-path ("ReportPath") (if the Output-path is specified as relative)
-            $real_output_path = Resolve-Path -Path "$Output"
-            $txt_file = "$real_output_path\$FileName"
-        } # Else (If)
-
-        # Add the user-defined path name(s) to the list of directories to process
-        # Source: Holmes
-        If ($Path) {
-            ForEach ($path_candidate in $Path) {
-                # Test if the path exists
-                If ((Test-Path "$path_candidate") -eq $false) {
-                    $invalid_path_was_found = $true
-
-                    # Increment the error counter
-                    $num_invalid_paths++
-
-                    # Display an error message in console
-                    # $empty_line | Out-String
-                    Write-Warning "'$path_candidate' doesn't seem to be a valid path name."
-                    # $empty_line | Out-String
-                    Write-Verbose "Please consider checking that the '-Path' variable value of '$path_candidate' was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
-                    # $empty_line | Out-String
-                    $skip_text = "Skipping '$path_candidate' from the directories to be processed."
-                    Write-Verbose $skip_text
-
-                    # Add the invalid path as an object (with properties) to a collection of skipped paths
-                    $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
-
-                        'Skipped Paths' = $path_candidate
-                        'Owner'         = ""
-                        'Created on'    = ""
-                        'Last Updated'  = ""
-                        'Size'          = "-"
-                        'Error'         = "The path was not found on $computer."
-                        'raw_size'      = 0
-
-                    } # New-Object
-
-                    # Add the invalid path name to a list of failed path names
-                    $skipped_path_names += $path_candidate
-
-                    # Return to top of the program loop (ForEach $path_candidate) and skip just this iteration of the loop.
-                    Continue
-                } Else {
-
-                    # Resolve path (if path is specified as relative)
-                    $full_path = (Resolve-Path "$path_candidate").Path
-                    $directories += $full_path
-
-                } # Else (If Test-Path $path_candidate)
-            } # ForEach $path_candidate
-        } Else {
-            # Take the path names that are piped into the script
-            $directories += @($input | ForEach-Object { $_.FullName })
-        } # Else (If $Path)
-
-    } # begin
-
-    Process {
-        # Search for the empty directories according to the user-set recurse option
-        # Note: For best results against nested empty directories, please run the script iteratively until no empty directories are found.
-        # Source: Mekac
-        $unique_directories = $directories | Select-Object -Unique
-        $total_number_of_directories = [int]($unique_directories.Count)
-
-        If ($unique_directories.Count -ge 1) {
-            # Source: nedarb
-            $available_directories = Get-ChildItem $unique_directories -Recurse:$Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true } | Select-Object FullName, @{ Label = "AclDenied"; Expression = { (Get-Acl $_.FullName).AreAccessRulesProtected } } | Where-Object { $_.AclDenied -eq $false } | Sort-Object FullName
-
-            $unavailable_directories = Get-ChildItem $unique_directories -Recurse:$Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true } | Select-Object FullName, @{ Label = "AclDenied"; Expression = { (Get-Acl $_.FullName).AreAccessRulesProtected } } | Where-Object { $_.AclDenied -eq $null } | Sort-Object FullName
-
-            # Select the available directories for further processing
-            If ($available_directories -eq $null) {
-                $continue = $true
-            } Else {
-                ForEach ($directory in ($available_directories)) {
-                    $total_number_of_directories++
-                    $the_query_of_empty_directories = Get-ItemProperty $directory.FullName | Where-Object { ($_.GetFiles().Count -eq 0) -and ($_.GetDirectories().Count -eq 0) } | Select-Object FullName
-                    If ($the_query_of_empty_directories -ne $null) {
-                        $empty_directories += New-Object -TypeName PSCustomObject -Property @{
-                            'FullName' = $directory.FullName
-                        } # New-Object
-                    } Else {
-                        $continue = $true
-                    } # Else (If $the_query_of_empty_directories)
-                } # ForEach $directory
-            } # Else (If $available_directories)
-
-            # Add the unavailable directories to the skipped path names list
-            If ($unavailable_directories -eq $null) {
-                $continue = $true
-            } Else {
-                $invalid_path_was_found = $true
-                ForEach ($item in ($unavailable_directories)) {
-
-                    # Increment the error counter
-                    $num_invalid_paths++
-
-                    # Add the invalid path as an object (with properties) to a collection of skipped paths
-                    $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
-                        'Skipped Paths' = $item.FullName
-                        'Owner'         = ""
-                        'Created on'    = ""
-                        'Last Updated'  = ""
-                        'Size'          = "-"
-                        'Error'         = "The path could not be opened (access denied)."
-                        'raw_size'      = 0
-                    } # New-Object
-
-                    # Add the invalid path name to a list of failed path names
-                    $skipped_path_names += $item
-                } # ForEach $item
-            } # Else (If $unavailable_directories)
-        } Else {
-            $continue = $true
-        } # Else (If $unique_directories.Count)
-    } # Process
-
-    End {
-        # Do the background work for natural language
-        If ($total_number_of_directories -gt 1) { $item_text = "directories" } Else { $item_text = "directory" }
-        # $empty_line | Out-String
-
-        # Write the operational stats in console
-        If ($skipped_path_names.Count -eq 0) {
-            $enumeration_went_succesfully = $true
-            If ($unique_directories.Count -le 4) {
-                $stats_text = "$($total_number_of_directories) $item_text in total processed at '$($unique_directories -join ', ')'."
-            } Else {
-                $stats_text = "$($total_number_of_directories) $item_text in total processed."
-            } # Else (If $unique_directories.Count)
-            Write-Debug $stats_text
-            # $empty_line | Out-String
-        } Else {
-            # Display the skipped path names and write the operational stats in console
-            $enumeration_went_succesfully = $false
-            $skipped.PSObject.TypeNames.Insert(0, "Skipped Path Names")
-            $skipped_selection = $skipped | Select-Object 'Skipped Paths', 'Size', 'Error' | Sort-Object 'Skipped Paths'
-            $skipped_selection | Format-Table -auto
-            If ($num_invalid_paths -gt 1) {
-                If ($unique_directories.Count -eq 0) {
-                    $stats_text = "There were $num_invalid_paths skipped paths. Didn't process any directories."
-                } ElseIf ($unique_directories.Count -le 4) {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed at $($unique_directories -join ', '). There were $num_invalid_paths skipped paths."
-                } Else {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed. There were $num_invalid_paths skipped paths."
-                } # Else (If $unique_directories.Count)
-            } Else {
-                If ($unique_directories.Count -eq 0) {
-                    $stats_text = "One path name was skipped. Didn't process any directories."
-                } ElseIf ($unique_directories.Count -le 4) {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed at $($unique_directories -join ', '). One path name was skipped."
-                } Else {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed. One path name was skipped."
-                } # Else (If $unique_directories.Count)
-            } # Else (If $num_invalid_paths)
-            Write-Debug $stats_text
-            # $empty_line | Out-String
-        } # Else (If $skipped_path_names.Count)
-
-        # Create a list of the empty directories
-        If ($empty_directories.Count -ge 1) {
-            $unique_empty_directories = $empty_directories | Select-Object -ExpandProperty FullName -Unique
-            If ($unique_empty_directories.Count -gt 1) { $directory_text = "directories" } Else { $directory_text = "directory" }
-            ForEach ($directory in $unique_empty_directories) {
-                # Create a list of the empty directories
-                $deleted_directories += $obj_deleted = New-Object -TypeName PSCustomObject -Property @{
-                    'Empty directories' = $directory
-                } # New-Object
-
-                # Delete the empty directories
-                Write-Verbose "Deleting empty directory '$directory'..."
-                Remove-Item "$directory" -Force -WhatIf:$WhatIf
-                Write-Debug "Empty directory '$directory' deleted."
-            } # ForEach $directory
-            
-            # Test if the directories were removed
-            If ((Test-Path $unique_empty_directories) -eq $true) {
-                If ($WhatIf) {
-                    # $empty_line | Out-String
-                    $notify_text = "$($unique_empty_directories.Count) empty $directory_text found." 
-                    Write-Verbose $notify_text
-                    # $empty_line | Out-String
-                    "Exit Code 1: A simulation run (the -WhatIf parameter was used), didn't touch any directories."
-                    # Return $empty_line
-                } Else {
-                    "Exit Code 2: Something went wrong with the deletion procedure."
-                    # Return $empty_line
-                } # Else (If $WhatIf)
-            } Else {
-                $continue = $true
-            } # Else (Test-Path $empty_directories)
-
-            # Write the deleted directory paths to a text file (located at the current temp-directory or the location is defined with the -Output parameter)
-            If ((Test-Path "$txt_file") -eq $false) {
-                $deleted_directories | Out-File "$txt_file" -Encoding UTF8 -Force
-                Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
-            } Else {
-                $pre_existing_content = Get-Content $txt_file
-                                ($pre_existing_content + $empty_line + $separator + $empty_line + ($deleted_directories | Select-Object -ExpandProperty 'Empty Directories') + $empty_line) | Out-File "$txt_file" -Encoding UTF8 -Force
-                Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
-            } # Else (If Test-Path txt_file)
-
-            # Sound the bell if set to do so with the -Audio parameter
-            # Source: https://blogs.technet.microsoft.com/heyscriptingguy/2013/09/21/powertip-use-powershell-to-send-beep-to-console/
-            If ( -not $Audio ) {
-                $continue = $true
-            } Else {
-                [console]::beep(2000, 830)
-            } # Else (If -not $Audio)
-
-        } Else {
-            If ($total_number_of_directories -ge 1) {
-                $exit_text = "Didn't find any empty directories."
-                Write-Verbose $exit_text
-                # $empty_line | Out-String
-            } Else {
-                $continue = $true
-            } # Else (If $total_number_of_directories)
-        } # Else (If $empty_directories.Count)
-    } # End
-    
-    <#
-# Sources
-
-auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed November 10, 2024. https://github.com/auberginehill/remove-empty-folders/tree/master.
-
-Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d. https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell.
-
-nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
-
-Robbins, Mike F. “PowerShell Advanced Functions: Can We Build Them Better? With Parameter Validation, Yes We Can!” mikefrobbins.com, March 31, 2015. https://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/.
-
-Holmes, Lee. Windows PowerShell Cookbook: The Complete Guide to Scripting Microsoft’s Command Shell. 3rd edition. Beijing Köln: O’Reilly Media, 2013. https://www.leeholmes.com/guide. Get-FileHash script.
-
-Holmes, Lee. “Get-FileHash.Ps1.” PowerShell Code Repository, October 9, 2011. http://poshcode.org/2154. Archived from the original 
-on 15 December, 2013. https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154.
-
-nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
-#>
-
-    <#
-
+<#
 .SYNOPSIS
 Removes empty directories from a specified directory recursively or non-recursively.
 
@@ -534,6 +232,309 @@ https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
 https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
 https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-send-beep-to-console/
 https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154
+#>
 
+function Remove-EmptyDirectories {
+    [CmdletBinding()]
+    Param (
+        [Parameter(ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            Mandatory = $false,
+            HelpMessage = "`r`nWhich directory, directory or path would you like to target? `r`n`r`nPlease enter a valid file system path to a directory (a full path name of a directory (a.k.a. a directory) i.e. directory path such as C:\Windows). `r`n`r`nNotes:`r`n`t- If the path name includes space characters, please enclose the path name in quotation marks (single or double). `r`n`t- To stop entering new values, please press [Enter] at an empty input row (and the script will run). `r`n`t- To exit this script, please press [Ctrl] + C`r`n"
+        )]
+        [ValidateNotNullOrEmpty()]
+        [Alias("Start", "Begin", "Directory", "From")]
+        [string[]]$Path,
+        
+        [Alias("ReportPath")]
+        [string]$Output = "$env:temp",
+
+        [ValidateScript({
+                # Source: Robbins
+                If ($_ -match '^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\"";|/]+$') {
+                    $True
+                } Else {
+                    Throw "'$_' is either not a valid filename or it is not recommended. If the filename includes space characters, please enclose the filename in quotation marks."
+                }
+            })]
+        [Alias("File")]
+        [string]$FileName = "deleted_directories.txt",
+
+        [switch]$Recurse,
+
+        [switch]$WhatIf,
+        
+        [switch]$Audio
+    )
+
+    Begin {
+        # Establish some common variables.
+        $ErrorActionPreference = "Stop"
+        $computer = $env:COMPUTERNAME
+        $separator = "---------------------"
+        $empty_line = ""
+        $skipped = @()
+        $directories = @()
+        $empty_directories = @()
+        $deleted_directories = @()
+        $skipped_path_names = @()
+        $num_invalid_paths = 0
+
+        # Test if the Output-path ("ReportPath") exists
+        If ((Test-Path "$Output") -eq $false) {
+            # Display an error message in console
+            # $empty_line | Out-String
+            Write-Warning "'$Output' doesn't seem to be a valid path name."
+            # $empty_line | Out-String
+            Write-Debug "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
+            # $empty_line | Out-String
+            $skip_text = "Couldn't find -Output directory '$Output'..."
+            Write-Warning $skip_text
+            # $empty_line | Out-String
+            Exit
+            Return
+        } Else {
+            # Resolve the Output-path ("ReportPath") (if the Output-path is specified as relative)
+            $real_output_path = Resolve-Path -Path "$Output"
+            $txt_file = "$real_output_path\$FileName"
+        } # Else (If)
+
+        # Add the user-defined path name(s) to the list of directories to process
+        # Source: Holmes
+        If ($Path) {
+            ForEach ($path_candidate in $Path) {
+                # Test if the path exists
+                If ((Test-Path "$path_candidate") -eq $false) {
+                    $invalid_path_was_found = $true
+
+                    # Increment the error counter
+                    $num_invalid_paths++
+
+                    # Display an error message in console
+                    # $empty_line | Out-String
+                    Write-Warning "'$path_candidate' doesn't seem to be a valid path name."
+                    # $empty_line | Out-String
+                    Write-Verbose "Please consider checking that the '-Path' variable value of '$path_candidate' was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
+                    # $empty_line | Out-String
+                    $skip_text = "Skipping '$path_candidate' from the directories to be processed."
+                    Write-Verbose $skip_text
+
+                    # Add the invalid path as an object (with properties) to a collection of skipped paths
+                    $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
+
+                        'Skipped Paths' = $path_candidate
+                        'Owner'         = ""
+                        'Created on'    = ""
+                        'Last Updated'  = ""
+                        'Size'          = "-"
+                        'Error'         = "The path was not found on $computer."
+                        'raw_size'      = 0
+
+                    } # New-Object
+
+                    # Add the invalid path name to a list of failed path names
+                    $skipped_path_names += $path_candidate
+
+                    # Return to top of the program loop (ForEach $path_candidate) and skip just this iteration of the loop.
+                    Continue
+                } Else {
+
+                    # Resolve path (if path is specified as relative)
+                    $full_path = (Resolve-Path "$path_candidate").Path
+                    $directories += $full_path
+
+                } # Else (If Test-Path $path_candidate)
+            } # ForEach $path_candidate
+        } Else {
+            # Take the path names that are piped into the script
+            $directories += @($input | ForEach-Object { $_.FullName })
+        } # Else (If $Path)
+
+    } # begin
+
+    Process {
+        # Search for the empty directories according to the user-set recurse option
+        # Note: For best results against nested empty directories, please run the script iteratively until no empty directories are found.
+        # Source: Mekac
+        $unique_directories = $directories | Select-Object -Unique
+        $total_number_of_directories = [int]($unique_directories.Count)
+
+        If ($unique_directories.Count -ge 1) {
+            # Source: nedarb
+            foreach ($directory in $unique_directories) {
+                <# $currentItemName is the current item #>
+            }
+            $available_directories = Get-ChildItem $unique_directories -Recurse:$Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true } | Select-Object FullName, @{ Label = "AclDenied"; Expression = { (Get-Acl $_.FullName).AreAccessRulesProtected } } | Where-Object { $_.AclDenied -eq $false } | Sort-Object FullName
+
+            $unavailable_directories = Get-ChildItem $unique_directories -Recurse:$Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true } | Select-Object FullName, @{ Label = "AclDenied"; Expression = { (Get-Acl $_.FullName).AreAccessRulesProtected } } | Where-Object { $_.AclDenied -eq $null } | Sort-Object FullName
+
+            # Select the available directories for further processing
+            If ($available_directories -eq $null) {
+                $continue = $true
+            } Else {
+                ForEach ($directory in ($available_directories)) {
+                    $total_number_of_directories++
+                    $the_query_of_empty_directories = Get-ItemProperty $directory.FullName | Where-Object { ($_.GetFiles().Count -eq 0) -and ($_.GetDirectories().Count -eq 0) } | Select-Object FullName
+                    If ($the_query_of_empty_directories -ne $null) {
+                        $empty_directories += New-Object -TypeName PSCustomObject -Property @{
+                            'FullName' = $directory.FullName
+                        } # New-Object
+                    } Else {
+                        $continue = $true
+                    } # Else (If $the_query_of_empty_directories)
+                } # ForEach $directory
+            } # Else (If $available_directories)
+
+            # Add the unavailable directories to the skipped path names list
+            If ($unavailable_directories -eq $null) {
+                $continue = $true
+            } Else {
+                $invalid_path_was_found = $true
+                ForEach ($item in ($unavailable_directories)) {
+
+                    # Increment the error counter
+                    $num_invalid_paths++
+
+                    # Add the invalid path as an object (with properties) to a collection of skipped paths
+                    $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
+                        'Skipped Paths' = $item.FullName
+                        'Owner'         = ""
+                        'Created on'    = ""
+                        'Last Updated'  = ""
+                        'Size'          = "-"
+                        'Error'         = "The path could not be opened (access denied)."
+                        'raw_size'      = 0
+                    } # New-Object
+
+                    # Add the invalid path name to a list of failed path names
+                    $skipped_path_names += $item
+                } # ForEach $item
+            } # Else (If $unavailable_directories)
+        } Else {
+            $continue = $true
+        } # Else (If $unique_directories.Count)
+    } # Process
+
+    End {
+        # Do the background work for natural language
+        If ($total_number_of_directories -gt 1) { $item_text = "directories" } Else { $item_text = "directory" }
+        # $empty_line | Out-String
+
+        # Write the operational stats in console
+        If ($skipped_path_names.Count -eq 0) {
+            $enumeration_went_succesfully = $true
+            If ($unique_directories.Count -le 4) {
+                $stats_text = "$($total_number_of_directories) $item_text in total processed at '$($unique_directories -join ', ')'."
+            } Else {
+                $stats_text = "$($total_number_of_directories) $item_text in total processed."
+            } # Else (If $unique_directories.Count)
+            Write-Debug $stats_text
+            # $empty_line | Out-String
+        } Else {
+            # Display the skipped path names and write the operational stats in console
+            $enumeration_went_succesfully = $false
+            $skipped.PSObject.TypeNames.Insert(0, "Skipped Path Names")
+            $skipped_selection = $skipped | Select-Object 'Skipped Paths', 'Size', 'Error' | Sort-Object 'Skipped Paths'
+            $skipped_selection | Format-Table -auto
+            If ($num_invalid_paths -gt 1) {
+                If ($unique_directories.Count -eq 0) {
+                    $stats_text = "There were $num_invalid_paths skipped paths. Didn't process any directories."
+                } ElseIf ($unique_directories.Count -le 4) {
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed at $($unique_directories -join ', '). There were $num_invalid_paths skipped paths."
+                } Else {
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed. There were $num_invalid_paths skipped paths."
+                } # Else (If $unique_directories.Count)
+            } Else {
+                If ($unique_directories.Count -eq 0) {
+                    $stats_text = "One path name was skipped. Didn't process any directories."
+                } ElseIf ($unique_directories.Count -le 4) {
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed at $($unique_directories -join ', '). One path name was skipped."
+                } Else {
+                    $stats_text = "$($total_number_of_directories) $item_text in total processed. One path name was skipped."
+                } # Else (If $unique_directories.Count)
+            } # Else (If $num_invalid_paths)
+            Write-Debug $stats_text
+            # $empty_line | Out-String
+        } # Else (If $skipped_path_names.Count)
+
+        # Create a list of the empty directories
+        If ($empty_directories.Count -ge 1) {
+            $unique_empty_directories = $empty_directories | Select-Object -ExpandProperty FullName -Unique
+            If ($unique_empty_directories.Count -gt 1) { $directory_text = "directories" } Else { $directory_text = "directory" }
+            ForEach ($directory in $unique_empty_directories) {
+                # Create a list of the empty directories
+                $deleted_directories += $obj_deleted = New-Object -TypeName PSCustomObject -Property @{
+                    'Empty directories' = $directory
+                } # New-Object
+
+                # Delete the empty directories
+                Write-Verbose "Deleting empty directory '$directory'..."
+                Remove-Item "$directory" -Force -WhatIf:$WhatIf
+                Write-Debug "Empty directory '$directory' deleted."
+            } # ForEach $directory
+            
+            # Test if the directories were removed
+            If ((Test-Path $unique_empty_directories) -eq $true) {
+                If ($WhatIf) {
+                    # $empty_line | Out-String
+                    $notify_text = "$($unique_empty_directories.Count) empty $directory_text found." 
+                    Write-Verbose $notify_text
+                    # $empty_line | Out-String
+                    "Exit Code 1: A simulation run (the -WhatIf parameter was used), didn't touch any directories."
+                    # Return $empty_line
+                } Else {
+                    "Exit Code 2: Something went wrong with the deletion procedure."
+                    # Return $empty_line
+                } # Else (If $WhatIf)
+            } Else {
+                $continue = $true
+            } # Else (Test-Path $empty_directories)
+
+            # Write the deleted directory paths to a text file (located at the current temp-directory or the location is defined with the -Output parameter)
+            If ((Test-Path "$txt_file") -eq $false) {
+                $deleted_directories | Out-File "$txt_file" -Encoding UTF8 -Force
+                Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
+            } Else {
+                $pre_existing_content = Get-Content $txt_file
+                                ($pre_existing_content + $empty_line + $separator + $empty_line + ($deleted_directories | Select-Object -ExpandProperty 'Empty Directories') + $empty_line) | Out-File "$txt_file" -Encoding UTF8 -Force
+                Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
+            } # Else (If Test-Path txt_file)
+
+            # Sound the bell if set to do so with the -Audio parameter
+            # Source: https://blogs.technet.microsoft.com/heyscriptingguy/2013/09/21/powertip-use-powershell-to-send-beep-to-console/
+            If ( -not $Audio ) {
+                $continue = $true
+            } Else {
+                [console]::beep(2000, 830)
+            } # Else (If -not $Audio)
+
+        } Else {
+            If ($total_number_of_directories -ge 1) {
+                $exit_text = "Didn't find any empty directories."
+                Write-Verbose $exit_text
+                # $empty_line | Out-String
+            } Else {
+                $continue = $true
+            } # Else (If $total_number_of_directories)
+        } # Else (If $empty_directories.Count)
+    } # End
+    
+<#
+# Sources
+
+auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed November 10, 2024. https://github.com/auberginehill/remove-empty-folders/tree/master.
+
+Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d. https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell.
+
+nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
+
+Robbins, Mike F. “PowerShell Advanced Functions: Can We Build Them Better? With Parameter Validation, Yes We Can!” mikefrobbins.com, March 31, 2015. https://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/.
+
+Holmes, Lee. Windows PowerShell Cookbook: The Complete Guide to Scripting Microsoft’s Command Shell. 3rd edition. Beijing Köln: O’Reilly Media, 2013. https://www.leeholmes.com/guide. Get-FileHash script.
+
+Holmes, Lee. “Get-FileHash.Ps1.” PowerShell Code Repository, October 9, 2011. http://poshcode.org/2154. Archived from the original 
+on 15 December, 2013. https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154.
+
+nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 #>
 }
