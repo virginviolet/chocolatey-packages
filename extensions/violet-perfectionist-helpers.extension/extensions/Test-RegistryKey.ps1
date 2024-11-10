@@ -21,7 +21,7 @@ function Test-RegistryKey {
   if (-not $Path.StartsWith("REGISTRY::") -and `
   $Path -ne '' -and `
   $null -ne $Path) {
-    $pathFriendly = $Path
+    # $pathFriendly = $Path
     $Path = $Path.Insert(0, "REGISTRY::")
   } else {
     $pathFriendly = $Path.Replace("REGISTRY::", "")
@@ -62,7 +62,7 @@ function Test-RegistryKey {
         # Look for child keys
         # Get the parent key by removing the asterisk
         $parentKeyPath = $Path.Substring(0, $Path.Length - 1)
-        $parentKeyPathFriendly = $parentKeyPath.Replace("REGISTRY::", "")
+        # $parentKeyPathFriendly = $parentKeyPath.Replace("REGISTRY::", "")
         # Write-Debug "Looking for key '$parentKeyPathFriendly'..."
         # Look for child keys and values 
         $childKeys = $(Get-ChildItem -Path $Path -ErrorAction Stop)
@@ -89,8 +89,9 @@ function Test-RegistryKey {
       # Get-RegistryKey -Path $Path -ErrorAction Stop > $null
       if ($Name -ne '*' -and $Name -ne '*') {
         if ($Path.Contains('*')) {
-          $message = "Matching part of a value name is not supported. " + `
-          "You can, however, search for all values in a key with '-Name *'"
+          $message = "Test-RegistryKey does not support " + `
+          "matching part of a value name. You can, however, " + `
+          "search for all values in a key with '-Name *'"
           Write-Warning $message
         }
         # Look for a single value
@@ -112,9 +113,12 @@ function Test-RegistryKey {
 
     # Look for value data
     if ($Value) {
+      if ($Value.Contains('*')) {
+        Write-Warning "Test-RegistryKey does not support matching part of the value data. "
+      }
       # Write-Debug "Testing if the key '$pathFriendly' exists, if it has a value named '$Name', and if the value contains the data '$Value'..."
       $existingValueData = $(Get-RegistryKey -Path $Path -Name $Name -ErrorAction Stop)
-      # Write-Debug "Value data matches the input."
+      # Write-Debug "Key exists, and the value name and data matches the input."
       if ($existingValueData -eq $Value) {
         return $true
       } else {
