@@ -24,7 +24,7 @@ Start-CheckandThrow -ProcessName "Frotz"
 
 # Uninstall
 $packageArgs = @{
-  packageName  = $env:ChocolateyPackageName
+  packageName  = "$($packageName)"
   softwareName = 'Windows Frotz' # Display name as it appears in "Installed apps" or "Programs and Features".
   fileType     = 'EXE'
   # Silent arguments
