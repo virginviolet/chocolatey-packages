@@ -8,12 +8,12 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # This cannot be moved to chocolateybeforemodify.ps1
 # unless the feature suggested in the following issue is added:
 # https://github.com/chocolatey/choco/issues/1731
-Start-CheckandThrow "Frotz"
+Start-CheckandThrow -ProcessName "Frotz"
 
 # Install
 # Paths
 $toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$exeInstallerPath = Join-Path $toolsDirPath 'WindowsFrotzInstaller.exe'
+$exeInstallerPath = Join-Path -Path $toolsDirPath -ChildPath 'WindowsFrotzInstaller.exe'
 # There is currently no 64-bit version
 # $exeInstaller64Path = Join-Path $toolsDirPath 'NAME_OF_EMBEDDED_INSTALLER_FILE.exe'
 # Arguments

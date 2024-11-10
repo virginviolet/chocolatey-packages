@@ -29,7 +29,9 @@
 
 This is an installing package (not portable).
 
-The default installation directory is `C:\Program Files (x86)\windows-frotz.install`.</description>
+The default installation directory is `C:\Program Files (x86)\windows-frotz.install`.
+
+Settings are stored in the registry key `HKEY_CURRENT_USER\Software\David Kinder\Frotz`. They are intentionally not removed on unintsallation.</description>
     <releaseNotes>Windows Frotz 1.26 was released on 6th September 2024.
 
 The maximum supported bit depth of images in Blorb files with an adaptive palette is now 8. This is required to support the output of the [Snavig tool](https://github.com/cspiegel/snavig).</releaseNotes>
@@ -37,7 +39,9 @@ The maximum supported bit depth of images in Blorb files with an adaptive palett
 
     <dependencies>
       <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" /> <!-- Required for 'Start-CheckandThrow' -->
+      <dependency id="violet-perfectionist-helpers.extension" version="1.1.0" /> <!-- Required for 'Test-RegistryKey' -->
       <!-- chocolatey-misc-helpers.extension - https://community.chocolatey.org/packages/chocolatey-misc-helpers.extension -->
+      <!-- violet-perfectionist-helpers.extension - https://community.chocolatey.org/packages/violet-perfectionist-helpers.extension -->
     </dependencies>
 
   </metadata>

@@ -10,35 +10,36 @@
 2. [x] Make sure the total nupkg package will be under 200MB.
 3. [x] Commit.
 4. [x] Add EXE installers to the tools directory (32-bit and/or 64-bit).
-5. [x] Fill out `legal\LICENSE.txt`.
-6. [x] Remove one of the verification files in `legal/`.
-7. [x] Fill out `legal\VERIFICATION.txt`.
-8. [x] Rename the remaining verification file to `VERIFICATION.txt`.
-9. [x] Fill out nuspec.
-10. [x] Fill out `tools\chocolateyInstall.ps1`.
-11. [x] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
-12. [x] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
-13. [x] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
-14. [x] Test the package to ensure install/uninstall work appropriately.
-15. [x] Commit.
-16. [x] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
-17. [ ] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
-18. [ ] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
-19. [ ] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
-20. [ ] Inform of default install location in description in nuspec.
-21. [ ] Finish `legal\VERIFICATION.txt`.
-22. [ ] Adjust `TODO_updating.md` if needed.
-23. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
-24. [ ] Test the package again to ensure install/uninstall work appropriately.
-25. [ ] Commit and publish to GitHub.
-26. [ ] Merge branch with main.
-27. [ ] Add icon key to nuspec.
-28. [ ] Test the package yet again to ensure install/uninstall work appropriately.
-29. [ ] Delete this file.
-30. [ ] Merge branch with main again.
-31. [ ] Commit and publish to GitHub again.
-32. [ ] Pack and push to Chocolatey Community Repository.
-33. [ ] Create a meta-package if applicable.
+5. [x] Make `.ignore` files for the EXE installers.
+6. [x] Fill out `legal\LICENSE.txt`.
+7. [x] Remove one of the verification files in `legal/`.
+8. [x] Fill out `legal\VERIFICATION.txt`.
+9. [x] Rename the remaining verification file to `VERIFICATION.txt`.
+10. [x] Fill out nuspec.
+11. [x] Fill out `tools\chocolateyInstall.ps1`.
+12. [x] Fill out `tools\chocolateyUninstall.ps1` - remove if autouninstaller can automatically uninstall and you have nothing additional to do during uninstall.
+13. [x] Remove `tools\.skipAutoUninstall` if `chocolateyUninstall.ps1` is used and auto-uninstaller is not desired.
+14. [x] Fill out `tools\chocolateyBeforeModify.ps1` - remove if you have no processes or services to shut down before upgrade/uninstall.
+15. [x] Test the package to ensure install/uninstall work appropriately.
+16. [x] Commit.
+17. [x] Clean out the comments you are not using in `tools\chocolateybeforeModify.ps1`.
+18. [x] Clean out the comments and sections you are not using in `tools\chocolateyInstall.ps1`.
+19. [x] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
+20. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
+21. [x] Inform of default install location in description in nuspec.
+22. [ ] Finish `legal\VERIFICATION.txt`.
+23. [ ] Adjust `TODO_updating.md` if needed.
+24. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
+25. [ ] Test the package again to ensure install/uninstall work appropriately.
+26. [ ] Commit and publish to GitHub.
+27. [ ] Merge branch with main.
+28. [ ] Add icon key to nuspec.
+29. [ ] Test the package yet again to ensure install/uninstall work appropriately.
+30. [ ] Delete this file.
+31. [ ] Merge branch with main again.
+32. [ ] Commit and publish to GitHub again.
+33. [ ] Pack and push to Chocolatey Community Repository.
+34. [ ] Create a meta-package if applicable.
 
 ## Learn more
 

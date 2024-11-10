@@ -6,15 +6,21 @@
 ## "Uninstall". https://docs.chocolatey.org/en-us/choco/commands/uninstall
 ## "Uninstall-ChocolateyPackage". https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypackage
 
-# Preferences
+# Initialization
 $ErrorActionPreference = 'Stop' # Stop on all errors
+$programFilesX86DirPath = ${Env:ProgramFiles(x86)}
+
+
+# Preferences
+# 'installPath' is only used for removing friendly app name
+$intstallDirPath = Join-Path -Path $programFilesX86DirPath -ChildPath 'Windows Frotz'
 
 # Prevent uninstall if the program is running
 # (so that no progress is lost)
 # This cannot be moved to chocolateybeforemodify.ps1
 # unless the feature suggested in the following issue is added:
 # https://github.com/chocolatey/choco/issues/1731
-Start-CheckandThrow "Frotz"
+Start-CheckandThrow -ProcessName "Frotz"
 
 # Uninstall
 $packageArgs = @{
@@ -53,3 +59,20 @@ if ($keys.Count -eq 1) {
     Uninstall-ChocolateyPackage @packageArgs
   }
 }
+
+# See if config exists in the registry and is not empty
+$configPath = "HKEY_CURRENT_USER\Software\David Kinder\Frotz\"
+$configExists = Test-RegistryKey -Path "$configPath\*"
+if ($configExists) {
+  $message = "Settings remain in the registry.`n" + `
+  "Settings registry path: " + ": '$configPath'"
+  Write-Warning $message
+  Start-Pause -Seconds 5 # Time to read
+}
+
+# Remove friendly app names
+# Paths
+$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$exeInstallerPath = Join-Path -Path $toolsDirPath -ChildPath 'WindowsFrotzInstaller.exe'
+Remove-FriendlyAppName -Path $intstallDirPath
+Remove-FriendlyAppName -Path $exeInstallerPath
