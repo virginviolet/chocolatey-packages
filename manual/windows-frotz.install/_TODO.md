@@ -30,10 +30,10 @@
 22. [x] Finish `legal\VERIFICATION.txt`.
 23. [x] Adjust `TODO_updating.md` if needed.
 24. [x] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
-25. [ ] Test the package again to ensure install/uninstall work appropriately.
-26. [ ] Commit and publish to GitHub.
-27. [ ] Merge branch with main.
-28. [ ] Add icon key to nuspec.
+25. [x] Test the package again to ensure install/uninstall work appropriately.
+26. [x] Commit and publish to GitHub.
+27. [x] Merge branch with main.
+28. [x] Add icon key to nuspec.
 29. [ ] Test the package yet again to ensure install/uninstall work appropriately.
 30. [ ] Delete this file.
 31. [ ] Merge branch with main again.
