@@ -35,9 +35,9 @@ function Test-RegistryKey {
     if ($null -ne $values) {
       $valueCount = $values.Length
       if ($null -ne $valueCount) {
-        Write-Debug "$valueCount values found."
+        # Write-Debug "$valueCount values found."
       } else {
-        Write-Debug "Value found."
+        # Write-Debug "Value found."
       }
       return $true
     } else {
@@ -46,7 +46,7 @@ function Test-RegistryKey {
   }
 
   try {
-    Write-Debug "Validating registry key path '$pathFriendly'..."
+    # Write-Debug "Validating registry key path '$pathFriendly'..."
     # Look for key(s)
     if (-Not $Name) {
       # If 'Path' ends with '*\',
@@ -54,30 +54,30 @@ function Test-RegistryKey {
       # otherwise, '$key' will hold values (think "files")
       if (-not $Path.EndsWith('\*') -and -not $Path.EndsWith('/*')) {
         # Look for a single key
-        Write-Debug "Looking for key '$pathFriendly'..."
+        # Write-Debug "Looking for key '$pathFriendly'..."
         $values = $(Get-RegistryKey -Path $Path -ErrorAction Stop)
-        Write-Debug "Key found."
+        # Write-Debug "Key found."
         return $true
       } else {
         # Look for child keys
         # Get the parent key by removing the asterisk
         $parentKeyPath = $Path.Substring(0, $Path.Length - 1)
         $parentKeyPathFriendly = $parentKeyPath.Replace("REGISTRY::", "")
-        Write-Debug "Looking for key '$parentKeyPathFriendly'..."
+        # Write-Debug "Looking for key '$parentKeyPathFriendly'..."
         # Look for child keys and values 
         $childKeys = $(Get-ChildItem -Path $Path -ErrorAction Stop)
-        Write-Debug "Key found."
+        # Write-Debug "Key found."
         if ($null -ne $childKeys) {
-          Write-Debug "Child keys found."
+          # Write-Debug "Child keys found."
           return $true
         } else {
-          Write-Debug "No child key(s) found."
-          Write-Debug "Looking for values in key '$parentKeyPathFriendly'..."
+          # Write-Debug "No child key(s) found."
+          # Write-Debug "Looking for values in key '$parentKeyPathFriendly'..."
           $valuesExist = Test-Values -GetValuePath $parentKeyPath
           if ($valuesExist) {
             return $true
           } else {
-            Write-Debug "No values found."
+            # Write-Debug "No values found."
             return $false
           }
         }
@@ -94,9 +94,9 @@ function Test-RegistryKey {
           Write-Warning $message
         }
         # Look for a single value
-        Write-Debug "Testing if registry key '$pathFriendly' exists and if it has the value '$Name'..."
+        # Write-Debug "Testing if registry key '$pathFriendly' exists and if it has the value '$Name'..."
         $value = $(Get-RegistryKey -Path $Path -Name $Name -ErrorAction Stop)
-        Write-Debug "Key exists and value found."
+        # Write-Debug "Key exists and value found."
         return $true
       } else {
         # Look for multiple values
@@ -104,7 +104,7 @@ function Test-RegistryKey {
         if ($valuesExist) {
           return $true
         } else {
-          Write-Debug "Value not found."
+          # Write-Debug "Value not found."
           return $false
         }
       }
@@ -112,7 +112,7 @@ function Test-RegistryKey {
 
     # Look for value data
     if ($Value) {
-      Write-Debug "Testing if the key '$pathFriendly' exists, if it has a value named '$Name', and if the value contains the data '$Value'..."
+      # Write-Debug "Testing if the key '$pathFriendly' exists, if it has a value named '$Name', and if the value contains the data '$Value'..."
       $existingValueData = $(Get-RegistryKey -Path $Path -Name $Name -ErrorAction Stop)
       # Write-Debug "Value data matches the input."
       if ($existingValueData -eq $Value) {
