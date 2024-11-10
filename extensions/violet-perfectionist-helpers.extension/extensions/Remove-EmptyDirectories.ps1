@@ -1,21 +1,20 @@
-<#
-Remove-EmptyDirectories.ps1
-#>
-
 function Remove-EmptyDirectories {
     [CmdletBinding()]
     Param (
         [Parameter(ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             Mandatory = $false,
-            HelpMessage = "`r`nWhich directory, directory or path would you like to target? `r`n`r`nPlease enter a valid file system path to a directory (a full path name of a directory (a.k.a. a directory) i.e. directory path such as C:\Windows). `r`n`r`nNotes:`r`n`t- If the path name includes space characters, please enclose the path name in quotation marks (single or double). `r`n`t- To stop entering new values, please press [Enter] at an empty input row (and the script will run). `r`n`t- To exit this script, please press [Ctrl] + C`r`n")]
+            HelpMessage = "`r`nWhich directory, directory or path would you like to target? `r`n`r`nPlease enter a valid file system path to a directory (a full path name of a directory (a.k.a. a directory) i.e. directory path such as C:\Windows). `r`n`r`nNotes:`r`n`t- If the path name includes space characters, please enclose the path name in quotation marks (single or double). `r`n`t- To stop entering new values, please press [Enter] at an empty input row (and the script will run). `r`n`t- To exit this script, please press [Ctrl] + C`r`n"
+            )]
         [ValidateNotNullOrEmpty()]
         [Alias("Start", "Begin", "Directory", "From")]
         [string[]]$Path,
+        
         [Alias("ReportPath")]
         [string]$Output = "$env:temp",
+        
         [ValidateScript({
-                # Credit: Mike F Robbins: "PowerShell Advanced Functions: Can we build them better?" http://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/
+                # Source: Robbins
                 If ($_ -match '^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\"";|/]+$') {
                     $True
                 } Else {
@@ -24,17 +23,15 @@ function Remove-EmptyDirectories {
             })]
         [Alias("File")]
         [string]$FileName = "deleted_directories.txt",
+
         [switch]$Recurse,
+
         [switch]$WhatIf,
+        
         [switch]$Audio
     )
 
-
-
-
     Begin {
-
-
         # Establish some common variables.
         $ErrorActionPreference = "Stop"
         $computer = $env:COMPUTERNAME
@@ -47,11 +44,8 @@ function Remove-EmptyDirectories {
         $skipped_path_names = @()
         $num_invalid_paths = 0
 
-
         # Test if the Output-path ("ReportPath") exists
         If ((Test-Path "$Output") -eq $false) {
-            $invalid_output_path_was_found = $true
-
             # Display an error message in console
             # $empty_line | Out-String
             Write-Warning "'$Output' doesn't seem to be a valid path name."
@@ -63,21 +57,16 @@ function Remove-EmptyDirectories {
             # $empty_line | Out-String
             Exit
             Return
-
         } Else {
             # Resolve the Output-path ("ReportPath") (if the Output-path is specified as relative)
             $real_output_path = Resolve-Path -Path "$Output"
             $txt_file = "$real_output_path\$FileName"
         } # Else (If)
 
-
         # Add the user-defined path name(s) to the list of directories to process
-        # Source: http://poshcode.org/2154
-        # Credit: Lee Holmes: "Windows PowerShell Cookbook (O'Reilly)" (Get-FileHash script) http://www.leeholmes.com/guide
+        # Source: Holmes
         If ($Path) {
-
             ForEach ($path_candidate in $Path) {
-
                 # Test if the path exists
                 If ((Test-Path "$path_candidate") -eq $false) {
                     $invalid_path_was_found = $true
@@ -112,7 +101,6 @@ function Remove-EmptyDirectories {
 
                     # Return to top of the program loop (ForEach $path_candidate) and skip just this iteration of the loop.
                     Continue
-
                 } Else {
 
                     # Resolve path (if path is specified as relative)
@@ -128,20 +116,15 @@ function Remove-EmptyDirectories {
 
     } # begin
 
-
-
-
     Process {
-
-
         # Search for the empty directories according to the user-set recurse option
         # Note: For best results against nested empty directories, please run the script iteratively until no empty directories are found.
-        # Credit: Mekac: "Get directory where Access is denied" https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell
+        # Source: Mekac
         $unique_directories = $directories | Select-Object -Unique
         $total_number_of_directories = [int]($unique_directories.Count)
 
         If ($unique_directories.Count -ge 1) {
-
+            # Source: nedarb
             $available_directories = Get-ChildItem $unique_directories -Recurse:$Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true } | Select-Object FullName, @{ Label = "AclDenied"; Expression = { (Get-Acl $_.FullName).AreAccessRulesProtected } } | Where-Object { $_.AclDenied -eq $false } | Sort-Object FullName
 
             $unavailable_directories = Get-ChildItem $unique_directories -Recurse:$Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.PSIsContainer -eq $true } | Select-Object FullName, @{ Label = "AclDenied"; Expression = { (Get-Acl $_.FullName).AreAccessRulesProtected } } | Where-Object { $_.AclDenied -eq $null } | Sort-Object FullName
@@ -150,12 +133,9 @@ function Remove-EmptyDirectories {
             If ($available_directories -eq $null) {
                 $continue = $true
             } Else {
-
                 ForEach ($directory in ($available_directories)) {
-
                     $total_number_of_directories++
                     $the_query_of_empty_directories = Get-ItemProperty $directory.FullName | Where-Object { ($_.GetFiles().Count -eq 0) -and ($_.GetDirectories().Count -eq 0) } | Select-Object FullName
-
                     If ($the_query_of_empty_directories -ne $null) {
                         $empty_directories += New-Object -TypeName PSCustomObject -Property @{
                             'FullName' = $directory.FullName
@@ -163,11 +143,8 @@ function Remove-EmptyDirectories {
                     } Else {
                         $continue = $true
                     } # Else (If $the_query_of_empty_directories)
-
                 } # ForEach $directory
-
             } # Else (If $available_directories)
-
 
             # Add the unavailable directories to the skipped path names list
             If ($unavailable_directories -eq $null) {
@@ -181,7 +158,6 @@ function Remove-EmptyDirectories {
 
                     # Add the invalid path as an object (with properties) to a collection of skipped paths
                     $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
-
                         'Skipped Paths' = $item.FullName
                         'Owner'         = ""
                         'Created on'    = ""
@@ -189,7 +165,6 @@ function Remove-EmptyDirectories {
                         'Size'          = "-"
                         'Error'         = "The path could not be opened (access denied)."
                         'raw_size'      = 0
-
                     } # New-Object
 
                     # Add the invalid path name to a list of failed path names
@@ -199,14 +174,9 @@ function Remove-EmptyDirectories {
         } Else {
             $continue = $true
         } # Else (If $unique_directories.Count)
-
     } # Process
 
-
-
-
     End {
-
         # Do the background work for natural language
         If ($total_number_of_directories -gt 1) { $item_text = "directories" } Else { $item_text = "directory" }
         # $empty_line | Out-String
@@ -222,7 +192,6 @@ function Remove-EmptyDirectories {
             Write-Debug $stats_text
             # $empty_line | Out-String
         } Else {
-
             # Display the skipped path names and write the operational stats in console
             $enumeration_went_succesfully = $false
             $skipped.PSObject.TypeNames.Insert(0, "Skipped Path Names")
@@ -249,23 +218,20 @@ function Remove-EmptyDirectories {
             # $empty_line | Out-String
         } # Else (If $skipped_path_names.Count)
 
-
+        # Create a list of the empty directories
         If ($empty_directories.Count -ge 1) {
-            
             $unique_empty_directories = $empty_directories | Select-Object -ExpandProperty FullName -Unique
             If ($unique_empty_directories.Count -gt 1) { $directory_text = "directories" } Else { $directory_text = "directory" }
             ForEach ($directory in $unique_empty_directories) {
-                
                 # Create a list of the empty directories
                 $deleted_directories += $obj_deleted = New-Object -TypeName PSCustomObject -Property @{
                     'Empty directories' = $directory
                 } # New-Object
-                
+
                 # Delete the empty directories
                 Write-Verbose "Deleting empty directory '$directory'..."
                 Remove-Item "$directory" -Force -WhatIf:$WhatIf
                 Write-Debug "Empty directory '$directory' deleted."
-                
             } # ForEach $directory
             
             # Test if the directories were removed
@@ -313,37 +279,24 @@ function Remove-EmptyDirectories {
             } # Else (If $total_number_of_directories)
         } # Else (If $empty_directories.Count)
     } # End
-
-
-
-
-    # [End of Line]
-
-
+    
     <#
+# Sources
 
+auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed November 10, 2024. https://github.com/auberginehill/remove-empty-folders/tree/master.
 
-   _____
-  / ____|
- | (___   ___  _   _ _ __ ___ ___
-  \___ \ / _ \| | | | '__/ __/ _ \
-  ____) | (_) | |_| | | | (_|  __/
- |_____/ \___/ \__,_|_|  \___\___|
+Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d. https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell.
 
+nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 
-https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell      # Mekac: "Get directory where Access is denied"
-http://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/                         # Mike F Robbins: "PowerShell Advanced Functions: Can we build them better?"
-http://www.leeholmes.com/guide                                                                                                                          # Lee Holmes: "Windows PowerShell Cookbook (O'Reilly)" (Get-FileHash script)
+Robbins, Mike F. “PowerShell Advanced Functions: Can We Build Them Better? With Parameter Validation, Yes We Can!” mikefrobbins.com, March 31, 2015. https://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/.
 
+Holmes, Lee. Windows PowerShell Cookbook: The Complete Guide to Scripting Microsoft’s Command Shell. 3rd edition. Beijing Köln: O’Reilly Media, 2013. https://www.leeholmes.com/guide. Get-FileHash script.
 
-  _    _      _
- | |  | |    | |
- | |__| | ___| |_ __
- |  __  |/ _ \ | '_ \
- | |  | |  __/ | |_) |
- |_|  |_|\___|_| .__/
-               | |
-               |_|
+Holmes, Lee. “Get-FileHash.Ps1.” PowerShell Code Repository, October 9, 2011. http://poshcode.org/2154. Archived from the original 
+on 15 December, 2013. https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154.
+
+nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 #>
 
     <#
@@ -450,13 +403,10 @@ of the log-file can be set with the -FileName parameter (a filename with a .txt
 ending is recommended) and the default output destination directory may be changed with
 the -Output parameter.
 
-
     Default values (the log-file creation/updating procedure only occurs if
     deletion(s) is/are made by Remove-EmptyDirectories):
 
-
         $env:temp\deleted_directories.txt       : TXT-file     : deleted_directories.txt
-
 
 .NOTES
 Please note that all the parameters can be used in one remove empty directories command
@@ -541,7 +491,6 @@ the default (LocalMachine) scope. Windows PowerShell has to be run with elevated
 (run as an administrator) to actually be able to change the script execution properties.
 The default value of the default (LocalMachine) scope is "Set-ExecutionPolicy restricted".
 
-
     Parameters:
 
     Restricted      Does not load configuration files or run scripts. Restricted is the default
@@ -563,7 +512,6 @@ The default value of the default (LocalMachine) scope is "Set-ExecutionPolicy re
                     This parameter will not remove an execution policy that is set in a Group
                     Policy scope.
 
-
 For more information, please type "Get-ExecutionPolicy -List", "help Set-ExecutionPolicy -Full",
 "help about_Execution_Policies" or visit https://technet.microsoft.com/en-us/library/hh849812.aspx
 or http://go.microsoft.com/fwlink/?LinkID=135170.
@@ -580,15 +528,12 @@ path name includes space characters, please enclose the path name in quotation m
 For more information, please type "help New-Item -Full".
 
 .LINK
-https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell
 http://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/
 http://www.leeholmes.com/guide
 https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
-https://gist.github.com/Appius/d863ada643c2ee615db9
-http://www.brangle.com/wordpress/2009/08/append-text-to-a-file-using-add-content-in-powershell/
-https://msdn.microsoft.com/en-us/powershell/reference/5.1/microsoft.powershell.core/about/about_functions_advanced_parameters
-https://blogs.technet.microsoft.com/heyscriptingguy/2013/09/21/powertip-use-powershell-to-send-beep-to-console/
-http://poshcode.org/2154
+https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
+https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-send-beep-to-console/
+https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154
 
 #>
 }
