@@ -27,8 +27,8 @@
 19. [x] Clean out the comments and sections you are not using in `tools\chocolateyUninstall.ps1`.
 20. [x] Clean out all the comments in nuspec (you may wish to leave the headers for the package vs software metadata).
 21. [x] Inform of default install location in description in nuspec.
-22. [ ] Finish `legal\VERIFICATION.txt`.
-23. [ ] Adjust `TODO_updating.md` if needed.
+22. [x] Finish `legal\VERIFICATION.txt`.
+23. [x] Adjust `TODO_updating.md` if needed.
 24. [ ] Delete `ReadMe.md` file once you have read over and used anything you've needed from here.
 25. [ ] Test the package again to ensure install/uninstall work appropriately.
 26. [ ] Commit and publish to GitHub.
