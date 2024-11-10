@@ -227,7 +227,6 @@ For more information, please type "help New-Item -Full".
 
 .LINK
 http://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/
-http://www.leeholmes.com/guide
 https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
 https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
 https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-send-beep-to-console/
@@ -300,7 +299,6 @@ function Remove-EmptyDirectories {
         } # Else (If)
 
         # Add the user-defined path name(s) to the list of directories to process
-        # Source: Holmes
         If ($Path) {
             ForEach ($path_candidate in $Path) {
                 # Test if the path exists
@@ -321,7 +319,6 @@ function Remove-EmptyDirectories {
 
                     # Add the invalid path as an object (with properties) to a collection of skipped paths
                     $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
-
                         'Skipped Paths' = $path_candidate
                         'Owner'         = ""
                         'Created on'    = ""
@@ -329,7 +326,6 @@ function Remove-EmptyDirectories {
                         'Size'          = "-"
                         'Error'         = "The path was not found on $computer."
                         'raw_size'      = 0
-
                     } # New-Object
 
                     # Add the invalid path name to a list of failed path names
@@ -338,18 +334,15 @@ function Remove-EmptyDirectories {
                     # Return to top of the program loop (ForEach $path_candidate) and skip just this iteration of the loop.
                     Continue
                 } Else {
-
                     # Resolve path (if path is specified as relative)
                     $full_path = (Resolve-Path "$path_candidate").Path
                     $directories += $full_path
-
                 } # Else (If Test-Path $path_candidate)
             } # ForEach $path_candidate
         } Else {
             # Take the path names that are piped into the script
             $directories += @($input | ForEach-Object { $_.FullName })
         } # Else (If $Path)
-
     } # begin
 
     Process {
@@ -529,11 +522,6 @@ Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d
 nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 
 Robbins, Mike F. “PowerShell Advanced Functions: Can We Build Them Better? With Parameter Validation, Yes We Can!” mikefrobbins.com, March 31, 2015. https://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/.
-
-Holmes, Lee. Windows PowerShell Cookbook: The Complete Guide to Scripting Microsoft’s Command Shell. 3rd edition. Beijing Köln: O’Reilly Media, 2013. https://www.leeholmes.com/guide. Get-FileHash script.
-
-Holmes, Lee. “Get-FileHash.Ps1.” PowerShell Code Repository, October 9, 2011. http://poshcode.org/2154. Archived from the original 
-on 15 December, 2013. https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154.
 
 nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 #>
