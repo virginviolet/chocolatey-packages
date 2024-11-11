@@ -112,22 +112,7 @@ pressing the [tab] key).
 
 Please also note that the possibly generated log-file is created in a directory,
 which is end-user settable in each remove empty directories command with the -Output
-parameter. The default save location is defined with the $Output variable (at
-line 14). The $env:temp variable points to the current temp directory. The default
-value of the $env:temp variable is C:\Users\<username>\AppData\Local\Temp
-(i.e. each user account has their own separate temp directory at path
-%USERPROFILE%\AppData\Local\Temp). To see the current temp path, for instance
-a command
-
-    [System.IO.Path]::GetTempPath()
-
-may be used at the PowerShell prompt window [PS>]. To change the temp directory for
-instance to C:\Temp, please, for example, follow the instructions at
-http://www.eightforums.com/tutorials/23500-temporary-files-directory-change-location-windows.html
-
-    Homepage:           https://github.com/auberginehill/remove-empty-directories
-    Short URL:          http://tinyurl.com/zbug5ep
-    Version:            1.1
+parameter.
 
 .EXAMPLE
 ./Remove-EmptyDirectories -Path "E:\chiore" -Output "C:\Scripts"
