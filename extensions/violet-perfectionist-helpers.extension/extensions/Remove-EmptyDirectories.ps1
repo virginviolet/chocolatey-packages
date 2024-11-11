@@ -221,7 +221,7 @@ function Remove-EmptyDirectories {
     Param (
         [Parameter(ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            Mandatory = $false,
+            Mandatory = $true,
             HelpMessage = "`r`nWhich directory, directory or path would you like to target? `r`n`r`nPlease enter a valid file system path to a directory (a full path name of a directory (a.k.a. a directory) i.e. directory path such as C:\Windows). `r`n`r`nNotes:`r`n`t- If the path name includes space characters, please enclose the path name in quotation marks (single or double). `r`n`t- To stop entering new values, please press [Enter] at an empty input row (and the script will run). `r`n`t- To exit this script, please press [Ctrl] + C`r`n"
         )]
         [ValidateNotNullOrEmpty()]
