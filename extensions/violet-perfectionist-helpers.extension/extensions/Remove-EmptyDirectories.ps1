@@ -228,6 +228,7 @@ function Remove-EmptyDirectories {
         [Alias("Start", "Begin", "Directory", "From")]
         [string[]]$Path,
         
+        [ValidateNotNullOrEmpty()]
         [Alias("ReportPath")]
         [string]$Output = "$env:temp",
         [Alias("File")]
@@ -253,24 +254,37 @@ function Remove-EmptyDirectories {
         $skipped_path_names = @()
         $num_invalid_paths = 0
 
-        # Test if the Output-path ("ReportPath") exists
+        # Test if the specified Path exists
+        $pathExists = Test-Path -Path "$Path"
+        If (-not $pathExists) {
+            # $empty_line | Out-String
+            $message = "'$Path' does not seem to be a valid path. `n" + `
+                # "`n" `
+                "Please verify that the path specified with the 'Path' parameter was typed correctly and that it is a valid file system path that points to a directory. If the path includes spaces, please enclose the path in single or double quotation marks." + `
+                # "`n" + `
+                "Path specified: '$Output'..."
+            Write-Error $message
+            throw
+        } # Else (If $pathExists)
         $outputPathExists = Test-Path -Path "$Output"
         If (-not $outputPathExists) {
             # $empty_line | Out-String
-            $message = "'$Output' doesn't seem to be a valid path name. `n" + `
+            $message = "'$Output' does not seem to be a valid path. `n" + `
                 # "`n" `
-                "Please verify that the path specified with the 'Output' (or 'ReportPath') parameter, where the resulting TXT file is ought to be saved, was typed correctly and that it is a valid file system path that points to a directory. If the path name includes space characters, please enclose the path name in single or double quotation marks." + `
+                "Please verify that the path specified with the 'Output' (or 'ReportPath') parameter was typed correctly and that it is a valid file system path that points to a directory. If the path includes spaces, please enclose the path in single or double quotation marks." + `
                 # "`n" + `
-                "Directory specified: '$Output'..."
+                "Output path specified: '$Output'..."
             Write-Error $message
+            Write-Verbose 
             throw
         } Else {
-            # Resolve the Output-path ("ReportPath")
-            $outputResolved = Resolve-Path -Path "$Output"
-            $txtFile = "$outputResolved\$FileName"
+            # Resolve Output ("ReportPath") path
+            $outputPathResolved = Resolve-Path -Path "$Output"
+            $txtFile = "$outputPathResolved\$FileName"
         } # Else (If)
 
-        # Add the user-defined path name(s) to the list of directories to process
+        # Add the user-defined path(s) to the list of directories to process
+        
         If ($Path) {
             ForEach ($path_candidate in $Path) {
                 # Test if the path exists
@@ -282,9 +296,9 @@ function Remove-EmptyDirectories {
 
                     # Display an error message in console
                     # $empty_line | Out-String
-                    Write-Warning "'$path_candidate' doesn't seem to be a valid path name."
+                    Write-Warning "'$path_candidate' does not seem to be a valid path."
                     # $empty_line | Out-String
-                    Write-Verbose "Please consider checking that the '-Path' variable value of '$path_candidate' was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
+                    Write-Verbose "Please verify that the path specified with the 'Path' parameter was typed correctly and that it is a valid file system path that points to a directory. If the path includes spaces, please enclose the path in single or double quotation marks."
                     # $empty_line | Out-String
                     $skip_text = "Skipping '$path_candidate' from the directories to be processed."
                     Write-Verbose $skip_text
@@ -382,7 +396,7 @@ function Remove-EmptyDirectories {
 
     End {
         # Do the background work for natural language
-        If ($total_number_of_directories -gt 1) { $item_text = "directories" } Else { $item_text = "directory" }
+        If ($total_number_of_directories -eq 1) { $item_text = "directory" } Else { $item_text = "directories" }
         # $empty_line | Out-String
 
         # Write the operational stats in console
@@ -425,7 +439,7 @@ function Remove-EmptyDirectories {
         # Create a list of the empty directories
         If ($empty_directories.Count -ge 1) {
             $unique_empty_directories = $empty_directories | Select-Object -ExpandProperty FullName -Unique
-            If ($unique_empty_directories.Count -gt 1) { $directory_text = "directories" } Else { $directory_text = "directory" }
+            If ($unique_empty_directories.Count -eq 1) { $directory_text = "directory" } Else { $directory_text = "directories" }
             ForEach ($directory in $unique_empty_directories) {
                 # Create a list of the empty directories
                 $deleted_directories += $obj_deleted = New-Object -TypeName PSCustomObject -Property @{
