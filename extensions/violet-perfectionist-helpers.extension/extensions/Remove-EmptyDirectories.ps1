@@ -226,7 +226,6 @@ path name includes space characters, please enclose the path name in quotation m
 For more information, please type "help New-Item -Full".
 
 .LINK
-http://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/
 https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
 https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
 https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-send-beep-to-console/
@@ -247,13 +246,18 @@ function Remove-EmptyDirectories {
         
         [Alias("ReportPath")]
         [string]$Output = "$env:temp",
-
         [ValidateScript({
-                # Source: Robbins
-                If ($_ -match '^(?!^(PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*)(\..+)?$)[^\x00-\x1f\\?*:\"";|/]+$') {
+                $disallowedFileNames = '^(CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])$'
+                $disallowedFileNameCharacters = '(\/|\|:|<|>|"|\?|\*)'
+                $disallowedFileNameEndings = '(\.| )$'
+                $asciiControlCharacters = '[\x00-\x1F]'
+                If ((-not "$_" -match $disallowedFileNames) -and
+                    (-not "$_" -match $disallowedFileNameCharacters) -and
+                    (-not "$_" -match $disallowedFileNameEndings) -and
+                    (-not "$_" -match $asciiControlCharacters)) {
                     $True
                 } Else {
-                    Throw "'$_' is either not a valid filename or it is not recommended. If the filename includes space characters, please enclose the filename in quotation marks."
+                    Throw "Output path '$_' is invalid."
                 }
             })]
         [Alias("File")]
@@ -285,10 +289,10 @@ function Remove-EmptyDirectories {
             # $empty_line | Out-String
             Write-Warning "'$Output' doesn't seem to be a valid path name."
             # $empty_line | Out-String
-            Write-Debug "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
+            Write-Warning "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
             # $empty_line | Out-String
             $skip_text = "Couldn't find -Output directory '$Output'..."
-            Write-Warning $skip_text
+            Write-Error $skip_text
             # $empty_line | Out-String
             Exit
             Return
@@ -520,8 +524,6 @@ auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed
 Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d. https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell.
 
 nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
-
-Robbins, Mike F. “PowerShell Advanced Functions: Can We Build Them Better? With Parameter Validation, Yes We Can!” mikefrobbins.com, March 31, 2015. https://mikefrobbins.com/2015/03/31/powershell-advanced-functions-can-we-build-them-better-with-parameter-validation-yes-we-can/.
 
 nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 #>
