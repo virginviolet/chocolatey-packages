@@ -288,7 +288,8 @@ function Remove-EmptyDirectories {
         If ($Path) {
             ForEach ($path_candidate in $Path) {
                 # Test if the path exists
-                If ((Test-Path "$path_candidate") -eq $false) {
+                $pathExists = Test-Path "$path_candidate"
+                If ($pathExists) {
                     $invalid_path_was_found = $true
 
                     # Increment the error counter
@@ -480,7 +481,7 @@ function Remove-EmptyDirectories {
             } # Else (If Test-Path txt_file)
 
             # Sound the bell if set to do so with the -Audio parameter
-            # Source: https://blogs.technet.microsoft.com/heyscriptingguy/2013/09/21/powertip-use-powershell-to-send-beep-to-console/
+            # Source: Doctor Scripto
             If ( -not $Audio ) {
                 $continue = $true
             } Else {
@@ -508,5 +509,9 @@ Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d
 nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 
 nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
+
+Doctor Scripto. “PowerTip: Use PowerShell to Send Beep to Console.” Scripting Blog (blog), September 21, 2013. https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-send-beep-to-console/.
+
+
 #>
 }
