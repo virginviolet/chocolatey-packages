@@ -210,9 +210,10 @@ path name includes space characters, please enclose the path name in quotation m
 For more information, please type "help New-Item -Full".
 
 .LINK
+https://community.chocolatey.org/packages/violet-perfectionist-helpers.extension/
+https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/violet-perfectionist-helpers.extension/
 https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
 https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
-https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-send-beep-to-console/
 https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154
 #>
 
@@ -481,7 +482,6 @@ function Remove-EmptyDirectories {
             } # Else (If Test-Path txt_file)
 
             # Sound the bell if set to do so with the -Audio parameter
-            # Source: Doctor Scripto
             If ( -not $Audio ) {
                 $continue = $true
             } Else {
@@ -507,11 +507,6 @@ auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed
 Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d. https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell.
 
 nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
-
-nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016. https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
-
-Doctor Scripto. “PowerTip: Use PowerShell to Send Beep to Console.” Scripting Blog (blog), September 21, 2013. https://devblogs.microsoft.com/scripting/powertip-use-powershell-to-send-beep-to-console/.
-
 
 #>
 }
