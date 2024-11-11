@@ -50,8 +50,7 @@ deeply buried empty directories are deleted) is toggled with the -Recurse parame
 with an alias -ReportPath. Specifies where the log-file
 (deleted_directories.txt by default, which is created or updated when deletions are
 made) is to be saved. The default save location is $env:temp, which points to the
-current temporary file location, which is set in the system. The default -Output
-save location is defined at line 14 with the $Output variable. In case the path name
+current temporary file location, which is set in the system. The default -Output is $env:temp.
 includes space characters, please enclose the path name in quotation marks (single
 or double). For usage, please see the Examples below and for more information about
 $env:temp, please see the Notes section below.
@@ -246,20 +245,6 @@ function Remove-EmptyDirectories {
         
         [Alias("ReportPath")]
         [string]$Output = "$env:temp",
-        [ValidateScript({
-                $disallowedFileNames = '^(CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])$'
-                $disallowedFileNameCharacters = '(\/|\|:|<|>|"|\?|\*)'
-                $disallowedFileNameEndings = '(\.| )$'
-                $asciiControlCharacters = '[\x00-\x1F]'
-                If ((-not "$_" -match $disallowedFileNames) -and
-                    (-not "$_" -match $disallowedFileNameCharacters) -and
-                    (-not "$_" -match $disallowedFileNameEndings) -and
-                    (-not "$_" -match $asciiControlCharacters)) {
-                    $True
-                } Else {
-                    Throw "Output path '$_' is invalid."
-                }
-            })]
         [Alias("File")]
         [string]$FileName = "deleted_directories.txt",
 
@@ -284,22 +269,20 @@ function Remove-EmptyDirectories {
         $num_invalid_paths = 0
 
         # Test if the Output-path ("ReportPath") exists
-        If ((Test-Path "$Output") -eq $false) {
-            # Display an error message in console
+        $outputPathExists = Test-Path -Path "$Output"
+        If (-not $outputPathExists) {
             # $empty_line | Out-String
-            Write-Warning "'$Output' doesn't seem to be a valid path name."
-            # $empty_line | Out-String
-            Write-Warning "Please consider checking that the Output ('ReportPath') location '$Output', where the resulting TXT-file is ought to be written, was typed correctly and that it is a valid file system path, which points to a directory. If the path name includes space characters, please enclose the path name in quotation marks (single or double)." -Verbose
-            # $empty_line | Out-String
-            $skip_text = "Couldn't find -Output directory '$Output'..."
-            Write-Error $skip_text
-            # $empty_line | Out-String
-            Exit
-            Return
+            $message = "'$Output' doesn't seem to be a valid path name. `n" + `
+                # "`n" `
+                "Please verify that the path specified with the 'Output' (or 'ReportPath') parameter, where the resulting TXT file is ought to be saved, was typed correctly and that it is a valid file system path that points to a directory. If the path name includes space characters, please enclose the path name in single or double quotation marks." + `
+                # "`n" + `
+                "Directory specified: '$Output'..."
+            Write-Error $message
+            throw
         } Else {
-            # Resolve the Output-path ("ReportPath") (if the Output-path is specified as relative)
-            $real_output_path = Resolve-Path -Path "$Output"
-            $txt_file = "$real_output_path\$FileName"
+            # Resolve the Output-path ("ReportPath")
+            $outputResolved = Resolve-Path -Path "$Output"
+            $txtFile = "$outputResolved\$FileName"
         } # Else (If)
 
         # Add the user-defined path name(s) to the list of directories to process
@@ -488,13 +471,13 @@ function Remove-EmptyDirectories {
             } # Else (Test-Path $empty_directories)
 
             # Write the deleted directory paths to a text file (located at the current temp-directory or the location is defined with the -Output parameter)
-            If ((Test-Path "$txt_file") -eq $false) {
-                $deleted_directories | Out-File "$txt_file" -Encoding UTF8 -Force
-                Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
+            If ((Test-Path "$txtFile") -eq $false) {
+                $deleted_directories | Out-File "$txtFile" -Encoding UTF8 -Force
+                Add-Content -Path "$txtFile" -Value "Date: $(Get-Date -Format g)"
             } Else {
-                $pre_existing_content = Get-Content $txt_file
-                                ($pre_existing_content + $empty_line + $separator + $empty_line + ($deleted_directories | Select-Object -ExpandProperty 'Empty Directories') + $empty_line) | Out-File "$txt_file" -Encoding UTF8 -Force
-                Add-Content -Path "$txt_file" -Value "Date: $(Get-Date -Format g)"
+                $pre_existing_content = Get-Content $txtFile
+                                ($pre_existing_content + $empty_line + $separator + $empty_line + ($deleted_directories | Select-Object -ExpandProperty 'Empty Directories') + $empty_line) | Out-File "$txtFile" -Encoding UTF8 -Force
+                Add-Content -Path "$txtFile" -Value "Date: $(Get-Date -Format g)"
             } # Else (If Test-Path txt_file)
 
             # Sound the bell if set to do so with the -Audio parameter
