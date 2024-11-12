@@ -261,9 +261,9 @@ function Remove-EmptyDirectories {
             # $emptyLine | Out-String
             $message = "'$Path' does not seem to be a valid path. `n" + `
                 # "`n" `
-                "Please verify that the path specified with the Path parameter was typed" + `
-                "correctly and that it is a valid file system path that points to a directory." + `
-                "If the path includes spaces, please enclose the path in single or double" + `
+                "Please verify that the path specified with the Path parameter was typed " + `
+                "correctly and that it is a valid file system path that points to a directory. " + `
+                "If the path includes spaces, please enclose the path in single or double " + `
                 "quotation marks." + `
                 # "`n" + `
                 "Path specified: '$Output'."
@@ -276,8 +276,8 @@ function Remove-EmptyDirectories {
             $message = "'$Output' does not seem to be a valid path. `n" + `
                 # "`n" `
                 "Please verify that the path specified with the Output (or ReportPath)" + `
-                "parameter was typed correctly and that it is a valid file system path that" + `
-                "points to a directory. If the path includes spaces, please enclose the path in" + `
+                "parameter was typed correctly and that it is a valid file system path that " + `
+                "points to a directory. If the path includes spaces, please enclose the path in " + `
                 "single or double quotation marks." + `
                 # "`n" + `
                 "Output path specified: '$Output'."
@@ -455,7 +455,7 @@ function Remove-EmptyDirectories {
         If ($skippedPathNames.Count -eq 0) {
             $enumerationSuccesful = $true
             If ($uniqueDirectories.Count -le 4) {
-                $skippedReport = "$($directoryCount) $directoryLabel in total processed" + `
+                $skippedReport = "$($directoryCount) $directoryLabel in total processed " + `
                     "at '$($uniqueDirectories -join ', ')'."
             } Else {
                 $skippedReport = "$($directoryCount) $directoryLabel in total processed."
@@ -474,7 +474,7 @@ function Remove-EmptyDirectories {
                 If ($uniqueDirectories.Count -eq 0) {
                     $skippedReport = "There were $invalidPathCount skipped paths. Didn't process any directories."
                 } ElseIf ($uniqueDirectories.Count -le 4) {
-                    $skippedReport = "$($directoryCount) $directoryLabel in total processed" + `
+                    $skippedReport = "$($directoryCount) $directoryLabel in total processed " + `
                         "at $($uniqueDirectories -join ', '). There were $invalidPathCount skipped paths."
                 } Else {
                     $skippedReport = "$($directoryCount) $directoryLabel in total processed. " + `
@@ -484,7 +484,7 @@ function Remove-EmptyDirectories {
                 If ($uniqueDirectories.Count -eq 0) {
                     $skippedReport = "One path name was skipped. Didn't process any directories."
                 } ElseIf ($uniqueDirectories.Count -le 4) {
-                    $skippedReport = "$($directoryCount) $directoryLabel in total processed" + `
+                    $skippedReport = "$($directoryCount) $directoryLabel in total processed " + `
                         "at $($uniqueDirectories -join ', '). One path name was skipped."
                 } Else {
                     $skippedReport = "$($directoryCount) $directoryLabel in total processed." + `
