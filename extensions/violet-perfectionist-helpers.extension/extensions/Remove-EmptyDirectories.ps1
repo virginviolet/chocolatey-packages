@@ -401,7 +401,7 @@ function Remove-EmptyDirectories {
             )
 
             # Select the available directories for further processing
-            If ($availableDirectories -eq $null) {
+            If ($null -eq $availableDirectories) {
                 $continue = $true
             } Else {
                 ForEach ($directory in ($availableDirectories)) {
@@ -421,7 +421,7 @@ function Remove-EmptyDirectories {
             } # Else (If $availableDirectories)
 
             # Add the unavailable directories to the skipped paths list
-            If ($unavailableDirectories -eq $null) {
+            If ($null -eq $unavailableDirectories) {
                 $continue = $true
             } Else {
                 $invalidPathWasFound = $true
