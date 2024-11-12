@@ -296,7 +296,7 @@ function Remove-EmptyDirectories {
             ForEach ($path_candidate in $Path) {
                 # Test if the path exists
                 $pathExists = Test-Path "$path_candidate"
-                If ($pathExists) {
+                If (-not $pathExists) {
                     $invalid_path_was_found = $true
 
                     # Increment the error counter
