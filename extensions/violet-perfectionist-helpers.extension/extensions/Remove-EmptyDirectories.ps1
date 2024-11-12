@@ -247,18 +247,18 @@ function Remove-EmptyDirectories {
         $ErrorActionPreference = "Stop"
         $computer = $env:COMPUTERNAME
         $separator = "---------------------"
-        $empty_line = ""
-        $skipped = @()
+        $emptyLine = ""
+        $skippedPath = @()
         $directories = @()
-        $empty_directories = @()
-        $deleted_directories = @()
-        $skipped_path_names = @()
-        $num_invalid_paths = 0
+        $emptyDirectories = @()
+        $deletedDirectories = @()
+        $skippedPathNames = @()
+        $invalidPathCount = 0
 
         # Test if the specified Path exists
         $pathExists = Test-Path -Path "$Path"
         If (-not $pathExists) {
-            # $empty_line | Out-String
+            # $emptyLine | Out-String
             $message = "'$Path' does not seem to be a valid path. `n" + `
                 # "`n" `
                 "Please verify that the path specified with the Path parameter was typed" + `
@@ -272,7 +272,7 @@ function Remove-EmptyDirectories {
         } # Else (If $pathExists)
         $outputPathExists = Test-Path -Path "$Output"
         If (-not $outputPathExists) {
-            # $empty_line | Out-String
+            # $emptyLine | Out-String
             $message = "'$Output' does not seem to be a valid path. `n" + `
                 # "`n" `
                 "Please verify that the path specified with the Output (or ReportPath)" + `
@@ -293,19 +293,19 @@ function Remove-EmptyDirectories {
         # Add the user-defined path(s) to the list of directories to process
         
         If ($Path) {
-            ForEach ($path_candidate in $Path) {
+            ForEach ($pathCandidate in $Path) {
                 # Test if the path exists
-                $pathExists = Test-Path "$path_candidate"
+                $pathExists = Test-Path "$pathCandidate"
                 If (-not $pathExists) {
-                    $invalid_path_was_found = $true
+                    $invalidPathWasFound = $true
 
                     # Increment the error counter
-                    $num_invalid_paths++
+                    $invalidPathCount++
 
                     # Display an error message in console
-                    # $empty_line | Out-String
-                    Write-Warning "'$path_candidate' does not seem to be a valid path."
-                    # $empty_line | Out-String
+                    # $emptyLine | Out-String
+                    Write-Warning "'$pathCandidate' does not seem to be a valid path."
+                    # $emptyLine | Out-String
 
                     $message = "Please verify that the path specified with the Path " + `
                         "parameter was typed correctly and that it is a valid file system path " + `
@@ -313,14 +313,14 @@ function Remove-EmptyDirectories {
                         "the path in single or double quotation marks."
                     Write-Verbose $message
 
-                    # $empty_line | Out-String
-                    $skip_text = "Skipping '$path_candidate' from the directories to be processed."
-                    Write-Verbose $skip_text
+                    # $emptyLine | Out-String
+                    $skipText = "Skipping '$pathCandidate' from the directories to be processed."
+                    Write-Verbose $skipText
 
                     # Add the invalid path as an object (with properties) to a collection of
                     # skipped paths
-                    $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
-                        'Skipped Paths' = $path_candidate
+                    $skippedPath += $skippedPathObject = New-Object -TypeName PSCustomObject -Property @{
+                        'Skipped Paths' = $pathCandidate
                         'Owner'         = ""
                         'Created on'    = ""
                         'Last Updated'  = ""
@@ -330,17 +330,17 @@ function Remove-EmptyDirectories {
                     } # New-Object
 
                     # Add the invalid path name to a list of failed path names
-                    $skipped_path_names += $path_candidate
+                    $skippedPathNames += $pathCandidate
 
-                    # Return to top of the program loop (ForEach $path_candidate) and skip just this
+                    # Return to top of the program loop (ForEach $pathCandidate) and skip just this
                     # iteration of the loop.
                     Continue
                 } Else {
                     # Resolve path (if path is specified as relative)
-                    $full_path = (Resolve-Path "$path_candidate").Path
-                    $directories += $full_path
-                } # Else (If Test-Path $path_candidate)
-            } # ForEach $path_candidate
+                    $fullPath = (Resolve-Path "$pathCandidate").Path
+                    $directories += $fullPath
+                } # Else (If Test-Path $pathCandidate)
+            } # ForEach $pathCandidate
         } Else {
             # Take the path names that are piped into the script
             $directories += @($input | ForEach-Object { $_.FullName })
@@ -352,18 +352,18 @@ function Remove-EmptyDirectories {
         # Note: For best results against nested empty directories, please run the script iteratively
         # until no empty directories are found.
         # Source: Mekac
-        $unique_directories = $directories | Select-Object -Unique
-        $total_number_of_directories = [int]($unique_directories.Count)
+        $uniqueDirectories = $directories | Select-Object -Unique
+        $directoryCount = [int]($uniqueDirectories.Count)
 
-        If ($unique_directories.Count -ge 1) {
+        If ($uniqueDirectories.Count -ge 1) {
             # Source: nedarb
-            foreach ($directory in $unique_directories) {
+            foreach ($directory in $uniqueDirectories) {
                 <# $currentItemName is the current item #>
             }
 
-            $available_directories =
+            $availableDirectories =
             (
-                Get-ChildItem $unique_directories -Recurse:$Recurse `
+                Get-ChildItem $uniqueDirectories -Recurse:$Recurse `
                     -Force `
                     -ErrorAction SilentlyContinue |
                     Where-Object { $_.PSIsContainer -eq $true } |
@@ -376,9 +376,9 @@ function Remove-EmptyDirectories {
                     Sort-Object FullName
             )
 
-            $unavailable_directories =
+            $unavailableDirectories =
             (
-                Get-ChildItem $unique_directories -Recurse:$Recurse `
+                Get-ChildItem $uniqueDirectories -Recurse:$Recurse `
                     -Force `
                     -ErrorAction SilentlyContinue |
                     Where-Object { $true -eq $_.PSIsContainer } |
@@ -392,38 +392,38 @@ function Remove-EmptyDirectories {
             )
 
             # Select the available directories for further processing
-            If ($available_directories -eq $null) {
+            If ($availableDirectories -eq $null) {
                 $continue = $true
             } Else {
-                ForEach ($directory in ($available_directories)) {
-                    $total_number_of_directories++
-                    $the_query_of_empty_directories = Get-ItemProperty $directory.FullName |
+                ForEach ($directory in ($availableDirectories)) {
+                    $directoryCount++
+                    $directoryQuery = Get-ItemProperty $directory.FullName |
                         Where-Object { ($_.GetFiles().Count -eq 0) -and ($_.GetDirectories().Count -eq 0) } |
                         Select-Object FullName
-                    If ($null -ne $the_query_of_empty_directories ) {
-                        $empty_directories += New-Object -TypeName PSCustomObject `
+                    If ($null -ne $directoryQuery ) {
+                        $emptyDirectories += New-Object -TypeName PSCustomObject `
                             -Property @{
                             'FullName' = $directory.FullName
                         } # New-Object
                     } Else {
                         $continue = $true
-                    } # Else (If $the_query_of_empty_directories)
+                    } # Else (If $directoryQuery)
                 } # ForEach $directory
-            } # Else (If $available_directories)
+            } # Else (If $availableDirectories)
 
             # Add the unavailable directories to the skipped path names list
-            If ($unavailable_directories -eq $null) {
+            If ($unavailableDirectories -eq $null) {
                 $continue = $true
             } Else {
-                $invalid_path_was_found = $true
-                ForEach ($item in ($unavailable_directories)) {
+                $invalidPathWasFound = $true
+                ForEach ($item in ($unavailableDirectories)) {
 
                     # Increment the error counter
-                    $num_invalid_paths++
+                    $invalidPathCount++
 
                     # Add the invalid path as an object (with properties) to a collection of skipped
                     # paths
-                    $skipped += $obj_skipped = New-Object -TypeName PSCustomObject -Property @{
+                    $skippedPath += $skippedPathObject = New-Object -TypeName PSCustomObject -Property @{
                         'Skipped Paths' = $item.FullName
                         'Owner'         = ""
                         'Created on'    = ""
@@ -434,76 +434,78 @@ function Remove-EmptyDirectories {
                     } # New-Object
 
                     # Add the invalid path name to a list of failed path names
-                    $skipped_path_names += $item
+                    $skippedPathNames += $item
                 } # ForEach $item
-            } # Else (If $unavailable_directories)
+            } # Else (If $unavailableDirectories)
         } Else {
             $continue = $true
-        } # Else (If $unique_directories.Count)
+        } # Else (If $uniqueDirectories.Count)
     } # Process
 
     End {
         # Do the background work for natural language
-        If ($total_number_of_directories -eq 1) {
-            $item_text = "directory"
+        If ($directoryCount -eq 1) {
+            $directoryLabel = "directory"
         } Else {
-            $item_text = "directories" 
+            $directoryLabel = "directories" 
         }
-        # $empty_line | Out-String
+        # $emptyLine | Out-String
 
         # Write the operational stats in console
-        If ($skipped_path_names.Count -eq 0) {
-            $enumeration_went_succesfully = $true
-            If ($unique_directories.Count -le 4) {
-                $stats_text = "$($total_number_of_directories) $item_text in total processed" + `
-                    "at '$($unique_directories -join ', ')'."
+        If ($skippedPathNames.Count -eq 0) {
+            $enumerationSuccesful = $true
+            If ($uniqueDirectories.Count -le 4) {
+                $skippedReport = "$($directoryCount) $directoryLabel in total processed" + `
+                    "at '$($uniqueDirectories -join ', ')'."
             } Else {
-                $stats_text = "$($total_number_of_directories) $item_text in total processed."
-            } # Else (If $unique_directories.Count)
-            Write-Debug $stats_text
-            # $empty_line | Out-String
+                $skippedReport = "$($directoryCount) $directoryLabel in total processed."
+            } # Else (If $uniqueDirectories.Count)
+            Write-Debug $skippedReport
+            # $emptyLine | Out-String
         } Else {
             # Display the skipped path names and write the operational stats in console
-            $enumeration_went_succesfully = $false
-            $skipped.PSObject.TypeNames.Insert(0, "Skipped Path Names")
-            $skipped_selection = $skipped | Select-Object 'Skipped Paths', 'Size', 'Error' | Sort-Object 'Skipped Paths'
-            $skipped_selection | Format-Table -auto
-            If ($num_invalid_paths -gt 1) {
-                If ($unique_directories.Count -eq 0) {
-                    $stats_text = "There were $num_invalid_paths skipped paths. Didn't process any directories."
-                } ElseIf ($unique_directories.Count -le 4) {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed" + `
-                        "at $($unique_directories -join ', '). There were $num_invalid_paths skipped paths."
+            $enumerationSuccesful = $false
+            $skippedPath.PSObject.TypeNames.Insert(0, "Skipped Path Names")
+            $skippedPathSelection = $skippedPath |
+                Select-Object 'Skipped Paths', 'Size', 'Error' |
+                Sort-Object 'Skipped Paths'
+            $skippedPathSelection | Format-Table -auto
+            If ($invalidPathCount -gt 1) {
+                If ($uniqueDirectories.Count -eq 0) {
+                    $skippedReport = "There were $invalidPathCount skipped paths. Didn't process any directories."
+                } ElseIf ($uniqueDirectories.Count -le 4) {
+                    $skippedReport = "$($directoryCount) $directoryLabel in total processed" + `
+                        "at $($uniqueDirectories -join ', '). There were $invalidPathCount skipped paths."
                 } Else {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed. " + `
-                        "There were $num_invalid_paths skipped paths."
-                } # Else (If $unique_directories.Count)
+                    $skippedReport = "$($directoryCount) $directoryLabel in total processed. " + `
+                        "There were $invalidPathCount skipped paths."
+                } # Else (If $uniqueDirectories.Count)
             } Else {
-                If ($unique_directories.Count -eq 0) {
-                    $stats_text = "One path name was skipped. Didn't process any directories."
-                } ElseIf ($unique_directories.Count -le 4) {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed" + `
-                        "at $($unique_directories -join ', '). One path name was skipped."
+                If ($uniqueDirectories.Count -eq 0) {
+                    $skippedReport = "One path name was skipped. Didn't process any directories."
+                } ElseIf ($uniqueDirectories.Count -le 4) {
+                    $skippedReport = "$($directoryCount) $directoryLabel in total processed" + `
+                        "at $($uniqueDirectories -join ', '). One path name was skipped."
                 } Else {
-                    $stats_text = "$($total_number_of_directories) $item_text in total processed." + `
+                    $skippedReport = "$($directoryCount) $directoryLabel in total processed." + `
                         "One path name was skipped."
-                } # Else (If $unique_directories.Count)
-            } # Else (If $num_invalid_paths)
-            Write-Debug $stats_text
-            # $empty_line | Out-String
-        } # Else (If $skipped_path_names.Count)
+                } # Else (If $uniqueDirectories.Count)
+            } # Else (If $invalidPathCount)
+            Write-Debug $skippedReport
+            # $emptyLine | Out-String
+        } # Else (If $skippedPathNames.Count)
 
         # Create a list of the empty directories
-        If ($empty_directories.Count -ge 1) {
-            $unique_empty_directories = $empty_directories | Select-Object -ExpandProperty FullName -Unique
-            If ($unique_empty_directories.Count -eq 1) {
-                $directory_text = "directory"
+        If ($emptyDirectories.Count -ge 1) {
+            $UniqueEmptyDirectories = $emptyDirectories | Select-Object -ExpandProperty FullName -Unique
+            If ($UniqueEmptyDirectories.Count -eq 1) {
+                $directoryLabel = "directory"
             } Else {
-                $directory_text = "directories"
+                $directoryLabel = "directories"
             }
-            ForEach ($directory in $unique_empty_directories) {
+            ForEach ($directory in $UniqueEmptyDirectories) {
                 # Create a list of the empty directories
-                $deleted_directories += $obj_deleted = New-Object -TypeName PSCustomObject -Property @{
+                $deletedDirectories += $deletedDirectoryObject = New-Object -TypeName PSCustomObject -Property @{
                     'Empty directories' = $directory
                 } # New-Object
 
@@ -514,37 +516,37 @@ function Remove-EmptyDirectories {
             } # ForEach $directory
             
             # Test if the directories were removed
-            If ((Test-Path $unique_empty_directories) -eq $true) {
+            If ((Test-Path $UniqueEmptyDirectories) -eq $true) {
                 If ($WhatIf) {
-                    # $empty_line | Out-String
-                    $notify_text = "$($unique_empty_directories.Count) empty $directory_text found." 
-                    Write-Verbose $notify_text
-                    # $empty_line | Out-String
+                    # $emptyLine | Out-String
+                    $emptyFoundReport = "$($UniqueEmptyDirectories.Count) empty $directoryLabel found." 
+                    Write-Verbose $emptyFoundReport
+                    # $emptyLine | Out-String
                     "Exit Code 1: A simulation run (the -WhatIf parameter was used), didn't touch any directories."
-                    # Return $empty_line
+                    # Return $emptyLine
                 } Else {
                     "Exit Code 2: Something went wrong with the deletion procedure."
-                    # Return $empty_line
+                    # Return $emptyLine
                 } # Else (If $WhatIf)
             } Else {
                 $continue = $true
-            } # Else (Test-Path $empty_directories)
+            } # Else (Test-Path $emptyDirectories)
 
             # Write the deleted directory paths to a text file (located at the current
             # temp-directory or the location is defined with the -Output parameter)
             If ((Test-Path "$txtFile") -eq $false) {
-                $deleted_directories | Out-File "$txtFile" -Encoding UTF8 -Force
+                $deletedDirectories | Out-File "$txtFile" -Encoding UTF8 -Force
                 Add-Content -Path "$txtFile" -Value "Date: $(Get-Date -Format g)"
             } Else {
-                $pre_existing_content = Get-Content $txtFile
-                $empty_directories_lines = $deleted_directories | Select-Object -ExpandProperty 'Empty Directories'
-                $new_content = $pre_existing_content + `
-                    $empty_line + `
+                $preExistingContent = Get-Content $txtFile
+                $deletedDirectoriesLines = $deletedDirectories | Select-Object -ExpandProperty 'Empty Directories'
+                $newContent = $preExistingContent + `
+                    $emptyLine + `
                     $separator + `
-                    $empty_line + `
-                    $empty_directories_lines + `
-                    $empty_line
-                $new_content | Out-File "$txtFile" -Encoding UTF8 -Force
+                    $emptyLine + `
+                    $deletedDirectoriesLines + `
+                    $emptyLine
+                $newContent | Out-File "$txtFile" -Encoding UTF8 -Force
                 Add-Content -Path "$txtFile" -Value "Date: $(Get-Date -Format g)"
             } # Else (If Test-Path txt_file)
 
@@ -556,14 +558,14 @@ function Remove-EmptyDirectories {
             } # Else (If -not $Audio)
 
         } Else {
-            If ($total_number_of_directories -ge 1) {
-                $exit_text = "Didn't find any empty directories."
-                Write-Verbose $exit_text
-                # $empty_line | Out-String
+            If ($directoryCount -ge 1) {
+                $exitText = "Didn't find any empty directories."
+                Write-Verbose $exitText
+                # $emptyLine | Out-String
             } Else {
                 $continue = $true
-            } # Else (If $total_number_of_directories)
-        } # Else (If $empty_directories.Count)
+            } # Else (If $directoryCount)
+        } # Else (If $emptyDirectories.Count)
     } # End
     
     <#
