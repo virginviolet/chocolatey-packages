@@ -1,4 +1,3 @@
-#region Help
 <#
 .SYNOPSIS
 Removes empty directories from a specified directory recursively or non-recursively.
@@ -105,7 +104,8 @@ Please also note that the possibly generated log-file is created in a directory,
 settable in each remove empty directories command with the Output parameter.
 
 .EXAMPLE
-./Remove-EmptyDirectories -Path "E:\chiore" -Output "C:\Scripts"  
+./Remove-EmptyDirectories -Path "E:\chiore" -Output "C:\Scripts"
+
 Run the script. Please notice to insert ./ or .\ before the script name. Removes all empty
 directories from the first level of E:\chiore (i.e. those empty directories, which would be listed
 with the "dir E:\chiore" command, and if any deletions were made, saves the log-file to C:\Scripts
@@ -120,10 +120,12 @@ will result in the exact same outcome.
 
 .EXAMPLE
 help ./Remove-EmptyDirectories -Full
+
 Display the help file.
 
 .EXAMPLE
-./Remove-EmptyDirectories -Path "C:\Users\Dropbox", "C:\dc01" -Recurse -WhatIf  
+./Remove-EmptyDirectories -Path "C:\Users\Dropbox", "C:\dc01" -Recurse -WhatIf
+
 Because the -WhatIf parameter was used, only a simulation run occurs, so no directories would be
 deleted in any circumstances. The script will look for empty directories from C:\Users\Dropbox and
 C:\dc01 and will add all sub-directories of the sub-directories of the sub-directories and their
@@ -143,7 +145,8 @@ the Path parameter may be left out from the command, too, since, for example,
 is the exact same command in nature.
 
 .EXAMPLE
-.\Remove-EmptyDirectories.ps1 -From C:\dc01 -ReportPath C:\Scripts -File log.txt -Recurse -Audio  
+.\Remove-EmptyDirectories.ps1 -From C:\dc01 -ReportPath C:\Scripts -File log.txt -Recurse -Audio
+
 Run the script and search recursively for empty directories from C:\dc01 and delete all recursively
 found empty directories under C:\dc01. If any deletions were made, the log-file would be saved to
 C:\Scripts with the filename log.txt and an audible beep would occur. This command will work,
@@ -152,7 +155,8 @@ FileName. Furthermore, since the paths don't contain any space characters, they 
 be enclosed in quotation marks.
 
 .EXAMPLE
-Set-ExecutionPolicy RemoteSigned  
+Set-ExecutionPolicy RemoteSigned
+
 This command is altering the Windows PowerShell rights to enable script execution for the default
 (LocalMachine) scope. Windows PowerShell has to be run with elevated rights (run as an
 administrator) to actually be able to change the script execution properties. The default value of
@@ -184,7 +188,8 @@ For more information on the Set-ExecutionPolicy command, type: "get-help Set-Exe
 For more information on execution policies, type: "help about_Execution_Policies".
 
 .EXAMPLE
-New-Item -ItemType File -Path C:\Temp\Remove-EmptyDirectories.ps1  
+New-Item -ItemType File -Path C:\Temp\Remove-EmptyDirectories.ps1
+
 Creates an empty ps1-file to the C:\Temp directory. The New-Item cmdlet has an inherent NoClobber
 mode built into it, so that the procedure will halt, if overwriting (replacing the contents) of an
 existing file is about to happen. Overwriting a file with the New-Item cmdlet requires using the
@@ -202,7 +207,6 @@ https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
 https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
 https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154
 #>
-#endregion
 
 function Remove-EmptyDirectories {
     [CmdletBinding()]
