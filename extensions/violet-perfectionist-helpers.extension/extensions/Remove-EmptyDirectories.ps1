@@ -33,10 +33,10 @@ command to invoke the -Path parameter, as is shown in the Examples below, since
 Remove-EmptyDirectories is trying to decipher the inputted queries as good as it is machinely
 possible within a 40 KB size limit.
 
-The paths should be valid file system paths to a directory (a full path name of a directory (i.e.
-directory path such as C:\Windows)). In case the path name includes space characters, please enclose
-the path name in quotation marks (single or double). If a collection of path names is defined for
-the -Path parameter, please separate the individual path names with a comma. The -Path parameter
+The paths should be valid file system paths to a directory (a full path of a directory (i.e.
+directory path such as C:\Windows)). In case the path includes space characters, please enclose
+the path in quotation marks (single or double). If a collection of paths is defined for
+the -Path parameter, please separate the individual paths with a comma. The -Path parameter
 also takes an array of strings for paths and objects could be piped to this parameter, too. If no
 path is defined in the command launching Remove-EmptyDirectories the user will be prompted to enter
 a -Path value. How deeply the filesystem structure is analysed (and how deeply buried empty
@@ -46,7 +46,7 @@ directories are deleted) is toggled with the -Recurse parameter.
 with an alias -ReportPath. Specifies where the log-file (deleted_directories.txt by default, which
 is created or updated when deletions are made) is to be saved. The default save location is
 $env:temp, which points to the current temporary file location, which is set in the system. The
-default -Output is $env:temp. includes space characters, please enclose the path name in quotation
+default -Output is $env:temp. includes space characters, please enclose the path in quotation
 marks (single or double). For usage, please see the Examples below and for more information about
 $env:temp, please see the Notes section below.
 
@@ -133,7 +133,7 @@ If empty directories aren't found, the result would be identical regardless whet
 parameter was used or not. If, however, empty directories were indeed found, only an indication of
 what the script would delete ("What if:") is displayed.
 
-The Path variable value is case-insensitive (as is most of the PowerShell), and since the path names
+The Path variable value is case-insensitive (as is most of the PowerShell), and since the paths
 don't contain any space characters, they don't need to be enveloped with quotation marks. Actually
 the -Path parameter may be left out from the command, too, since, for example,
 
@@ -147,7 +147,7 @@ Run the script and search recursively for empty directories from C:\dc01 and del
 found empty directories under C:\dc01. If any deletions were made, the log-file would be saved to
 C:\Scripts with the filename log.txt and an audible beep would occur. This command will work,
 because -From is an alias of -Path and -ReportPath is an alias of -Output and -File is an alias of
--FileName. Furthermore, since the path names don't contain any space characters, they don't need to
+-FileName. Furthermore, since the paths don't contain any space characters, they don't need to
 be enclosed in quotation marks.
 
 .EXAMPLE
@@ -190,7 +190,7 @@ New-Item -ItemType File -Path C:\Temp\Remove-EmptyDirectories.ps1
 Creates an empty ps1-file to the C:\Temp directory. The New-Item cmdlet has an inherent -NoClobber
 mode built into it, so that the procedure will halt, if overwriting (replacing the contents) of an
 existing file is about to happen. Overwriting a file with the New-Item cmdlet requires using the
-Force. If the path name includes space characters, please enclose the path name in quotation marks
+Force. If the path includes space characters, please enclose the path in quotation marks
 (single or double):
 
     New-Item -ItemType File -Path "C:\Directory Name\Remove-EmptyDirectories.ps1"
@@ -214,7 +214,7 @@ function Remove-EmptyDirectories {
             HelpMessage = "`n" + `
                 "Which directory or path would you like to target? `n" + `
                 "`n" + `
-                "Please enter a valid file system path to a directory (a full path name of a " + `
+                "Please enter a valid file system path to a directory (a full path of a " + `
                 "directory (a.k.a. a folder) i.e. directory path such as C:\Windows). `n" + `
                 "`n" + `
                 "Notes: `n" + `
@@ -329,7 +329,7 @@ function Remove-EmptyDirectories {
                         'raw_size'      = 0
                     } # New-Object
 
-                    # Add the invalid path name to a list of failed path names
+                    # Add the invalid path to a list of failed paths
                     $skippedPathNames += $pathCandidate
 
                     # Return to top of the program loop (ForEach $pathCandidate) and skip just this
@@ -342,7 +342,7 @@ function Remove-EmptyDirectories {
                 } # Else (If Test-Path $pathCandidate)
             } # ForEach $pathCandidate
         } Else {
-            # Take the path names that are piped into the script
+            # Take the paths that are piped into the script
             $directories += @($input | ForEach-Object { $_.FullName })
         } # Else (If $Path)
     } # begin
@@ -411,7 +411,7 @@ function Remove-EmptyDirectories {
                 } # ForEach $directory
             } # Else (If $availableDirectories)
 
-            # Add the unavailable directories to the skipped path names list
+            # Add the unavailable directories to the skipped paths list
             If ($unavailableDirectories -eq $null) {
                 $continue = $true
             } Else {
@@ -433,7 +433,7 @@ function Remove-EmptyDirectories {
                         'raw_size'      = 0
                     } # New-Object
 
-                    # Add the invalid path name to a list of failed path names
+                    # Add the invalid path to a list of failed paths
                     $skippedPathNames += $item
                 } # ForEach $item
             } # Else (If $unavailableDirectories)
@@ -463,9 +463,9 @@ function Remove-EmptyDirectories {
             Write-Debug $skippedReport
             # $emptyLine | Out-String
         } Else {
-            # Display the skipped path names and write the operational stats in console
+            # Display the skipped paths and write the operational stats in console
             $enumerationSuccesful = $false
-            $skippedPath.PSObject.TypeNames.Insert(0, "Skipped Path Names")
+            $skippedPath.PSObject.TypeNames.Insert(0, "Skipped paths")
             $skippedPathSelection = $skippedPath |
                 Select-Object 'Skipped Paths', 'Size', 'Error' |
                 Sort-Object 'Skipped Paths'
@@ -482,13 +482,13 @@ function Remove-EmptyDirectories {
                 } # Else (If $uniqueDirectories.Count)
             } Else {
                 If ($uniqueDirectories.Count -eq 0) {
-                    $skippedReport = "One path name was skipped. Didn't process any directories."
+                    $skippedReport = "One path was skipped. Didn't process any directories."
                 } ElseIf ($uniqueDirectories.Count -le 4) {
                     $skippedReport = "$($directoryCount) $directoryLabel in total processed " + `
-                        "at $($uniqueDirectories -join ', '). One path name was skipped."
+                        "at $($uniqueDirectories -join ', '). One path was skipped."
                 } Else {
                     $skippedReport = "$($directoryCount) $directoryLabel in total processed." + `
-                        "One path name was skipped."
+                        "One path was skipped."
                 } # Else (If $uniqueDirectories.Count)
             } # Else (If $invalidPathCount)
             Write-Debug $skippedReport
