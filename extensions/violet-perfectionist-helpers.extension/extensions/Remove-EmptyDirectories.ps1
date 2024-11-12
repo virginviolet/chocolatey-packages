@@ -1,3 +1,4 @@
+#region Help
 <#
 .SYNOPSIS
 Removes empty directories from a specified directory recursively or non-recursively.
@@ -204,6 +205,7 @@ https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
 https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
 https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154
 #>
+#endregion
 
 function Remove-EmptyDirectories {
     [CmdletBinding()]
@@ -242,6 +244,7 @@ function Remove-EmptyDirectories {
         [switch]$Audio
     )
 
+    #region Begin
     Begin {
         # Establish some common variables.
         $ErrorActionPreference = "Stop"
@@ -255,11 +258,14 @@ function Remove-EmptyDirectories {
         $skippedPathNames = @()
         $invalidPathCount = 0
 
+        Write-Debug "Write-EmptyDirectories started."
+        # $emptyLine | Out-String
+        
         # Test if the specified Path exists
         $pathExists = Test-Path -Path "$Path"
         If (-not $pathExists) {
             # $emptyLine | Out-String
-            $message = "'$Path' does not seem to be a valid path. `n" + `
+            $message = "Cannot find path '$Path' because it does not exist. `n" + `
                 # "`n" `
                 "Please verify that the path specified with the Path parameter was typed " + `
                 "correctly and that it is a valid file system path that points to a directory. " + `
@@ -269,11 +275,15 @@ function Remove-EmptyDirectories {
                 "Path specified: '$Output'."
             Write-Error $message
             throw
-        } # Else (If $pathExists)
+        } # Else (If -not $pathExists)
         $outputPathExists = Test-Path -Path "$Output"
-        If (-not $outputPathExists) {
+        If ($outputPathExists) {
+            # Resolve Output ("ReportPath") path
+            $outputPathResolved = Resolve-Path -Path "$Output"
+            $txtFile = "$outputPathResolved\$FileName"
+        } Else {
             # $emptyLine | Out-String
-            $message = "'$Output' does not seem to be a valid path. `n" + `
+            $message = "Cannot find path '$Output' because it does not exist. `n" + `
                 # "`n" `
                 "Please verify that the path specified with the Output (or ReportPath)" + `
                 "parameter was typed correctly and that it is a valid file system path that " + `
@@ -282,21 +292,25 @@ function Remove-EmptyDirectories {
                 # "`n" + `
                 "Output path specified: '$Output'."
             Write-Error $message
-            Write-Verbose 
             throw
-        } Else {
-            # Resolve Output ("ReportPath") path
-            $outputPathResolved = Resolve-Path -Path "$Output"
-            $txtFile = "$outputPathResolved\$FileName"
-        } # Else (If)
+        } # Else (If $outputPathExists)
 
         # Add the user-defined path(s) to the list of directories to process
         
-        If ($Path) {
+        If (-not $Path) {
+            # Take the paths that are piped into the script
+            $directories += @($input | ForEach-Object { $_.FullName })
+            Write-Debug "Piped input detected."
+        }
+        Else {
             ForEach ($pathCandidate in $Path) {
-                # Test if the path exists
-                $pathExists = Test-Path "$pathCandidate"
-                If (-not $pathExists) {
+                # Test if the path cadidate exists
+                $pathCandidateExists = Test-Path "$pathCandidate"
+                If ($pathCandidateExists) {
+                    # Resolve path (if path is specified as relative)
+                    $fullPath = (Resolve-Path "$pathCandidate").Path
+                    $directories += $fullPath # Note: This causes Path to be counted in `$directoryCount`
+                } Else {
                     $invalidPathWasFound = $true
 
                     # Increment the error counter
@@ -304,7 +318,7 @@ function Remove-EmptyDirectories {
 
                     # Display an error message in console
                     # $emptyLine | Out-String
-                    Write-Warning "'$pathCandidate' does not seem to be a valid path."
+                    Write-Warning "Cannot find path '$pathCandidate' because it does not exist."
                     # $emptyLine | Out-String
 
                     $message = "Please verify that the path specified with the Path " + `
@@ -335,18 +349,13 @@ function Remove-EmptyDirectories {
                     # Return to top of the program loop (ForEach $pathCandidate) and skip just this
                     # iteration of the loop.
                     Continue
-                } Else {
-                    # Resolve path (if path is specified as relative)
-                    $fullPath = (Resolve-Path "$pathCandidate").Path
-                    $directories += $fullPath
-                } # Else (If Test-Path $pathCandidate)
+                } # Else (If $pathCandidateExists)
             } # ForEach $pathCandidate
-        } Else {
-            # Take the paths that are piped into the script
-            $directories += @($input | ForEach-Object { $_.FullName })
-        } # Else (If $Path)
+        } # Else (If -not $Path)
     } # begin
+    #endregion
 
+    #region Process
     Process {
         # Search for the empty directories according to the user-set recurse option
         # Note: For best results against nested empty directories, please run the script iteratively
@@ -441,7 +450,9 @@ function Remove-EmptyDirectories {
             $continue = $true
         } # Else (If $uniqueDirectories.Count)
     } # Process
+    #endregion
 
+    #region End
     End {
         # Do the background work for natural language
         If ($directoryCount -eq 1) {
@@ -455,10 +466,10 @@ function Remove-EmptyDirectories {
         If ($skippedPathNames.Count -eq 0) {
             $enumerationSuccesful = $true
             If ($uniqueDirectories.Count -le 4) {
-                $skippedReport = "$($directoryCount) $directoryLabel in total processed " + `
+                $skippedReport = "$($directoryCount) $directoryLabel processed " + `
                     "at '$($uniqueDirectories -join ', ')'."
             } Else {
-                $skippedReport = "$($directoryCount) $directoryLabel in total processed."
+                $skippedReport = "$($directoryCount) $directoryLabel processed."
             } # Else (If $uniqueDirectories.Count)
             Write-Debug $skippedReport
             # $emptyLine | Out-String
@@ -472,22 +483,22 @@ function Remove-EmptyDirectories {
             $skippedPathSelection | Format-Table -auto
             If ($invalidPathCount -gt 1) {
                 If ($uniqueDirectories.Count -eq 0) {
-                    $skippedReport = "There were $invalidPathCount skipped paths. Didn't process any directories."
+                    $skippedReport = "$invalidPathCount paths skipped. No directories were processed."
                 } ElseIf ($uniqueDirectories.Count -le 4) {
-                    $skippedReport = "$($directoryCount) $directoryLabel in total processed " + `
+                    $skippedReport = "$($directoryCount) $directoryLabel processed " + `
                         "at $($uniqueDirectories -join ', '). There were $invalidPathCount skipped paths."
                 } Else {
-                    $skippedReport = "$($directoryCount) $directoryLabel in total processed. " + `
+                    $skippedReport = "$($directoryCount) $directoryLabel processed. " + `
                         "There were $invalidPathCount skipped paths."
                 } # Else (If $uniqueDirectories.Count)
             } Else {
                 If ($uniqueDirectories.Count -eq 0) {
-                    $skippedReport = "One path was skipped. Didn't process any directories."
+                    $skippedReport = "One path was skipped. No directories were processed."
                 } ElseIf ($uniqueDirectories.Count -le 4) {
-                    $skippedReport = "$($directoryCount) $directoryLabel in total processed " + `
+                    $skippedReport = "$($directoryCount) $directoryLabel processed " + `
                         "at $($uniqueDirectories -join ', '). One path was skipped."
                 } Else {
-                    $skippedReport = "$($directoryCount) $directoryLabel in total processed." + `
+                    $skippedReport = "$($directoryCount) $directoryLabel processed." + `
                         "One path was skipped."
                 } # Else (If $uniqueDirectories.Count)
             } # Else (If $invalidPathCount)
@@ -495,8 +506,16 @@ function Remove-EmptyDirectories {
             # $emptyLine | Out-String
         } # Else (If $skippedPathNames.Count)
 
-        # Create a list of the empty directories
-        If ($emptyDirectories.Count -ge 1) {
+        If ($emptyDirectories.Count -lt 1) {
+            If ($directoryCount -ge 1) {
+                $exitText = "No empty directories were found."
+                Write-Verbose $exitText
+                # $emptyLine | Out-String
+            } Else {
+                $continue = $true
+            } # Else (If $directoryCount)
+        } Else {
+            # Create a list of the empty directories
             $UniqueEmptyDirectories = $emptyDirectories | Select-Object -ExpandProperty FullName -Unique
             If ($UniqueEmptyDirectories.Count -eq 1) {
                 $directoryLabel = "directory"
@@ -556,19 +575,14 @@ function Remove-EmptyDirectories {
             } Else {
                 [console]::beep(2000, 830)
             } # Else (If -not $Audio)
-
-        } Else {
-            If ($directoryCount -ge 1) {
-                $exitText = "Didn't find any empty directories."
-                Write-Verbose $exitText
-                # $emptyLine | Out-String
-            } Else {
-                $continue = $true
-            } # Else (If $directoryCount)
         } # Else (If $emptyDirectories.Count)
+        # $emptyLine | Out-String
+        Write-Debug "Write-EmptyDirectories ended."
     } # End
-    
-    <#
+    #endregion
+
+#region Sources
+<#
 # Sources
 
 auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed November 10, 2024.  
@@ -581,4 +595,5 @@ nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016.
 https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 
 #>
+#endregion
 }
