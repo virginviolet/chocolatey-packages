@@ -4,201 +4,107 @@ Removes empty directories from a specified directory recursively or non-recursiv
 
 .DESCRIPTION
 Remove-EmptyDirectories searches for empty directories from a directory specified with the Path
-parameter. By default the search is limited to the first directory level (i.e. the search and
-removal of the empty directories is done non-recursively), but if a Recurse parameter is added to
-the launching command, Remove-EmptyDirectories will remove empty directories from the subdirectories
-as well (i.e. the search and removal is done recursively).
+parameter.  
 
-If deletions are made, a log-file (deleted_directories.txt by default) is created to $env:temp,
-which points to the current temporary file location and is set in the system (- for more information
-about $env:temp, please see the Notes section). The filename of the log-file can be set with the
-FileName parameter (a filename with a .txt ending is recommended) and the default output
-destination directory may be changed with the Output parameter. During the possibly invoked
-log-file creation procedure Remove-EmptyDirectories tries to preserve any pre-existing content
-rather than overwrite the specified file, so if the FileName parameter points to an existing file,
-new log-info data is appended to the end of that file.
+By default, the search is limited to the first directory level (i.e. the search and removal of the
+empty directories is done non-recursively), but if the Recurse parameter is specified, then the search
+Remove-EmptyDirectories will remove empty directories from subdirectories as well (i.e. the search
+and removal is done recursively).
 
-To invoke a simulation run, where no directories would be deleted in any circumstances, a parameter
-WhatIf may be added to the launching command. If the Audio parameter has been used, an audible
-beep would be emitted after Remove-EmptyDirectories has deleted one or more directories. Please note
-that if any of the parameter values (after the parameter name itself) includes space characters, the
-value should be enclosed in quotation marks (single or double) so that PowerShell can interpret the
-command correctly.
+If directories are found and deleted, a log file is made. By default it is saved to the Temp
+directory (`$Env:TEMP`) with the file name `deleted_directories.txt`. If the function has been run
+before and it the file already exists, it will be appendend to, not replaced.
 
 .PARAMETER Path
-with aliases Start, Begin, Directory, and From. The Path parameter determines the starting
-point of the empty directory analyzation. The Path parameter also accepts a collection of path
-names (separated by a comma). It's not mandatory to write Path in the remove empty directories
-command to invoke the Path parameter, as is shown in the Examples below, since
-Remove-EmptyDirectories is trying to decipher the inputted queries as good as it is machinely
-possible within a 40 KB size limit.
+The Path parameter determines the starting point of the empty directory search.
 
-The paths should be valid file system paths to a directory (a full path of a directory (i.e.
-directory path such as C:\Windows)). In case the path includes space characters, please enclose
-the path in quotation marks (single or double). If a collection of paths is defined for
-the Path parameter, please separate the individual paths with a comma. The Path parameter
-also takes an array of strings for paths and objects could be piped to this parameter, too. If no
-path is defined in the command launching Remove-EmptyDirectories the user will be prompted to enter
-a Path value. How deeply the filesystem structure is analysed (and how deeply buried empty
-directories are deleted) is toggled with the Recurse parameter.
+A collection of paths (separated by a comma), or an array of paths in strings, may be used instead
+of a single path. Objects piped to Remove-EmptyDirectories will be sent to the Path parameter.
+
+Aliases: Start, Begin, Directory, From
 
 .PARAMETER Output
-with an alias ReportPath. Specifies where the log-file (deleted_directories.txt by default, which
-is created or updated when deletions are made) is to be saved. The default save location is
-$env:temp, which points to the current temporary file location, which is set in the system. The
-default Output is $env:temp. includes space characters, please enclose the path in quotation
-marks (single or double). For usage, please see the Examples below and for more information about
-$env:temp, please see the Notes section below.
+The Output parameter specifies the directory where the log file is to be saved.  
+The default value of Output is `$Env:TEMP`, which means that the log file will be saved to the Temp
+directory.
+
+A log file is only created (or appended to) if any empty directories are found.
+
+Alias: ReportPath
 
 .PARAMETER FileName
-with an alias File. The filename of the log-file can be set with the FileName parameter (a
-filename with a .txt ending is recommended, the default filename is deleted_directories.txt). During
-the possibly invoked log-file creation procedure Remove-EmptyDirectories tries to preserve any
-pre-existing content rather than overwrite the specified file, so if the FileName parameter points
-to an existing file, new log-info data is appended to the end of that file. If the filename includes
-space characters, please enclose the filename in quotation marks (single or double).
+
+The FileName parameter specifies the file name of the log.  
+It is recommended that it ends with `.txt`.
+
+The default file name is `deleted_directories.txt`
+
+If a file with the same name is found, it will appended to, rather than overwritten.
+
+Alias: File
 
 .PARAMETER Recurse
-If the Recurse parameter is added to the command launching Remove-EmptyDirectories, also each and
-every sub-directory in any level, no matter how deep in the directory structure or behind how many
-sub-directories, is searched for empty directories and all found empty directories regardless of the
-sub-level are deleted. For best results against nested empty directories, it is recommended to run
-Remove-EmptyDirectories iteratively with the Recurse parameter until no empty directories are
-found.
+If the Recurse parameter is used, then each and every sub-directory, on all levels below the Path
+directory, (no matter how deep in the directory structure or behind how many sub-directories), are
+searched for empty directories, and all empty directories found (regardless of the sub-level) are
+deleted.
 
-If the Recurse parameter is not used, the search is limited to the first directory level (i.e. the
-search is done non-recursively) and only empty directories from the first level (as indicated with
-the Path parameter with the common command "dir", for example) are deleted.
+In some cases, it might be necessary to run Remove-EmptyDirectories iteratively with the Recurse
+parameter until no empty directories are found.
+
+If the Recurse parameter is *not* used, the search is limited to the first directory level (the
+directory specified with Path).  
+For example, if the Path is `C:\My Files\`, and one of the directories in that folder (let's say
+`C:\My Files\Scripts\`), has itself an empty folder (perhaps `C:\My Files\Scripts\Old\`), then the
+Old directory will not be found, and the Script directory will be considered non-empty and will not
+be deleted. But if the Recurse parameter *is* used, then the Scripts directory will be searched and
+the Old directory will be found and deleted. You might then have to run Remove-EmptyDirectories
+again to have the Scripts directory deleted.
 
 .PARAMETER WhatIf
-The parameter WhatIf toggles whether the deletion of directories is actually done or not. By adding
-the WhatIf parameter to the launching command only a simulation run is performed. When the WhatIf
-parameter is added to the command launching Remove-EmptyDirectories, a WhatIf parameter is also
-added to the underlying Remove-Item cmdlet that is deleting the directories in
-Remove-EmptyDirectories. In such case and if indeed empty directory(s) was/were detected by
-Remove-EmptyDirectories, a list of directory paths that would be deleted by Remove-EmptyDirectories
-is displayed in console ("What if:"). Since no real deletions aren't made, the script will return an
-"Exit Code 1" (A simulation run: the WhatIf parameter was used).
+When the WhatIf parameter is provided, a WhatIf parameter is also added to the underlying
+Remove-Item cmdlet, so only a simulation run will be performed. No directories will actually be
+deleted in this case, even if it appears so from the debug messages.
 
 .PARAMETER Audio
-If this parameter is used in the remove empty directories command, an audible beep will occur, if
-any deletions are made by Remove-EmptyDirectories.
+If the Audio parameter is specified, an audible beep will be made if any directories have been
+deleted when the operation is complete.
 
 .OUTPUTS
 Deletes empty directories.  
-Displays results about deleting empty directories in console, and if any deletions were made, writes
-or updates a logfile (deleted_directories.txt) at $env:temp. The filename of the log-file can be set
-with the FileName parameter (a filename with a .txt ending is recommended) and the default output
-destination directory may be changed with the Output parameter.
-
-    Default values (the log-file creation/updating procedure only occurs if deletion(s) is/are made
-    by Remove-EmptyDirectories):
-
-        $env:temp\deleted_directories.txt       : TXT-file     : deleted_directories.txt
-
-.NOTES
-Please note that all the parameters can be used in one remove empty directories command and that
-each of the parameters can be "tab completed" before typing them fully (by pressing the [tab] key).
-
-Please also note that the possibly generated log-file is created in a directory, which is end-user
-settable in each remove empty directories command with the Output parameter.
+Displays information about the process in the Debug and Verbose streams, and if any deletions are
+made, a log file will be created or appended to.
 
 .EXAMPLE
-./Remove-EmptyDirectories -Path "E:\chiore" -Output "C:\Scripts"
+Remove-EmptyDirectories -Path 'C:\My Files\' -Output 'C:\My Logs\'
 
-Run the script. Please notice to insert ./ or .\ before the script name. Removes all empty
-directories from the first level of E:\chiore (i.e. those empty directories, which would be listed
-with the "dir E:\chiore" command, and if any deletions were made, saves the log-file to C:\Scripts
-with the default filename (deleted_directories.txt). During the possibly invoked log-file creation
-procedure Remove-EmptyDirectories tries to preserve any pre-existing content rather than overwrite
-the file, so if the default log-file (deleted_directories.txt) already exists, new log-info data is
-appended to the end of that file. Please note, that Path can be omitted in this example, because
-
-    ./Remove-EmptyDirectories "E:\chiore" -Output "C:\Scripts"
-
-will result in the exact same outcome.
+Removes all empty directories from the first level of `C:\My Files\` (i.e. the same directories that
+would be listed with `Get-ChildItem 'C:\My Files\'`), and if any deletions are made, it logs to a
+file in `C:\My Logs\` with the default file name (`deleted_directories.txt`).
 
 .EXAMPLE
-help ./Remove-EmptyDirectories -Full
+Get-Help Remove-EmptyDirectories -Full
 
-Display the help file.
-
-.EXAMPLE
-./Remove-EmptyDirectories -Path "C:\Users\Dropbox", "C:\dc01" -Recurse -WhatIf
-
-Because the -WhatIf parameter was used, only a simulation run occurs, so no directories would be
-deleted in any circumstances. The script will look for empty directories from C:\Users\Dropbox and
-C:\dc01 and will add all sub-directories of the sub-directories of the sub-directories and their
-sub-directories as well from those directories to the list of directories to process (the search for
-other directories to process is done recursively).
-
-If empty directories aren't found, the result would be identical regardless whether the -WhatIf
-parameter was used or not. If, however, empty directories were indeed found, only an indication of
-what the script would delete ("What if:") is displayed.
-
-The Path variable value is case-insensitive (as is most of the PowerShell), and since the paths
-don't contain any space characters, they don't need to be enveloped with quotation marks. Actually
-the Path parameter may be left out from the command, too, since, for example,
-
-    ./Remove-EmptyDirectories c:\users\dROPBOx, c:\DC01 -Recurse -WhatIf
-
-is the exact same command in nature.
+Displays help for the Remove-EmptyDirectories function.
 
 .EXAMPLE
-.\Remove-EmptyDirectories.ps1 -From C:\dc01 -ReportPath C:\Scripts -File log.txt -Recurse -Audio
+Remove-EmptyDirectories -Path 'C:\Program Files\Notepad++\', "$Env:AppData\Notepad++\" -Recurse -WhatIf
 
-Run the script and search recursively for empty directories from C:\dc01 and delete all recursively
-found empty directories under C:\dc01. If any deletions were made, the log-file would be saved to
-C:\Scripts with the filename log.txt and an audible beep would occur. This command will work,
-because From is an alias of Path and ReportPath is an alias of Output and File is an alias of
-FileName. Furthermore, since the paths don't contain any space characters, they don't need to
-be enclosed in quotation marks.
-
-.EXAMPLE
-Set-ExecutionPolicy RemoteSigned
-
-This command is altering the Windows PowerShell rights to enable script execution for the default
-(LocalMachine) scope. Windows PowerShell has to be run with elevated rights (run as an
-administrator) to actually be able to change the script execution properties. The default value of
-the default (LocalMachine) scope is "Set-ExecutionPolicy restricted".
-
-    Parameters:
-
-    Restricted      Does not load configuration files or run scripts. Restricted is the default
-                    execution policy.
-
-    AllSigned       Requires that all scripts and configuration files be signed by a trusted
-                    publisher, including scripts that you write on the local computer.
-
-    RemoteSigned    Requires that all scripts and configuration files downloaded from the Internet
-                    be signed by a trusted publisher.
-
-    Unrestricted    Loads all configuration files and runs all scripts. If you run an unsigned
-                    script that was downloaded from the Internet, you are prompted for permission
-                    before it runs.
-
-    Bypass          Nothing is blocked and there are no warnings or prompts.
-
-    Undefined       Removes the currently assigned execution policy from the current scope.
-                    This parameter will not remove an execution policy that is set in a Group
-                    Policy scope.
-
-
-For more information on the Set-ExecutionPolicy command, type: "get-help Set-ExecutionPolicy". 
-For more information on execution policies, type: "help about_Execution_Policies".
+Because the WhatIf parameter was used, only a simulation run is made. No directories will be deleted
+in any circumstance.  
+The script will look for empty directories in `C:\Program Files\Notepad++\` and
+`C:\Users\<user name>\AppData\Roaming\Notepad++` and will add all sub-directories of the
+sub-directories of the sub-directories and their sub-directories (and so on) to the list of
+directories to process (the search for other directories to process is done recursively).  
+If empty directories are found, and the `$debugPreference` varible is set to 'Continue', messages
+will displayed in console as if the directories are being deleted.
 
 .EXAMPLE
-New-Item -ItemType File -Path C:\Temp\Remove-EmptyDirectories.ps1
+Remove-EmptyDirectories -Path 'D:\Downloads\' -Output 'D:\' -File 'log.txt' -Recurse -Audio
 
-Creates an empty ps1-file to the C:\Temp directory. The New-Item cmdlet has an inherent NoClobber
-mode built into it, so that the procedure will halt, if overwriting (replacing the contents) of an
-existing file is about to happen. Overwriting a file with the New-Item cmdlet requires using the
-Force. If the path includes space characters, please enclose the path in quotation marks
-(single or double):
-
-    New-Item -ItemType File -Path "C:\Directory Name\Remove-EmptyDirectories.ps1"
-
-For more information, type: "help New-Item -Full".
+Search recursively, starting at `D:\Downloads\`, and delete all empty directories found. When the
+operation is complete, and if any directories were found and deleted during the process, a log file
+will be saved to `D:\` with the file name `log.txt`, and a beep sound is played.
 
 .LINK
 https://community.chocolatey.org/packages/violet-perfectionist-helpers.extension/
@@ -234,7 +140,8 @@ function Remove-EmptyDirectories {
         
         [ValidateNotNullOrEmpty()]
         [Alias("ReportPath")]
-        [string]$Output = "$env:temp",
+        [string]$Output = "$Env:temp",
+
         [Alias("File")]
         [string]$FileName = "deleted_directories.txt",
 
@@ -244,6 +151,8 @@ function Remove-EmptyDirectories {
         
         [switch]$Audio
     )
+
+    # TODO Remove help message from the Param block.
 
     #region Begin
     Begin {
