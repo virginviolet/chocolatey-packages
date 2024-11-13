@@ -1,120 +1,124 @@
-<#
-.SYNOPSIS
-Removes empty directories from a specified directory recursively or non-recursively.
-
-.DESCRIPTION
-Remove-EmptyDirectories searches for empty directories from a directory specified with the Path
-parameter.  
-
-By default, the search is limited to the first directory level (i.e. the search and removal of the
-empty directories is done non-recursively), but if the Recurse parameter is specified, then the search
-Remove-EmptyDirectories will remove empty directories from subdirectories as well (i.e. the search
-and removal is done recursively).
-
-If directories are found and deleted, a log file is made. By default it is saved to the Temp
-directory (`$Env:TEMP`) with the file name `deleted_directories.txt`. If the function has been run
-before and it the file already exists, it will be appendend to, not replaced.
-
-.PARAMETER Path
-The Path parameter determines the starting point of the empty directory search.
-
-A collection of paths (separated by a comma), or an array of paths in strings, may be used instead
-of a single path. Objects piped to Remove-EmptyDirectories will be sent to the Path parameter.
-
-Aliases: Start, Begin, Directory, From
-
-.PARAMETER Output
-The Output parameter specifies the directory where the log file is to be saved.  
-The default value of Output is `$Env:TEMP`, which means that the log file will be saved to the Temp
-directory.
-
-A log file is only created (or appended to) if any empty directories are found.
-
-Alias: ReportPath
-
-.PARAMETER FileName
-
-The FileName parameter specifies the file name of the log.  
-It is recommended that it ends with `.txt`.
-
-The default file name is `deleted_directories.txt`
-
-If a file with the same name is found, it will appended to, rather than overwritten.
-
-Alias: File
-
-.PARAMETER Recurse
-If the Recurse parameter is used, then each and every sub-directory, on all levels below the Path
-directory, (no matter how deep in the directory structure or behind how many sub-directories), are
-searched for empty directories, and all empty directories found (regardless of the sub-level) are
-deleted.
-
-In some cases, it might be necessary to run Remove-EmptyDirectories iteratively with the Recurse
-parameter until no empty directories are found.
-
-If the Recurse parameter is *not* used, the search is limited to the first directory level (the
-directory specified with Path).  
-For example, if the Path is `C:\My Files\`, and one of the directories in that folder (let's say
-`C:\My Files\Scripts\`), has itself an empty folder (perhaps `C:\My Files\Scripts\Old\`), then the
-Old directory will not be found, and the Script directory will be considered non-empty and will not
-be deleted. But if the Recurse parameter *is* used, then the Scripts directory will be searched and
-the Old directory will be found and deleted. You might then have to run Remove-EmptyDirectories
-again to have the Scripts directory deleted.
-
-.PARAMETER WhatIf
-When the WhatIf parameter is provided, a WhatIf parameter is also added to the underlying
-Remove-Item cmdlet, so only a simulation run will be performed. No directories will actually be
-deleted in this case, even if it appears so from the debug messages.
-
-.PARAMETER Audio
-If the Audio parameter is specified, an audible beep will be made if any directories have been
-deleted when the operation is complete.
-
-.OUTPUTS
-Deletes empty directories.  
-Displays information about the process in the Debug and Verbose streams, and if any deletions are
-made, a log file will be created or appended to.
-
-.EXAMPLE
-Remove-EmptyDirectories -Path 'C:\My Files\' -Output 'C:\My Logs\'
-
-Removes all empty directories from the first level of `C:\My Files\` (i.e. the same directories that
-would be listed with `Get-ChildItem 'C:\My Files\'`), and if any deletions are made, it logs to a
-file in `C:\My Logs\` with the default file name (`deleted_directories.txt`).
-
-.EXAMPLE
-Get-Help Remove-EmptyDirectories -Full
-
-Displays help for the Remove-EmptyDirectories function.
-
-.EXAMPLE
-Remove-EmptyDirectories -Path 'C:\Program Files\Notepad++\', "$Env:AppData\Notepad++\" -Recurse -WhatIf
-
-Because the WhatIf parameter was used, only a simulation run is made. No directories will be deleted
-in any circumstance.  
-The script will look for empty directories in `C:\Program Files\Notepad++\` and
-`C:\Users\<user name>\AppData\Roaming\Notepad++` and will add all sub-directories of the
-sub-directories of the sub-directories and their sub-directories (and so on) to the list of
-directories to process (the search for other directories to process is done recursively).  
-If empty directories are found, and the `$debugPreference` varible is set to 'Continue', messages
-will displayed in console as if the directories are being deleted.
-
-.EXAMPLE
-Remove-EmptyDirectories -Path 'D:\Downloads\' -Output 'D:\' -File 'log.txt' -Recurse -Audio
-
-Search recursively, starting at `D:\Downloads\`, and delete all empty directories found. When the
-operation is complete, and if any directories were found and deleted during the process, a log file
-will be saved to `D:\` with the file name `log.txt`, and a beep sound is played.
-
-.LINK
-https://community.chocolatey.org/packages/violet-perfectionist-helpers.extension/
-https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/violet-perfectionist-helpers.extension/
-https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
-https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
-https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154
-#>
-
 function Remove-EmptyDirectories {
+    #region Help
+
+    <#
+        .SYNOPSIS
+        Removes empty directories from a specified directory recursively or non-recursively.
+
+        .DESCRIPTION
+        Remove-EmptyDirectories searches for empty directories from a directory specified with the Path
+        parameter.  
+
+        By default, the search is limited to the first directory level (i.e. the search and removal of the
+        empty directories is done non-recursively), but if the Recurse parameter is specified, then the search
+        Remove-EmptyDirectories will remove empty directories from subdirectories as well (i.e. the search
+        and removal is done recursively).
+
+        If directories are found and deleted, a log file is made. By default it is saved to the Temp
+        directory (`$Env:TEMP`) with the file name `deleted_directories.txt`. If the function has been run
+        before and it the file already exists, it will be appendend to, not replaced.
+
+        .PARAMETER Path
+        The Path parameter determines the starting point of the empty directory search.
+
+        A collection of paths (separated by a comma), or an array of paths in strings, may be used instead
+        of a single path. Objects piped to Remove-EmptyDirectories will be sent to the Path parameter.
+
+        Aliases: Start, Begin, Directory, From
+
+        .PARAMETER Output
+        The Output parameter specifies the directory where the log file is to be saved.  
+        The default value of Output is `$Env:TEMP`, which means that the log file will be saved to the Temp
+        directory.
+
+        A log file is only created (or appended to) if any empty directories are found.
+
+        Alias: ReportPath
+
+        .PARAMETER FileName
+
+        The FileName parameter specifies the file name of the log.  
+        It is recommended that it ends with `.txt`.
+
+        The default file name is `deleted_directories.txt`
+
+        If a file with the same name is found, it will appended to, rather than overwritten.
+
+        Alias: File
+
+        .PARAMETER Recurse
+        If the Recurse parameter is used, then each and every sub-directory, on all levels below the Path
+        directory, (no matter how deep in the directory structure or behind how many sub-directories), are
+        searched for empty directories, and all empty directories found (regardless of the sub-level) are
+        deleted.
+
+        In some cases, it might be necessary to run Remove-EmptyDirectories iteratively with the Recurse
+        parameter until no empty directories are found.
+
+        If the Recurse parameter is *not* used, the search is limited to the first directory level (the
+        directory specified with Path).  
+        For example, if the Path is `C:\My Files\`, and one of the directories in that folder (let's say
+        `C:\My Files\Scripts\`), has itself an empty folder (perhaps `C:\My Files\Scripts\Old\`), then the
+        Old directory will not be found, and the Script directory will be considered non-empty and will not
+        be deleted. But if the Recurse parameter *is* used, then the Scripts directory will be searched and
+        the Old directory will be found and deleted. You might then have to run Remove-EmptyDirectories
+        again to have the Scripts directory deleted.
+
+        .PARAMETER WhatIf
+        When the WhatIf parameter is provided, a WhatIf parameter is also added to the underlying
+        Remove-Item cmdlet, so only a simulation run will be performed. No directories will actually be
+        deleted in this case, even if it appears so from the debug messages.
+
+        .PARAMETER Audio
+        If the Audio parameter is specified, an audible beep will be made if any directories have been
+        deleted when the operation is complete.
+
+        .OUTPUTS
+        Deletes empty directories.  
+        Displays information about the process in the Debug and Verbose streams, and if any deletions are
+        made, a log file will be created or appended to.
+
+        .EXAMPLE
+        Remove-EmptyDirectories -Path 'C:\My Files\' -Output 'C:\My Logs\'
+
+        Removes all empty directories from the first level of `C:\My Files\` (i.e. the same directories that
+        would be listed with `Get-ChildItem 'C:\My Files\'`), and if any deletions are made, it logs to a
+        file in `C:\My Logs\` with the default file name (`deleted_directories.txt`).
+
+        .EXAMPLE
+        Get-Help Remove-EmptyDirectories -Full
+
+        Displays help for the Remove-EmptyDirectories function.
+
+        .EXAMPLE
+        Remove-EmptyDirectories -Path 'C:\Program Files\Notepad++\', "$Env:AppData\Notepad++\" -Recurse -WhatIf
+
+        Because the WhatIf parameter was used, only a simulation run is made. No directories will be deleted
+        in any circumstance.  
+        The script will look for empty directories in `C:\Program Files\Notepad++\` and
+        `C:\Users\<user name>\AppData\Roaming\Notepad++` and will add all sub-directories of the
+        sub-directories of the sub-directories and their sub-directories (and so on) to the list of
+        directories to process (the search for other directories to process is done recursively).  
+        If empty directories are found, and the `$debugPreference` varible is set to 'Continue', messages
+        will displayed in console as if the directories are being deleted.
+
+        .EXAMPLE
+        Remove-EmptyDirectories -Path 'D:\Downloads\' -Output 'D:\' -File 'log.txt' -Recurse -Audio
+
+        Search recursively, starting at `D:\Downloads\`, and delete all empty directories found. When the
+        operation is complete, and if any directories were found and deleted during the process, a log file
+        will be saved to `D:\` with the file name `log.txt`, and a beep sound is played.
+
+        .LINK
+        https://community.chocolatey.org/packages/violet-perfectionist-helpers.extension/
+        https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/violet-perfectionist-helpers.extension/
+        https://gist.github.com/nedarb/840f9f0c9a2e6014d38f
+        https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_advanced_parameters
+        https://web.archive.org/web/20170310083256/http://poshcode.org:80/2154
+    #>
+
+    #endregion
+
     [CmdletBinding()]
     Param (
         [Parameter(ValueFromPipeline = $true,
@@ -211,8 +215,7 @@ function Remove-EmptyDirectories {
             # Take the paths that are piped into the script
             $directories += @($input | ForEach-Object { $_.FullName })
             Write-Debug "Piped input detected."
-        }
-        Else {
+        } Else {
             ForEach ($pathCandidate in $Path) {
                 # Test if the path cadidate exists
                 $pathCandidateExists = Test-Path "$pathCandidate"
@@ -491,19 +494,19 @@ function Remove-EmptyDirectories {
     } # End
     #endregion
 
-#region Sources
-<#
-# Sources
+    #region Sources
+    <#
+        # Sources
 
-auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed November 10, 2024.  
-https://github.com/auberginehill/remove-empty-folders/tree/master.
+        auberginehill. “Remove-EmptyFolders.ps1.” GitHub, February 2, 2013. Accessed November 10, 2024.  
+        https://github.com/auberginehill/remove-empty-folders/tree/master.
 
-Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d.  
-https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell.
+        Mekac. “Get Directory Where Access Is Denied.” Microsoft TechNet Forums, n.d.  
+        https://social.technet.microsoft.com/Forums/en-US/4d78bba6-084a-4a41-8d54-6dde2408535f/get-directory-where-access-is-denied?forum=winserverpowershell.
 
-nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016.  
-https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
+        nedarb. “RemoveEmptyFolders.Ps1.” GitHub Gist, January 28, 2016.  
+        https://gist.github.com/nedarb/840f9f0c9a2e6014d38f.
 
-#>
-#endregion
+    #>
+    #endregion
 }
