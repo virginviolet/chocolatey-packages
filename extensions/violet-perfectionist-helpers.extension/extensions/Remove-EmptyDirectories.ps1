@@ -71,7 +71,8 @@ function Remove-EmptyDirectories {
 
         .PARAMETER Audio
         If the Audio parameter is specified, an audible beep will be made if any directories have been
-        deleted when the operation is complete.
+        deleted when the operation is complete.  
+        For whatever reason, this does not always work (not an issue with the function).
 
         .OUTPUTS
         Deletes empty directories.  
@@ -484,7 +485,7 @@ function Remove-EmptyDirectories {
             if ( -not $Audio ) {
                 $continue = $true
             } else {
-                [console]::beep(2000, 830)
+                [console]::beep(2000, 150)
             } # else (if -not $Audio)
         } # else (if $emptyDirectories.Count)
         # $emptyLine | Out-String
