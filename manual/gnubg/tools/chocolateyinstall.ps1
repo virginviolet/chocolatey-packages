@@ -2,6 +2,7 @@
 
 # Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors
+# $autoHotKeyPath = 'C:\Program Files\AutoHotkey\AutoHotkey.exe'
 
 # Prevent force install if any of these programs are running
 # (so that no progress is lost)
@@ -33,15 +34,79 @@ if ($PSVersionTable.PSVersion.Major -ge 5) {
   Start-CheckandStop "bearoffdump"
 }
 
+function Get-AutoHotkeyExePath {
+  param (
+    [string] $InstallDirPath
+  )
+  $executables = @(
+    'AutoHotkey.exe'
+    'AutoHotkeyU64.exe'
+    'AutoHotkeyA64.exe'
+    'AutoHotkeyU32.exe'
+    'AutoHotkeyA32.exe'
+  )
+  foreach ($executable in $executables) {
+    $autoHotKeyPathTestPath = Join-Path -Path -ChildPath $executable
+    if (Test-Path $autoHotKeyPathTestPath -PathType Leaf) {
+      Write-Debug "AutoHotKey found at '$autoHotKeyPath'."
+      return $autoHotKeyPathTestPath
+    }
+  }
+  Write-Debug "AutoHotKey not found."
+}
+
+
+
 # Run EXE installer
 # Start AutoHotKey script to hide compiler window
 $toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $exeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
+if ($autoHotKeyPath) {
+  $autoHotKeyPathFound = $true
+  Write-Debug "AutoHotKey path is set to '$autoHotKeyPath'."
+}
+if (-not $autoHotKeyPathFound) {
+  Write-Debug "Finding AutoHotKey path..."
+  try {
+    Write-Debug "Looking for AutoHotKey path in registry..."
+    $regKeyPath = "REGISTRY::HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
+    $regKeyValueName = "InstallDir"
+    $installDir = Get-ItemPropertyValue -Path $regKeyPath -Name $regKeyValueName
+    $exists = Test-Path ($installDir) -PathType Container
+    if ($exists) {
+      $autoHotKeyPath = Get-AutoHotkeyPath -Path $installDir
+      if ($autoHotKeyPath) {
+        $autoHotKeyPathFound = $true
+        Write-Debug "AutoHotKey path found in registry."
+        break
+      }
+    }
+  } catch [System.Management.Automation.ItemNotFoundException] {
+    $message = "Could not get registry key.`n" + `
+      "The key '$Path' does not exist.`n$_"
+    Write-Debug $message
+  } catch [System.Management.Automation.PSArgumentException] {
+    $message = "Could not get registry key.`n" + 
+    "The key '$Path' does not have the value '$Name'.`n$_"
+    Write-Debug $message
+  } catch {
+    Write-Debug $_
+  }
+  Write-Debug "AutoHotKey not found in registry."
+  try {
+    Write-Debug "Looking for AutoHotKey path with Get-Command..."
+    $autoHotKeyPath = $(Get-Command autohotkey).Source
+  } catch [System.Management.Automation.CommandNotFoundException] {
+    Write-Debug "AutoHotKey not found.`n$_"
+  } catch {
+    Write-Debug "$_"
+  }
+  Write-Debug "Looking for AutoHotKey Chocolatey install path..."
+}
 $ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
 $ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
 # Get AutoHotKey path
 try {
-  # IMPROVE Move to Preferences section
   $autoHotKeyPath = $(Get-Command autohotkey).Source
   # Set custom AutoHotKey path (comment out previous line
   # and uncomment next line)
@@ -65,7 +130,7 @@ if ($ahkVersionMajor -ge 2) {
 }
 # Arguments
 $packageArgs = @{
-  packageName    = $env:ChocolateyPackageName
+  packageName    = "$($packageName)"
   unzipLocation  = $toolsDirPath
   fileType       = 'EXE'
   file           = $exeInstallerPath
