@@ -55,8 +55,9 @@ The default installation directory is `C:\Program Files (x86)\gnubg\`. </descrip
     <!-- =============================== -->
      
     <dependencies>
-      <dependency id="autohotkey" version="1.0" /> <!-- Required for silent installation -->
+      <dependency id="chocolatey-core.extension" version="1.3.3" /> <!-- Required for Get-AppInstallLocation -->
       <dependency id="chocolatey-misc-helpers.extension" version="0.0.3" /> <!-- Required for 'Start-CheckandThrow' -->
+      <dependency id="autohotkey" version="[1.0, 3.0)" /> <!-- Required for silent installation -->
     </dependencies>
   </metadata>
   <files>

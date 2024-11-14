@@ -42,60 +42,44 @@ $getProcessIdPath = Join-Path -Path $helpersPath -ChildPath 'Get-ProcessId'
 . $getProcessIdPath
 Write-Debug "Helper loaded."
 
-# Get AutoHotKey version
+# Get AutoHotkey path
 if ($autoHotKeyPath) {
-  Write-Debug "AutoHotKey path is set to '$autoHotKeyPath'."
-  $ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
-  Write-Debug "Autohotkey v$ahkVersionMajor found."
+  Write-Debug "AutoHotkey path is set to '$autoHotKeyPath'."
 } else {
-  $isAutoHotKeyPortableV2Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|2"
-  if ($isAutoHotKeyPortableV2Installed) {
-    Write-Debug "autohotkey.portable v2 found."
-    $ahkVersionMajor = 2
-  } else {
-    $isAutoHotKeyPortableV1Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|1"
-    if ($isAutoHotKeyPortableV1Installed) {
-      Write-Debug "autohotkey.portable v1 found."
-      $ahkVersionMajor = 1
-    }
-  }
-  if (-not $isAutoHotKeyPortableV2Installed -and -not $isAutoHotKeyPortableV1Installed) {
-    $isAutoHotKeyInstallV2Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)" -match "\|2"
-    if ($isAutoHotKeyInstallV2Installed) {
-      Write-Debug "autohotkey.install v2 found."
-      $ahkVersionMajor = 2
-    } else {
-      $isAutoHotKeyInstallV1Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)" -match "\|1"
-      if ($isAutoHotKeyInstallV1Installed) {
-        Write-Debug "autohotkey.install v1 found."
-        $ahkVersionMajor = 1
-      } else {
-        Write-Warning "AutoHotKey not found."
-        Write-Warning "Setting AutoHotKey version to 2." # Try with 2 I guess
-        $ahkVersionMajor = 2
-      }
-    }
-  }
+  Write-Debug "Loading helper 'Get-AutoHotkeyPath' from '$helpersPath'..."
+  $getAutoHotkeyPath = Join-Path -Path $helpersPath -ChildPath 'Get-AutoHotkeyPath'
+  . $getAutoHotkeyPath
+  Write-Debug "Helper loaded."
+  $packagePath = Split-Path -Parent $toolsDirPath
+  $libPath = Split-Path -Parent $packagePath
+  $autoHotKeyPath = Get-AutoHotkeyPath -LibPath $libPath
 }
+# Get AutoHotkey version
+$ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
+Write-Debug "AutoHotkey v$ahkVersionMajor found."
 
-# Run AutoHotKey script that a hides the compiler window that appears during installation
-# Run the correct script for the correct AutoHotKey version
+# Run AutoHotkey script that a hides the compiler window that appears during installation
+# Run the correct script for the correct AutoHotkey version
 $ahk1ScriptPath = Join-Path -Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
 $ahk2ScriptPath = Join-Path -Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
 if ($ahkVersionMajor -ge 2) {
-  Write-Debug "AutoHotKey >= 2.0"
+  Write-Debug "AutoHotkey >= 2.0"
   $ahkScriptPath = $ahk2ScriptPath
 } else {
-  Write-Debug "AutoHotKey < 2.0"
+  Write-Debug "AutoHotkey < 2.0"
   $ahkScriptPath = $ahk1ScriptPath
 }
 $ahkStatements = "/ErrorStdOut=utf-8 ""$ahkScriptPath"""
-$ahkProcess = Start-Process -FilePath 'AutoHotKey' -ArgumentList $ahkStatements -NoNewWindow -PassThru 2>&1
-Write-Debug "AutoHotKey script '$ahk1ScriptPath' executed."
+$ahkProcess = Start-Process -FilePath $autoHotKeyPath -ArgumentList $ahkStatements -NoNewWindow -PassThru 2>&1
+Write-Debug "AutoHotkey script '$ahkScriptPath' executed."
 
-Write-Debug "Getting AutoHotKey process ID."
-$ahkProcessId = Get-ProcessId -CommandLine "$ahkScriptPath"
-Write-Debug "AutoHotKey process ID: '$ahkProcessId'."
+try {
+  Write-Debug "Getting AutoHotkey process ID."
+  $ahkProcessId = Get-ProcessId -CommandLine "$ahkScriptPath"
+  Write-Debug "AutoHotkey process ID: '$ahkProcessId'."
+} catch {
+  Write-Warning "Could not get AutoHotkey process ID.`n$_"
+}
 
 # Install
 # Installer path
@@ -122,12 +106,12 @@ try {
   Install-ChocolateyInstallPackage @packageArgs
 } catch {
   # Untested
-  Write-Warning "Installation failed. Terminating AutoHotKey script."
+  Write-Warning "Installation failed. Terminating AutoHotkey script."
   $errorMessage = $_
   try {
     Stop-Process -Id $ahkProcessId -Force
   } catch {
-    Write-Error "Could not terminate AutoHotKey script.`n$_"
+    Write-Error "Could not terminate AutoHotkey script.`n$_"
     throw
   }
   Write-Error "Could not install '$($packageName)'.`n$ErrorMessage"
