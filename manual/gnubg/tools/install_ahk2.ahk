@@ -30,7 +30,7 @@ HWND := WinWait("ahk_exe gnubg-cli.exe", , 720)
 if not HWND
     {
         ; Throw error if the window did not appear within the time limit
-        Throw "A windown from a 'gnubg-cli.exe' process did not appear within 12 minutes."
+        Throw "A window from a 'gnubg-cli.exe' process did not appear within 12 minutes."
     }
 ; Otherwise
 ; Hide the window
