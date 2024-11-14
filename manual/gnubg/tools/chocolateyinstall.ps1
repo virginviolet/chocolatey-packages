@@ -1,4 +1,24 @@
-﻿# Other steps for installing gnubg with Chocolatey
+﻿<#
+.SYNOPSIS
+Installs GNU Backgammon (GnuBG).
+
+.DESCRIPTION
+Chocolatey executes this script to install to GNU Backgammon (gnubg).  
+The script ensures that certain processes are not running before proceeding with the installation
+and uses AutoHotkey to hide the compiler window during the installation process.
+
+.NOTES
+- The script supports both AutoHotkey v1 and v2.
+
+.LINK
+https://community.chocolatey.org/packages/gnubg
+https://github.com/virginviolet/chocolatey-packages/tree/main/manual/gnubg
+
+.EXAMPLE
+choco install gnubg --source . -y
+
+Uninstalls the gnubg package.
+#>
 
 # Preferences
 $ErrorActionPreference = 'Stop' # stop on all errors

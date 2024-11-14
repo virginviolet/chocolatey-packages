@@ -1,11 +1,36 @@
 function Get-AutoHotkeyPath {
+    <#
+        .SYNOPSIS
+        Retrieves the path to an AutoHotkey executable.
+
+        .DESCRIPTION
+        This function retrieves the path to an AutoHotkey executable.  
+        autohotkey.portable is prioritized over other AutoHotkey installations.
+
+        .PARAMETER LibPath
+        The path to Chocolatey's lib directory where the autohotkey.portable package might be located. This parameter is mandatory and cannot be null or empty.
+
+        .EXAMPLE
+        $autoHotkeyPath = Get-AutoHotkeyPath -LibPath "C:\ProgramData\chocolatey\lib"
+        Retrieves the AutoHotkey executable path.
+    #>
     param (
         [Alias("Path")]
         [ValidateNotNullOrEmpty()]
         [Parameter(Mandatory = $true)]
         [string] $LibPath
     )
+    
     function Get-AutoHotkeyExePath {
+        <#
+            .SYNOPSIS
+            Retrieves the path to the AutoHotkey executable.
+
+            .DESCRIPTION
+            Searches for the AutoHotkey executable in the specified installation directory.
+            It checks for various common AutoHotkey executable names and returns the path
+            to the first executable it finds.
+        #>
         param (
             # Directory to search in
             [Alias("Path")]
@@ -32,13 +57,14 @@ function Get-AutoHotkeyPath {
         }
         Write-Debug "AutoHotkey executable not found in '$InstallDirPath'."
     }
+
     Write-Debug "Running Get-AutoHotkeyPath..."
     Write-Debug "Getting AutoHotkey path..."
+    # Look for autohotkey.portable
     $autoHotKeyPortableInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only AutoHotkey.portable)"
     if ($autoHotKeyPortableInstalled) {
         Write-Debug "AutoHotkey.portable found."
         try {
-            # [x] Test
             $autoHotKeyPath = Convert-Path -Path "$LibPath\AutoHotkey.portable\tools\AutoHotkey.exe"
             Write-Debug "AutoHotkey found at '$autoHotKeyPath'."
             Write-Debug "Get-AutoHotkeyPath has finished."
@@ -52,6 +78,7 @@ function Get-AutoHotkeyPath {
         }
     }
     if (-not $autoHotKeyPortableInstalled -or ($autoHotKeyPortableFailed)) {
+        # Look for autohotkey.install
         $autoHotKeyInstallInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only AutoHotkey.install)"
         if ($autoHotKeyInstallInstalled) {
             Write-Debug "AutoHotkey.install found."
@@ -60,6 +87,8 @@ function Get-AutoHotkeyPath {
         }
     }
     try {
+        # Find the installation path
+        # Look in the registry
         $regKeyPath = "REGISTRY::HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
         $regKeyValueName = "InstallDir"
         Write-Debug "Looking for AutoHotkey path in registry key '$regKeyPath'...".Replace("REGISTRY::", "")
@@ -69,7 +98,6 @@ function Get-AutoHotkeyPath {
             Write-Debug "AutoHotkey installation directory path '$installDir' found in the registry."
             $autoHotKeyPath = Get-AutoHotkeyExePath -InstallDirPath $installDir
             if ($autoHotKeyPath) {
-                # [x] Test
                 Write-Debug "AutoHotkey found at '$autoHotKeyPath'."
                 Write-Debug "Get-AutoHotkeyPath has finished."
                 return $autoHotKeyPath
@@ -87,20 +115,19 @@ function Get-AutoHotkeyPath {
         Write-Warning $_
     }
     Write-Warning "AutoHotkey not found in the registry."
+    # Search using Get-AppInstallLocation
     $installDir = Get-AppInstallLocation 'AutoHotkey*'
     if ($installDir) {
         $installDirExists = Test-Path ($installDir) -PathType Container
         if ($installDirExists) {
             $autoHotKeyPath = Get-AutoHotkeyExePath -InstallDirPath $installDir
             if ($autoHotKeyPath) {
-                # [x] Test
                 Write-Debug "AutoHotkey found at '$autoHotKeyPath'."
                 Write-Debug "Get-AutoHotkeyPath has finished."
                 return $autoHotKeyPath
             }
         }
     }
-    # [x] Test
     Write-Debug "Get-AutoHotkeyPath has finished."
     Write-Error "AutoHotkey not found."
     throw

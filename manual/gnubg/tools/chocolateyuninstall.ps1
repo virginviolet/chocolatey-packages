@@ -1,4 +1,29 @@
-﻿# Other steps for uninstalling gnubg with Chocolatey
+﻿<#
+  .SYNOPSIS
+  Uninstalls GNU Backgammon (GnuBG).
+
+  .DESCRIPTION
+  Chocolatey executes this script to uninstall GNU Backgammon (GnuBG).  
+  It ensures that no related processes are running before proceeding with the uninstallation.
+  Additionally, it temporary moves the GNU Backgammon preferences directories to prevent GUI prompts
+  during the uninstallation process.
+
+  .EXAMPLE
+  chooco uninstall gnubg -y
+  Uninstalls the gnubg package.
+
+  .NOTES
+  - The script prevents uninstallation if any related processes are running to avoid data loss.
+  - It moves the GNU Backgammon preferences directory to a temporary location before uninstallation
+    and restores it afterwards.
+  - It includes debug and verbose messages to provide detailed information during execution.
+
+  .LINK
+  https://community.chocolatey.org/packages/gnubg
+  https://github.com/virginviolet/chocolatey-packages/tree/main/manual/gnubg
+#>
+
+# Other steps for uninstalling gnubg with Chocolatey
 
 # Preferences
 $ErrorActionPreference = 'Stop' # Stop on all errors
