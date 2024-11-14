@@ -34,126 +34,68 @@ if ($PSVersionTable.PSVersion.Major -ge 5) {
   Start-CheckandStop "bearoffdump"
 }
 
-function Get-AutoHotkeyExePath {
-  param (
-    [string] $InstallDirPath
-  )
-  $executables = @(
-    'AutoHotkey.exe'
-    'AutoHotkeyU64.exe'
-    'AutoHotkeyA64.exe'
-    'AutoHotkeyU32.exe'
-    'AutoHotkeyA32.exe'
-  )
-  foreach ($executable in $executables) {
-    $autoHotKeyPathTestPath = Join-Path -Path -ChildPath $executable
-    if (Test-Path $autoHotKeyPathTestPath -PathType Leaf) {
-      Write-Debug "AutoHotKey found at '$autoHotKeyPath'."
-      return $autoHotKeyPathTestPath
-    }
-  }
-  Write-Debug "AutoHotKey not found."
-}
-
-# Get AutoHotKey path
-$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$exeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
+# Get AutoHotKey version
 if ($autoHotKeyPath) {
-  $autoHotKeyPathFound = $true
   Write-Debug "AutoHotKey path is set to '$autoHotKeyPath'."
-}
-if (-not $autoHotKeyPathFound) {
-  Write-Debug "Finding AutoHotKey path..."
-  $ahkPortableInstalled = choco list --limit-output -e autohotkey.portable
-  $ahkInstallInstalled = choco list --limit-output -e autohotkey.install
-} if ($ahkPortableInstalled) {
-  Write-Debug "autohotkey.portable is installed."
-  $libPath = Split-Path -Parent "$($packagePath)"
-  try {
-    $autoHotKeyPath = Convert-Path -Path "$libPath\tools\AutoHotkey\AutoHotkey.exe"
-    break
-  } catch [System.Management.Automation.CommandNotFoundException] {
-    if (-not $ahkInstallInstalled) {
-      Write-Error "AutoHotKey not found. Please reinstall autohotkey.portable.`n$_"
-    } else {
-      Write-Warning "AutoHotKey not found. Please reinstall autohotkey.portable.`n$_"
-    }
-  } catch {
-    if (-not $ahkInstallInstalled) {
-      Write-Error "$_"
-    } else {
-      Write-Warning "$_"
-    }
-  }
-  if ($ahkInstallInstalled) {
-    Write-Debug "autohotkey.install is installed."
-    try {
-      Write-Debug "Looking for AutoHotKey path in registry..."
-      $regKeyPath = "REGISTRY::HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
-      $regKeyValueName = "InstallDir"
-      $installDir = Get-ItemPropertyValue -Path $regKeyPath -Name $regKeyValueName
-      $installDirExists = Test-Path ($installDir) -PathType Container
-      if ($installDirExists) {
-        $autoHotKeyPath = Get-AutoHotkeyPath -Path $installDir
-        if ($autoHotKeyPath) {
-          Write-Warning "AutoHotKey path found in the registry."
-          break
-        }
-      }
-    } catch [System.Management.Automation.ItemNotFoundException] {
-      $message = "Could not get registry key.`n" + `
-        "The key '$Path' does not exist.`n$_"
-      Write-Warning $message
-    } catch [System.Management.Automation.PSArgumentException] {
-      $message = "Could not get registry key.`n" + 
-      "The key '$Path' does not have the value '$Name'.`n$_"
-      Write-Warning $message
-    } catch {
-      Write-Warning $_
-    }
-    Write-Warning "AutoHotKey not found in the registry."
-    $installDir = Get-AppInstallLocation 'AutoHotKey*'
-    if ($installDir) {
-      $installDirExists = Test-Path ($installDir) -PathType Container
-      if ($installDirExists) {
-        $autoHotKeyPath = Get-AutoHotkeyPath -Path $installDir
-        if ($autoHotKeyPath) {
-          break
-        }
-      }
-    }
-  }
-  Write-Error "AutoHotKey not found."
-}
-
-# Get the AutoHotKey version
-$ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
-if ($ahkVersionMajor -ge 2) {
-  Write-Debug "AutoHotKey >= 2.0"
-  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2ScriptPath"""
-  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+  $ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
+  Write-Debug "Autohotkey v$ahkVersionMajor found."
 } else {
-  Write-Debug "AutoHotKey < 2.0"
-  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
-  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+  $isAutoHotKeyPortableV2Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|2"
+  if ($isAutoHotKeyPortableV2Installed) {
+    # [x] Test
+    Write-Debug "autohot.portable v2 found."
+    $ahkVersionMajor = 2
+  } else {
+    $isAutoHotKeyPortableV1Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|1"
+    if ($isAutoHotKeyPortableV1Installed) {
+      # [x] Test
+      Write-Debug "autohot.portable v1 found."
+      $ahkVersionMajor = 1
+    }
+  }
+  if (-not $isAutoHotKeyPortableV2Installed -and -not $isAutoHotKeyPortableV1Installed) {
+    $isAutoHotKeyInstallV2Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)" -match "\|2"
+    if ($isAutoHotKeyInstallV2Installed) {
+      # [x] Test
+      Write-Debug "autohotkey.install v2 found."
+      $ahkVersionMajor = 2
+    } else {
+      $isAutoHotKeyInstallV1Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)" -match "\|1"
+      if ($isAutoHotKeyInstallV1Installed) {
+        # [x] Test
+        Write-Debug "autohotkey.install v1 found."
+        $ahkVersionMajor = 1
+      } else {
+        # [x] Test
+        Write-Warning "AutoHotKey not found."
+        Write-Warning "Setting AutoHotKey version to 2." # Try with 2 I guess
+        $ahkVersionMajor = 2
+      }
+    }
+  }
 }
 
 # Run AutoHotKey script that a hides the compiler window that appears during installation
-# Run the script correct script for the found version of AutoHotKey
+# Run the correct script for the correct AutoHotKey version
+$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
 $ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
-$ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
+
 if ($ahkVersionMajor -ge 2) {
   Write-Debug "AutoHotKey >= 2.0"
   $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2ScriptPath"""
-  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+  Start-Process -FilePath 'AutoHotKey' -ArgumentList $ahkStatements -NoNewWindow 2>&1
+  Write-Debug "AutoHotKey script '$ahk2ScriptPath' executed."
 } else {
   Write-Debug "AutoHotKey < 2.0"
   $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
-  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+  Start-Process -FilePath 'AutoHotKey' -ArgumentList $ahkStatements -NoNewWindow 2>&1
+  Write-Debug "AutoHotKey script '$ahk1ScriptPath' executed."
 }
 
 # Install
+# Installer path
+$exeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
 # Arguments
 $packageArgs = @{
   packageName    = "$($packageName)"
@@ -172,4 +114,5 @@ $packageArgs = @{
   validExitCodes = @(0) # Inno Setup
 }
 # Run the installer (will assert administrative rights)
+# IMPROVE Stop AutoHotKey script if install fails
 Install-ChocolateyInstallPackage @packageArgs

@@ -9,15 +9,15 @@ $ErrorActionPreference = 'Stop' # Stop on all errors
 # unless the feature suggested in the following issue is added:
 # https://github.com/chocolatey/choco/issues/1731
 # GUI version of the game
-Start-CheckandThrow "gnubg"
+Start-CheckandThrow -ProcessName "gnubg"
 # Command line version of the game
-Start-CheckandThrow "gnubg-cli"
+Start-CheckandThrow -ProcessName "gnubg-cli"
 # Bundled program for generating bearoff databases
-Start-CheckandThrow "makebearoff"
+Start-CheckandThrow -ProcessName "makebearoff"
 # Bundled program for generating databases for Hypergammon
-Start-CheckandThrow "makehyper"
+Start-CheckandThrow -ProcessName "makehyper"
 # Bundled program for generating a GNU Backgammon binary weights file
-Start-CheckandThrow "makeweights"
+Start-CheckandThrow -ProcessName "makeweights"
 
 # Close the following program if it is running
 # Bundled program for dumping a position from the
@@ -27,10 +27,10 @@ Start-CheckandThrow "makeweights"
 # in PowerShell > 5.0)
 if ($PSVersionTable.PSVersion.Major -ge 5) {
   Write-Debug "PowerShell >= 5.0"
-  Start-CheckandStop "bearoffdump" 6> $null
+  Start-CheckandStop -ProcessName "bearoffdump" 6> $null
 } else {
   Write-Debug "PowerShell < 5.0"
-  Start-CheckandStop "bearoffdump"
+  Start-CheckandStop -ProcessName "bearoffdump"
 }
 
 # Remove empty GNUbg preferences folders
@@ -43,7 +43,7 @@ $exists = Test-Path "$gnuBgPreferencesBackupDir" -PathType Container
 $empty = -not ([bool](Test-Path "$gnuBgPreferencesBackupDir\*"))
 if ($exists -and $empty) {
   Write-Debug "Empty GNU Backgammon preferences backup directory found. Removing..."
-  Remove-Item $gnuBgPreferencesBackupDir
+  Remove-Item -Path $gnuBgPreferencesBackupDir
   Write-Debug "Empty GNU Backgammon preferences backup directory removed."
 }
 # Remove '.gnubg/' directory if it is empty
@@ -51,7 +51,7 @@ $exists = Test-Path "$gnuBgPreferencesDir" -PathType Container
 $empty = -not ([bool](Test-Path "$gnuBgPreferencesDir\*"))
 if ($exists -and $empty) {
   Write-Debug "Empty GNU Backgammon preferences directory found. Removing..."
-  Remove-Item $gnuBgPreferencesDir
+  Remove-Item -Path $gnuBgPreferencesDir
   Write-Debug "Empty GNU Backgammon preferences directory removed."
 }
 
@@ -107,7 +107,7 @@ if ($keys.Count -eq 0) {
         Write-Error "$message"
       }
       Write-Verbose "Moving '.gnubg/' from '$env:UserProfile' to '$env:TEMP'..."
-      Move-Item $gnuBgPreferencesDir -Destination "$env:TEMP" -Force
+      Move-Item -Path $gnuBgPreferencesDir -Destination "$env:TEMP" -Force
       Write-Verbose "Moved '.gnubg/' from '$env:UserProfile' to '$env:TEMP'."
       $shouldRestorePrefsDir = $true
     } else {
@@ -127,12 +127,12 @@ if ($keys.Count -eq 0) {
       } finally {
         Write-Verbose "Restoring preferences directory..."
         Write-Verbose "Moving '.gnubg/' from '$env:TEMP' to '$env:UserProfile'..."
-        Move-Item $gnuBgPreferencesTempDir -Destination "$env:UserProfile" -Force
+        Move-Item -Path $gnuBgPreferencesTempDir -Destination "$env:UserProfile" -Force
         Write-Verbose "Moved '.gnubg/' from '$env:TEMP' to '$env:UserProfile'."
         Write-Verbose "Preferences directory restored."
       }
       # Inform user if preferences exists.
-      $exists = Test-Path "$gnuBgPreferencesDir" -PathType Container
+      $exists = Test-Path -Path "$gnuBgPreferencesDir" -PathType Container
       $message = "GNU Backgammon preferences directory remains.`n" `
         + "Manually remove it if you do not wish to keep it.`n" `
         + "GNU Backgammon preferences directory: $gnuBgPreferencesDir"
