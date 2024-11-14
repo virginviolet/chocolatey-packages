@@ -50,12 +50,12 @@ if ($autoHotKeyPath) {
 } else {
   $isAutoHotKeyPortableV2Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|2"
   if ($isAutoHotKeyPortableV2Installed) {
-    Write-Debug "autohot.portable v2 found."
+    Write-Debug "autohotkey.portable v2 found."
     $ahkVersionMajor = 2
   } else {
     $isAutoHotKeyPortableV1Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|1"
     if ($isAutoHotKeyPortableV1Installed) {
-      Write-Debug "autohot.portable v1 found."
+      Write-Debug "autohotkey.portable v1 found."
       $ahkVersionMajor = 1
     }
   }
