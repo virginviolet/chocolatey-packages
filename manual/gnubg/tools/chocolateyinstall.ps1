@@ -1,28 +1,46 @@
 ﻿<#
-.SYNOPSIS
-Installs GNU Backgammon (GnuBG).
+  .SYNOPSIS
+  Installs GNU Backgammon (GnuBG).
 
-.DESCRIPTION
-Chocolatey executes this script to install to GNU Backgammon (gnubg).  
-The script ensures that certain processes are not running before proceeding with the installation
-and uses AutoHotkey to hide the compiler window during the installation process.
+  .DESCRIPTION
+  Chocolatey executes this script to install to GNU Backgammon (gnubg).  
 
-.NOTES
-- The script supports both AutoHotkey v1 and v2.
+  .PARAMETER AutoHotkeyPath
+  Path to an AutoHotkey executable. This parameter is optional.
 
-.LINK
-https://community.chocolatey.org/packages/gnubg
-https://github.com/virginviolet/chocolatey-packages/tree/main/manual/gnubg
+  .NOTES
+  - The script supports both AutoHotkey v1 and v2.
 
-.EXAMPLE
-choco install gnubg --source . -y
+  .LINK
+  https://community.chocolatey.org/packages/gnubg
+  https://github.com/virginviolet/chocolatey-packages/tree/main/manual/gnubg
 
-Uninstalls the gnubg package.
+  .EXAMPLE
+  choco install gnubg --source . -y
+
+  Installs GNU Backgammon using Chocolatey.
+
+  .EXAMPLE
+  choco install gnubg --source . -y --params "'/AutoHotkeyPath:'C:\Program Files\AutoHotkey\AutoHotkey.exe''"
+
+  Installs GNU Backgammon using Chocolatey, with a custom AutoHotkey path.
+
+  .LINK
+  https://community.chocolatey.org/packages/gnubg
+  https://github.com/virginviolet/chocolatey-packages/tree/main/manual/gnubg
 #>
 
+# Other steps for installing gnubg with Chocolatey
+
+# Initialization
+$ErrorActionPreference = 'Stop' # Stop on all errors
+
+# Get package parameters
+$packageParameters = Get-PackageParameters
+$autoHotkeyPath = $packageParameters['AutoHotkeyPath']
+
 # Preferences
-$ErrorActionPreference = 'Stop' # stop on all errors
-# $autoHotKeyPath = 'C:\Program Files\AutoHotkey\AutoHotkey.exe'
+# $autoHotkeyPath = 'C:\Program Files\AutoHotkey\AutoHotkey.exe'
 
 # Prevent force install if any of these programs are running
 # (so that no progress is lost)
@@ -65,6 +83,11 @@ Write-Debug "Helper loaded."
 # Get AutoHotkey path
 if ($autoHotKeyPath) {
   Write-Debug "AutoHotkey path is set to '$autoHotKeyPath'."
+  $pathExists = Test-Path -Path $autoHotKeyPath -PathType Leaf
+  if (-not $pathExists) {
+    Write-Error "AutoHotkey path '$autoHotKeyPath' does not exist."
+    throw
+  }
 } else {
   Write-Debug "Loading helper 'Get-AutoHotkeyPath' from '$helpersPath'..."
   $getAutoHotkeyPath = Join-Path -Path $helpersPath -ChildPath 'Get-AutoHotkeyPath'
@@ -125,6 +148,7 @@ $packageArgs = @{
 try {
   Install-ChocolateyInstallPackage @packageArgs
 } catch {
+  # IMPROVE Handle Ctrl+C break event 
   # Untested
   Write-Warning "Installation failed. Terminating AutoHotkey script."
   $errorMessage = $_

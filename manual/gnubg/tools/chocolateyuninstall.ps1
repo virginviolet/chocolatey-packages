@@ -25,7 +25,7 @@
 
 # Other steps for uninstalling gnubg with Chocolatey
 
-# Preferences
+# Initialization
 $ErrorActionPreference = 'Stop' # Stop on all errors
 
 # Prevent uninstall if any of these programs are running
