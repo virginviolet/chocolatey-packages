@@ -55,11 +55,8 @@ function Get-AutoHotkeyExePath {
   Write-Debug "AutoHotKey not found."
 }
 
-
-
-# Run EXE installer
-# Start AutoHotKey script to hide compiler window
-$toolsDirPath = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+# Get AutoHotKey path
+$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $exeInstallerPath = Join-Path $toolsDirPath 'gnubg-1_08_003-20240428-setup.exe'
 if ($autoHotKeyPath) {
   $autoHotKeyPathFound = $true
@@ -67,57 +64,69 @@ if ($autoHotKeyPath) {
 }
 if (-not $autoHotKeyPathFound) {
   Write-Debug "Finding AutoHotKey path..."
+  $ahkPortableInstalled = choco list --limit-output -e autohotkey.portable
+  $ahkInstallInstalled = choco list --limit-output -e autohotkey.install
+} if ($ahkPortableInstalled) {
+  Write-Debug "autohotkey.portable is installed."
+  $libPath = Split-Path -Parent "$($packagePath)"
   try {
-    Write-Debug "Looking for AutoHotKey path in registry..."
-    $regKeyPath = "REGISTRY::HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
-    $regKeyValueName = "InstallDir"
-    $installDir = Get-ItemPropertyValue -Path $regKeyPath -Name $regKeyValueName
-    $exists = Test-Path ($installDir) -PathType Container
-    if ($exists) {
-      $autoHotKeyPath = Get-AutoHotkeyPath -Path $installDir
-      if ($autoHotKeyPath) {
-        $autoHotKeyPathFound = $true
-        Write-Debug "AutoHotKey path found in registry."
-        break
+    $autoHotKeyPath = Convert-Path -Path "$libPath\tools\AutoHotkey\AutoHotkey.exe"
+    break
+  } catch [System.Management.Automation.CommandNotFoundException] {
+    if (-not $ahkInstallInstalled) {
+      Write-Error "AutoHotKey not found. Please reinstall autohotkey.portable.`n$_"
+    } else {
+      Write-Warning "AutoHotKey not found. Please reinstall autohotkey.portable.`n$_"
+    }
+  } catch {
+    if (-not $ahkInstallInstalled) {
+      Write-Error "$_"
+    } else {
+      Write-Warning "$_"
+    }
+  }
+  if ($ahkInstallInstalled) {
+    Write-Debug "autohotkey.install is installed."
+    try {
+      Write-Debug "Looking for AutoHotKey path in registry..."
+      $regKeyPath = "REGISTRY::HKEY_LOCAL_MACHINE\SOFTWARE\AutoHotkey"
+      $regKeyValueName = "InstallDir"
+      $installDir = Get-ItemPropertyValue -Path $regKeyPath -Name $regKeyValueName
+      $installDirExists = Test-Path ($installDir) -PathType Container
+      if ($installDirExists) {
+        $autoHotKeyPath = Get-AutoHotkeyPath -Path $installDir
+        if ($autoHotKeyPath) {
+          Write-Warning "AutoHotKey path found in the registry."
+          break
+        }
+      }
+    } catch [System.Management.Automation.ItemNotFoundException] {
+      $message = "Could not get registry key.`n" + `
+        "The key '$Path' does not exist.`n$_"
+      Write-Warning $message
+    } catch [System.Management.Automation.PSArgumentException] {
+      $message = "Could not get registry key.`n" + 
+      "The key '$Path' does not have the value '$Name'.`n$_"
+      Write-Warning $message
+    } catch {
+      Write-Warning $_
+    }
+    Write-Warning "AutoHotKey not found in the registry."
+    $installDir = Get-AppInstallLocation 'AutoHotKey*'
+    if ($installDir) {
+      $installDirExists = Test-Path ($installDir) -PathType Container
+      if ($installDirExists) {
+        $autoHotKeyPath = Get-AutoHotkeyPath -Path $installDir
+        if ($autoHotKeyPath) {
+          break
+        }
       }
     }
-  } catch [System.Management.Automation.ItemNotFoundException] {
-    $message = "Could not get registry key.`n" + `
-      "The key '$Path' does not exist.`n$_"
-    Write-Debug $message
-  } catch [System.Management.Automation.PSArgumentException] {
-    $message = "Could not get registry key.`n" + 
-    "The key '$Path' does not have the value '$Name'.`n$_"
-    Write-Debug $message
-  } catch {
-    Write-Debug $_
   }
-  Write-Debug "AutoHotKey not found in registry."
-  try {
-    Write-Debug "Looking for AutoHotKey path with Get-Command..."
-    $autoHotKeyPath = $(Get-Command autohotkey).Source
-  } catch [System.Management.Automation.CommandNotFoundException] {
-    Write-Debug "AutoHotKey not found.`n$_"
-  } catch {
-    Write-Debug "$_"
-  }
-  Write-Debug "Looking for AutoHotKey Chocolatey install path..."
+  Write-Error "AutoHotKey not found."
 }
-$ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
-$ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
-# Get AutoHotKey path
-try {
-  $autoHotKeyPath = $(Get-Command autohotkey).Source
-  # Set custom AutoHotKey path (comment out previous line
-  # and uncomment next line)
-  # $autoHotKeyPath = "C:\Program Files\AutoHotkey\AutoHotkey.exe"
-} catch [System.Management.Automation.CommandNotFoundException] {
-  Write-Error "AutoHotKey not found.`n$_"
-} catch {
-  Write-Error "$_"
-}
-# Run AutoHotKey script that a hides window that appears during installation
-# Run the script correct script for the found version of AutoHotKey
+
+# Get the AutoHotKey version
 $ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
 if ($ahkVersionMajor -ge 2) {
   Write-Debug "AutoHotKey >= 2.0"
@@ -128,6 +137,23 @@ if ($ahkVersionMajor -ge 2) {
   $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
   Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
 }
+
+# Run AutoHotKey script that a hides the compiler window that appears during installation
+# Run the script correct script for the found version of AutoHotKey
+$ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
+$ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
+$ahkVersionMajor = $(Get-Command $autoHotKeyPath).Version.Major
+if ($ahkVersionMajor -ge 2) {
+  Write-Debug "AutoHotKey >= 2.0"
+  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2ScriptPath"""
+  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+} else {
+  Write-Debug "AutoHotKey < 2.0"
+  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
+  Start-Process "$autoHotKeyPath" -ArgumentList $ahkStatements -NoNewWindow 2>&1
+}
+
+# Install
 # Arguments
 $packageArgs = @{
   packageName    = "$($packageName)"
@@ -137,13 +163,13 @@ $packageArgs = @{
   softwareName   = 'GNU Backgammon*' # Name used in "Installed apps" or "Programs and Features".
   # Checksums
   checksum       = '68CD01D92A99E6EC4BDB5F544C14ECBFCC7D9119AFB0D2AC189698B309E62D06'
-  checksumType   = 'sha256' # Default is md5, can also be sha1, sha256 or sha512
-  # No 64-bit version has yet been made and published
+  checksumType   = 'sha256'
+  # No 64-bit version has yet been released
   # checksum64     = 'INSERT_CHECKSUM'
-  # checksumType64 = 'sha256' # Default is checksumType
+  # checksumType64 = 'sha256'
   silentArgs     = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-' # Inno Setup
   # Exit codes indicating success
   validExitCodes = @(0) # Inno Setup
 }
-# Installer, will assert administrative rights
+# Run the installer (will assert administrative rights)
 Install-ChocolateyInstallPackage @packageArgs
