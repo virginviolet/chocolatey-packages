@@ -10,15 +10,15 @@ $ErrorActionPreference = 'Stop' # stop on all errors
 # unless the feature suggested in the following issue is added:
 # https://github.com/chocolatey/choco/issues/1731
 # GUI version of the game
-Start-CheckandThrow "gnubg" > $null
+Start-CheckandThrow -ProcessName "gnubg"
 # Command line version of the game
-Start-CheckandThrow "gnubg-cli" > $null
+Start-CheckandThrow -ProcessName "gnubg-cli"
 # Bundled program for generating bearoff databases
-Start-CheckandThrow "makebearoff" > $null
+Start-CheckandThrow -ProcessName "makebearoff"
 # Bundled program for generating databases for Hypergammon
-Start-CheckandThrow "makehyper" > $null
+Start-CheckandThrow -ProcessName "makehyper"
 # Bundled program for generating a GNU Backgammon binary weights file
-Start-CheckandThrow "makeweights" > $null
+Start-CheckandThrow -ProcessName "makeweights"
 
 # Close the following program if it is running
 # Bundled program for dumping a position from the
@@ -28,11 +28,19 @@ Start-CheckandThrow "makeweights" > $null
 # in PowerShell > 5.0)
 if ($PSVersionTable.PSVersion.Major -ge 5) {
   Write-Debug "PowerShell >= 5.0"
-  Start-CheckandStop "bearoffdump" 6> $null
+  Start-CheckandStop -ProcessName "bearoffdump" 6> $null
 } else {
   Write-Debug "PowerShell < 5.0"
-  Start-CheckandStop "bearoffdump"
+  Start-CheckandStop -ProcessName "bearoffdump"
 }
+
+# Load helper to get process ID later
+$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$helpersPath = Join-Path -Path $toolsDirPath -ChildPath 'helpers'
+Write-Debug "Loading helper 'Get-ProcessId' from '$helpersPath'..."
+$getProcessIdPath = Join-Path -Path $helpersPath -ChildPath 'Get-ProcessId'
+. $getProcessIdPath
+Write-Debug "Helper loaded."
 
 # Get AutoHotKey version
 if ($autoHotKeyPath) {
@@ -42,13 +50,11 @@ if ($autoHotKeyPath) {
 } else {
   $isAutoHotKeyPortableV2Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|2"
   if ($isAutoHotKeyPortableV2Installed) {
-    # [x] Test
     Write-Debug "autohot.portable v2 found."
     $ahkVersionMajor = 2
   } else {
     $isAutoHotKeyPortableV1Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)" -match "\|1"
     if ($isAutoHotKeyPortableV1Installed) {
-      # [x] Test
       Write-Debug "autohot.portable v1 found."
       $ahkVersionMajor = 1
     }
@@ -56,17 +62,14 @@ if ($autoHotKeyPath) {
   if (-not $isAutoHotKeyPortableV2Installed -and -not $isAutoHotKeyPortableV1Installed) {
     $isAutoHotKeyInstallV2Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)" -match "\|2"
     if ($isAutoHotKeyInstallV2Installed) {
-      # [x] Test
       Write-Debug "autohotkey.install v2 found."
       $ahkVersionMajor = 2
     } else {
       $isAutoHotKeyInstallV1Installed = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)" -match "\|1"
       if ($isAutoHotKeyInstallV1Installed) {
-        # [x] Test
         Write-Debug "autohotkey.install v1 found."
         $ahkVersionMajor = 1
       } else {
-        # [x] Test
         Write-Warning "AutoHotKey not found."
         Write-Warning "Setting AutoHotKey version to 2." # Try with 2 I guess
         $ahkVersionMajor = 2
@@ -77,21 +80,22 @@ if ($autoHotKeyPath) {
 
 # Run AutoHotKey script that a hides the compiler window that appears during installation
 # Run the correct script for the correct AutoHotKey version
-$toolsDirPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$ahk1ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
-$ahk2ScriptPath = Join-Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
-
+$ahk1ScriptPath = Join-Path -Path $toolsDirPath -ChildPath 'install_ahk1.ahk'
+$ahk2ScriptPath = Join-Path -Path $toolsDirPath -ChildPath 'install_ahk2.ahk'
 if ($ahkVersionMajor -ge 2) {
   Write-Debug "AutoHotKey >= 2.0"
-  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk2ScriptPath"""
-  Start-Process -FilePath 'AutoHotKey' -ArgumentList $ahkStatements -NoNewWindow 2>&1
-  Write-Debug "AutoHotKey script '$ahk2ScriptPath' executed."
+  $ahkScriptPath = $ahk2ScriptPath
 } else {
   Write-Debug "AutoHotKey < 2.0"
-  $ahkStatements = "/ErrorStdOut=utf-8 ""$ahk1ScriptPath"""
-  Start-Process -FilePath 'AutoHotKey' -ArgumentList $ahkStatements -NoNewWindow 2>&1
-  Write-Debug "AutoHotKey script '$ahk1ScriptPath' executed."
+  $ahkScriptPath = $ahk1ScriptPath
 }
+$ahkStatements = "/ErrorStdOut=utf-8 ""$ahkScriptPath"""
+$ahkProcess = Start-Process -FilePath 'AutoHotKey' -ArgumentList $ahkStatements -NoNewWindow -PassThru 2>&1
+Write-Debug "AutoHotKey script '$ahk1ScriptPath' executed."
+
+Write-Debug "Getting AutoHotKey process ID."
+$ahkProcessId = Get-ProcessId -CommandLine "$ahkScriptPath"
+Write-Debug "AutoHotKey process ID: '$ahkProcessId'."
 
 # Install
 # Installer path
@@ -114,5 +118,19 @@ $packageArgs = @{
   validExitCodes = @(0) # Inno Setup
 }
 # Run the installer (will assert administrative rights)
-# IMPROVE Stop AutoHotKey script if install fails
-Install-ChocolateyInstallPackage @packageArgs
+
+try {
+  Install-ChocolateyInstallPackage @packageArgs
+} catch {
+  # Untested
+  Write-Warning "Installation failed. Terminating AutoHotKey script."
+  $errorMessage = $_
+  try {
+    Stop-Process -Id $ahkProcessId -Force
+  } catch {
+    Write-Error "Could not terminate AutoHotKey script.`n$_"
+    throw
+  }
+  Write-Error "Could not install '$($packageName)'.`n$ErrorMessage"
+  throw
+}
