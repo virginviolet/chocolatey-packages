@@ -118,7 +118,6 @@ $packageArgs = @{
   validExitCodes = @(0) # Inno Setup
 }
 # Run the installer (will assert administrative rights)
-
 try {
   Install-ChocolateyInstallPackage @packageArgs
 } catch {
