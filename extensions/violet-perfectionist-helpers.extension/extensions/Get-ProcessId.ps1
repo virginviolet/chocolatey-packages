@@ -8,7 +8,7 @@ function Get-ProcessId {
     $CommandLine
   )
   if ($Name) {
-    $processIds = Get-WmiObject Win32_Process | Where-Object {
+    $processIds = Get-CimInstance Win32_Process | Where-Object {
       $_.Name -like $Name
     } | ForEach-Object {
       Write-Output "$($_.ProcessId)"
@@ -17,7 +17,7 @@ function Get-ProcessId {
     # Escape characters for the path (by no means complete)
     $commandLineEscaped = $CommandLine -replace '\\', '\\' `
       -replace ':', '\:' -replace '\(', '\(' -replace '\)', '\)'
-    $processIds = Get-WmiObject Win32_Process | Where-Object {
+    $processIds = Get-CimInstance Win32_Process | Where-Object {
       $_.CommandLine -match $commandLineEscaped
     } | ForEach-Object {
       Write-Output "$($_.ProcessId)"

@@ -14,13 +14,13 @@ function Get-ProcessName {
     $CommandLine
   )
   if ($Name) {
-    $processNames = Get-WmiObject Win32_Process | Where-Object {
+    $processNames = Get-CimInstance Win32_Process | Where-Object {
       $_.Name -like $Name
     } | ForEach-Object {
       Write-Output "$($_.Name)"
     }
   } elseif ($Id) {
-    $processNames = Get-WmiObject Win32_Process | Where-Object {
+    $processNames = Get-CimInstance Win32_Process | Where-Object {
       $_.ProcessId -eq $Id
     } | ForEach-Object {
       Write-Output "$($_.Name)"
@@ -29,7 +29,7 @@ function Get-ProcessName {
     # Escape characters for the path (by no means complete)
     $commandLineEscaped = $CommandLine -replace '\\', '\\' `
       -replace ':', '\:' -replace '\(', '\(' -replace '\)', '\)'
-    $processNames = Get-WmiObject Win32_Process | Where-Object {
+    $processNames = Get-CimInstance Win32_Process | Where-Object {
       $_.CommandLine -match $commandLineEscaped
     } | ForEach-Object {
       Write-Output "$($_.Name)"
