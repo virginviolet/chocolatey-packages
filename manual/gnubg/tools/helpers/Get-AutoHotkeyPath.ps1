@@ -61,16 +61,16 @@ function Get-AutoHotkeyPath {
     Write-Debug "Running Get-AutoHotkeyPath..."
     Write-Debug "Getting AutoHotkey path..."
     # Look for autohotkey.portable
-    $autoHotKeyPortableInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only AutoHotkey.portable)"
+    $autoHotKeyPortableInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)"
     if ($autoHotKeyPortableInstalled) {
-        Write-Debug "AutoHotkey.portable found."
+        Write-Debug "autohotkey.portable found."
         try {
-            $autoHotKeyPath = Convert-Path -Path "$LibPath\AutoHotkey.portable\tools\AutoHotkey.exe"
+            $autoHotKeyPath = Convert-Path -Path "$LibPath\autohotkey.portable\tools\AutoHotkey.exe"
             Write-Debug "AutoHotkey found at '$autoHotKeyPath'."
             Write-Debug "Get-AutoHotkeyPath has finished."
             return $autoHotKeyPath
         } catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Warning "AutoHotkey not found. Please reinstall AutoHotkey.portable.`n$_"
+            Write-Warning "AutoHotkey not found. Please reinstall autohotkey.portable.`n$_"
             $autoHotKeyPortableFailed = $true
         } catch {
             Write-Warning "Could not get AutoHotkey path`n$_"
@@ -79,9 +79,9 @@ function Get-AutoHotkeyPath {
     }
     if (-not $autoHotKeyPortableInstalled -or ($autoHotKeyPortableFailed)) {
         # Look for autohotkey.install
-        $autoHotKeyInstallInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only AutoHotkey.install)"
+        $autoHotKeyInstallInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)"
         if ($autoHotKeyInstallInstalled) {
-            Write-Debug "AutoHotkey.install found."
+            Write-Debug "autohotkey.install found."
         } else {
             Write-Error "AutoHotkey not found."
         }
