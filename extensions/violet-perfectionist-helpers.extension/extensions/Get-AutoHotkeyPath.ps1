@@ -7,19 +7,10 @@ function Get-AutoHotkeyPath {
         This function retrieves the path to an AutoHotkey executable.  
         autohotkey.portable is prioritized over other AutoHotkey installations.
 
-        .PARAMETER LibPath
-        The path to Chocolatey's lib directory where the autohotkey.portable package might be located. This parameter is mandatory and cannot be null or empty.
-
         .EXAMPLE
-        $autoHotkeyPath = Get-AutoHotkeyPath -LibPath "C:\ProgramData\chocolatey\lib"
+        $autoHotkeyPath = Get-AutoHotkeyPath
         Retrieves the AutoHotkey executable path.
     #>
-    param (
-        [Alias("Path")]
-        [ValidateNotNullOrEmpty()]
-        [Parameter(Mandatory = $true)]
-        [string] $LibPath
-    )
     
     function Get-AutoHotkeyExePath {
         <#
@@ -58,19 +49,23 @@ function Get-AutoHotkeyPath {
         Write-Debug "AutoHotkey executable not found in '$InstallDirPath'."
     }
 
+    # IMPROVE Make it possible to prioritize v1 or v2
     Write-Debug "Running Get-AutoHotkeyPath..."
     Write-Debug "Getting AutoHotkey path..."
     # Look for autohotkey.portable
-    $autoHotKeyPortableInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only AutoHotkey.portable)"
+    $autoHotKeyPortableInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.portable)"
     if ($autoHotKeyPortableInstalled) {
-        Write-Debug "AutoHotkey.portable found."
+        Write-Debug "autohotkey.portable found."
         try {
-            $autoHotKeyPath = Convert-Path -Path "$LibPath\AutoHotkey.portable\tools\AutoHotkey.exe"
+            $chocolateyDirPath = $Env:ChocolateyInstall
+            $libPath = Join-Path -Path $chocolateyDirPath -ChildPath 'lib'
+
+            $autoHotKeyPath = Convert-Path -Path "$LibPath\autohotkey.portable\tools\AutoHotkey.exe"
             Write-Debug "AutoHotkey found at '$autoHotKeyPath'."
             Write-Debug "Get-AutoHotkeyPath has finished."
             return $autoHotKeyPath
         } catch [System.Management.Automation.CommandNotFoundException] {
-            Write-Warning "AutoHotkey not found. Please reinstall AutoHotkey.portable.`n$_"
+            Write-Warning "AutoHotkey not found. Please reinstall autohotkey.portable.`n$_"
             $autoHotKeyPortableFailed = $true
         } catch {
             Write-Warning "Could not get AutoHotkey path`n$_"
@@ -79,9 +74,9 @@ function Get-AutoHotkeyPath {
     }
     if (-not $autoHotKeyPortableInstalled -or ($autoHotKeyPortableFailed)) {
         # Look for autohotkey.install
-        $autoHotKeyInstallInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only AutoHotkey.install)"
+        $autoHotKeyInstallInstalled = "$(Choco List -LimitOutput -Exact -By-Id-Only autohotkey.install)"
         if ($autoHotKeyInstallInstalled) {
-            Write-Debug "AutoHotkey.install found."
+            Write-Debug "autohotkey.install found."
         } else {
             Write-Error "AutoHotkey not found."
         }
