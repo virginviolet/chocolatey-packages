@@ -12,12 +12,14 @@ function Get-ProcessName {
 
     [parameter(Mandatory = $true, Position = 0, ParameterSetName = "Id")]
     [parameter(Mandatory = $true, Position = 1, ParameterSetName = "NameAndId")]
+    [parameter(Mandatory = $true, Position = 1, ParameterSetName = "IdAndCommandLine")]
     [parameter(Mandatory = $true, Position = 1, ParameterSetName = "NameIdAndCommandLine")]
     [Int32]
     $Id,
 
     [parameter(Mandatory = $true, Position = 0, ParameterSetName = "CommandLine")]
     [parameter(Mandatory = $true, Position = 1, ParameterSetName = "NameAndCommandLine")]
+    [parameter(Mandatory = $true, Position = 1, ParameterSetName = "IdAndCommandLine")]
     [parameter(Mandatory = $true, Position = 2, ParameterSetName = "NameIdAndCommandLine")]
     [string]
     $CommandLine
@@ -46,30 +48,27 @@ function Get-ProcessName {
     return $escapedString
   }
 
-  if ($CommandLine) {
-  }
-
   if ($Name) {
     $processNames = Get-CimInstance Win32_Process | Where-Object {
       $_.Name -like $Name
     } | ForEach-Object {
       Write-Output "$($_.Name)"
     }
-    if ($null -ne $processNames) {
-      $nameSucceeded = $true
+    if ($null -eq $processNames) {
+      $nameFailed = $true
     }
 
-  } if ($Id -and -not $nameSucceeded) {
+  } if ($Id -and -not $nameFailed) {
     $processNames = Get-CimInstance Win32_Process | Where-Object {
       $_.ProcessId -eq $Id
     } | ForEach-Object {
       Write-Output "$($_.Name)"
     }
-    if ($null -ne $processNames) {
-      $idSucceeded = $true
+    if ($null -eq $processNames) {
+      $idFailed = $true
     }
 
-  } if ($CommandLine -and -not $nameSucceeded -and -not $idSucceeded) {
+  } if ($CommandLine -and -not $nameFailed -and -not $idFailed) {
     $commandLineEscaped = ConvertTo-EscapedString -String $CommandLine
     $processNames = Get-CimInstance Win32_Process | Where-Object {
       $_.CommandLine -match $commandLineEscaped
@@ -93,6 +92,3 @@ function Get-ProcessName {
 # Write-Host "Process name: '$process'"
 
 # TODO Add a parameter to pick last match, first match, or a specific number.
-
-$processes = (Get-ProcessName -CommandLine 'matid' -Name 'Notepad++.exe')
-echo $processes
