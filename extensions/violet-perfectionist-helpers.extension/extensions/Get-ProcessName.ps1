@@ -1,6 +1,6 @@
 # Sometimes, a process has an automatically generated name,
 # but the name can sometimes be found by looking for
-# the process's Commard Line property, which is what this function does.
+# the process's Command Line property, which is what this function does.
 function Get-ProcessName {
   param (
     [parameter(Mandatory = $true, Position = 0, ParameterSetName = "Name")]
@@ -48,33 +48,31 @@ function Get-ProcessName {
     return $escapedString
   }
 
+  # Get all processes
+  $allProcesses = Get-CimInstance Win32_Process
+
   if ($Name) {
-    $processNames = Get-CimInstance Win32_Process | Where-Object {
-      $_.Name -like $Name
-    } | ForEach-Object {
-      Write-Output "$($_.Name)"
-    }
+    $processNames = $allProcesses |
+      Where-Object { $_.Name -like $Name } |
+      ForEach-Object { Write-Output "$($_.Name)" }
     if ($null -eq $processNames) {
       $nameFailed = $true
     }
+  }
 
-  } if ($Id -and -not $nameFailed) {
-    $processNames = Get-CimInstance Win32_Process | Where-Object {
-      $_.ProcessId -eq $Id
-    } | ForEach-Object {
-      Write-Output "$($_.Name)"
-    }
+  if ($Id -and -not $nameFailed) {
+    $processNames = $allProcesses |
+      Where-Object { $_.ProcessId -eq $Id } |
+      ForEach-Object { Write-Output "$($_.Name)" }
     if ($null -eq $processNames) {
       $idFailed = $true
     }
+  }
 
-  } if ($CommandLine -and -not $nameFailed -and -not $idFailed) {
+  if ($CommandLine -and -not $nameFailed -and -not $idFailed) {
     $commandLineEscaped = ConvertTo-EscapedString -String $CommandLine
-    $processNames = Get-CimInstance Win32_Process | Where-Object {
-      $_.CommandLine -match $commandLineEscaped
-    } | ForEach-Object {
-      Write-Output "$($_.Name)"
-    }
+    $processNames = $allProcesses | Where-Object { $_.CommandLine -match $commandLineEscaped } |
+      ForEach-Object { Write-Output "$($_.Name)" }
   }
   # Return an object containing one or many strings
   return $processNames
