@@ -23,9 +23,9 @@ function Test-RegistryKey {
   $null -ne $Path) {
     # $pathFriendly = $Path
     $Path = $Path.Insert(0, "REGISTRY::")
-  } else {
+  } <# else {
     $pathFriendly = $Path.Replace("REGISTRY::", "")
-  }
+  } #>
 
   # Calls to these functions need to be placed inside a try-catch block,
   # Otherwise, they aren't really testing anything.
