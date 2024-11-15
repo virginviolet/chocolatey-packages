@@ -72,24 +72,18 @@ function Get-ProcessId {
     return $escapedString
   }
 
-  $allProcesses = Get-CimInstance Win32_Process
-  if ($CommandLine) {
-    $commandLineEscaped = ConvertTo-EscapedString -String $CommandLine
-  }
-
-  if ($Name -and $CommandLine) {
-    $processIds = $allProcesses |
-      Where-Object { $_.Name -like $Name -and $_.CommandLine -match $commandLineEscaped } |
-      ForEach-Object { Write-Output "$($_.ProcessId)" }
-
-  } elseif ($CommandLine) {
-    $processIds = $allProcesses |
-      Where-Object { $_.CommandLine -match $commandLineEscaped } |
-      ForEach-Object { Write-Output "$($_.ProcessId)" }
-
-  } elseif ($Name) {
+  if ($Name) {
     $processIds = $allProcesses |
       Where-Object { $_.Name -like $Name } |
+      ForEach-Object { Write-Output "$($_.ProcessId)" }
+    if ($null -eq $processIds) {
+      $nameFailed = $true
+    }
+
+  } if ($CommandLine -and -not $nameFailed) {
+    $commandLineEscaped = ConvertTo-EscapedString -String $CommandLine
+    $processIds = $allProcesses |
+      Where-Object { $_.CommandLine -match $commandLineEscaped } |
       ForEach-Object { Write-Output "$($_.ProcessId)" }
   }
 
