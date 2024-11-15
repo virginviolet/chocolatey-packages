@@ -153,7 +153,7 @@ function Get-RegistryKeyValueData {
     #region Error Handling
   } catch [System.Management.Automation.ItemNotFoundException] {
     $message = "Could not retrieve registry key value.`n" + `
-    "The key '$pathFriendly' does not exist.`n$_"
+    "The key '$Path' does not exist.`n$_"
     Write-Error $message
     Write-Debug $hasFinishedMessage
   } catch {
