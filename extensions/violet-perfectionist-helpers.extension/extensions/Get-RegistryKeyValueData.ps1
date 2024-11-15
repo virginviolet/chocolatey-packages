@@ -1,4 +1,6 @@
 function Get-RegistryKeyValueData {
+  #region Help
+
   <#
   .SYNOPSIS
   Retrieves the value data from a value in a registry key, or an array of all value data in a registry key.
@@ -30,6 +32,9 @@ function Get-RegistryKeyValueData {
   If the specified registry key or value does not exist, an error message will be displayed.
   #>
 
+  #endregion
+  
+  #region Parameters
   param (
     [Alias("KeyPath")]
     [Alias("Key")]
@@ -44,8 +49,17 @@ function Get-RegistryKeyValueData {
     [string]
     $Name
   )
+  #endregion
 
+  #region Sub-function
   function Get-ValueData {
+    <#
+      .SYNOPSIS
+      Retrieves the data of a value from a registry key.
+
+      .DESCRIPTION
+      The Get-ValueData function retrieves the data of a specified value from a key in the registry.
+    #>
     param (
       # Key path
       [parameter(Mandatory = $true, Position = 0)]
@@ -81,13 +95,15 @@ function Get-RegistryKeyValueData {
     } catch {
       Write-Error "Could not retrieve registry key value data.`n$_"
     }
-    
   }
+  #endregion
 
-  # Write-Debug "Get-RegistryKeyValueData started."
-  $hasFinishedMessage = "Get-RegistryKeyValueData has finished."
 
   try {
+    #region Preparations
+    # Write-Debug "Get-RegistryKeyValueData started."
+    # $hasFinishedMessage = "Get-RegistryKeyValueData has finished."
+
     Write-Debug "Validating the registry key path '$Path'."
     if (-not $Path.StartsWith("REGISTRY::")) {
       $Path = $Path.Insert(0,"REGISTRY::")
@@ -103,7 +119,9 @@ function Get-RegistryKeyValueData {
     $pathFriendly = $pathFriendly.Replace("HKEY_USERS", "HKU")
     $pathFriendly = $pathFriendly.Replace("HKEY_CURRENT_CONFIG", "HKCC")
     Write-Debug "Key '$pathFriendly' found."
+    #endregion
 
+    #region Main
     if ($Name) {
       $valueData = Get-ValueData -KeyPath $pathResolved -ValueName $Name -KeyPathFriendly $pathFriendly
       # Write-Debug $hasFinishedMessage
@@ -130,6 +148,9 @@ function Get-RegistryKeyValueData {
       # Write-Debug $hasFinishedMessage
       return $keyData
     }
+    #endregion
+
+    #region Error Handling
   } catch [System.Management.Automation.ItemNotFoundException] {
     $message = "Could not retrieve registry key value.`n" + `
     "The key '$pathFriendly' does not exist.`n$_"
@@ -139,8 +160,10 @@ function Get-RegistryKeyValueData {
     Write-Error "Could not retrieve registry key value.`n$_"
     # Write-Debug $hasFinishedMessage
   }
+  #endregion
 }
 
+#region Aliases
 New-Alias -Name Get-RegKeyValueData -Value Get-RegistryKeyValueData -Scope Global
 New-Alias -Name Get-RegistryKeyData -Value Get-RegistryKeyValueData -Scope Global
 New-Alias -Name Get-RegKeyData -Value Get-RegistryKeyValueData -Scope Global
@@ -148,3 +171,4 @@ New-Alias -Name Get-RegistryKeyValueDatum -Value Get-RegistryKeyValueData -Scope
 New-Alias -Name Get-RegKeyValueDatum -Value Get-RegistryKeyValueData -Scope Global
 New-Alias -Name Get-RegistryKeyDatum -Value Get-RegistryKeyValueData -Scope Global
 New-Alias -Name Get-RegKeyDatum -Value Get-RegistryKeyValueData -Scope Global
+#endregion
