@@ -80,6 +80,9 @@ Manually delete the [name] directory if you do not wish to keep the data.
     <projectSourceUrl>https://github.com/virginviolet/chocolatey-packages/tree/main/extensions/violet-perfectionist-helpers.extension</projectSourceUrl>
     <docsUrl>https://github.com/virginviolet/chocolatey-packages/blob/main/extensions/violet-perfectionist-helpers.extension/README.md</docsUrl>
     <bugTrackerUrl>https://github.com/virginviolet/chocolatey-packages/issues</bugTrackerUrl>
+    <dependencies>
+      <dependency id="chocolatey-core.extension" version="1.3.3" /> <!-- Required for Get-AppInstallLocation in Get-AutoHotkeyPath -->
+    </dependencies>
   </metadata>
   <files>
     <file src="README.md" target="README.md" />
